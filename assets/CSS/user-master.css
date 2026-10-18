@@ -1,0 +1,474 @@
+/* ==========================================================================
+   SkillLinkX - Candidate Master Layout CSS (user-master.css)
+   Desktop Grid System: Fixed Sidebar (250px) + Scrollable Body Area
+   Exact Figma Design
+   ========================================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+    background-color: #F8FAFC;
+    color: #0F172A;
+    min-height: 100vh;
+}
+
+/* Desktop Grid Layout: Fixed 260px Sidebar + Independent Scroll Body */
+.user-layout-grid {
+    display: block;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* Left Sidebar (260px) - Fixed on Desktop */
+.user-sidebar {
+    background-color: #FFFFFF;
+    border-right: 1px solid #E2E8F0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 260px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Sidebar Brand / Logo - Prominent & Centered */
+.sidebar-brand {
+    padding: 22px 18px 18px;
+    flex-shrink: 0;
+}
+
+.sidebar-logo-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.sidebar-logo-img {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 9px;
+}
+
+.sidebar-text-stack {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.sidebar-logo-text {
+    font-size: 21px;
+    font-weight: 800;
+    color: #0040A2;
+    line-height: 1.1;
+    letter-spacing: -0.4px;
+}
+
+.sidebar-logo-sub {
+    font-size: 9.5px;
+    font-weight: 800;
+    color: #334155;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-top: 3px;
+    line-height: 1;
+}
+
+/* Primary Action Box: "Search a job" button */
+.sidebar-action-box {
+    padding: 0 14px 14px;
+    flex-shrink: 0;
+}
+
+.btn-sidebar-search-job {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #0040A2;
+    color: #FFFFFF;
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 9.5px 16px;
+    border-radius: 7px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-sidebar-search-job:hover {
+    background-color: #002D72;
+}
+
+.btn-sidebar-search-job i {
+    font-size: 13px;
+}
+
+/* Sidebar Navigation Links - Clean, standard Figma sizing */
+.sidebar-nav {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0 10px 14px;
+    overflow-y: auto;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background-color: #E2E8F0;
+    border-radius: 4px;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8.5px 14px;
+    color: #475569;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+}
+
+.sidebar-link i {
+    font-size: 14px;
+    width: 18px;
+    text-align: center;
+    color: #475569;
+}
+
+.sidebar-link:hover {
+    background-color: #F1F5F9;
+    color: #0F172A;
+}
+
+/* Active solid blue rounded item */
+.sidebar-link.active {
+    background-color: #0052CC;
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
+.sidebar-link.active i {
+    color: #FFFFFF;
+}
+
+/* Sidebar Footer (Help Center & Logout) */
+.sidebar-footer {
+    margin-top: auto;
+    padding: 12px 12px 16px;
+    border-top: 1px solid #F1F5F9;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background-color: #FFFFFF;
+    flex-shrink: 0;
+}
+
+.sidebar-footer-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8.5px 14px;
+    color: #475569;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.sidebar-footer-link i {
+    font-size: 14px;
+    width: 18px;
+    text-align: center;
+    color: #475569;
+}
+
+.sidebar-footer-link:hover {
+    background-color: #F1F5F9;
+    color: #0F172A;
+}
+
+.sidebar-footer-link.logout {
+    color: #DC2626;
+    margin-top: 4px;
+}
+
+.sidebar-footer-link.logout i {
+    color: #DC2626;
+}
+
+.sidebar-footer-link.logout:hover {
+    background-color: #FEF2F2;
+    color: #B91C1C;
+}
+
+/* Right Body */
+.user-main-area {
+    margin-left: 260px;
+    width: calc(100% - 260px);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 100vh;
+}
+
+/* Topbar Header */
+.user-topbar {
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #E2E8F0;
+    padding: 10px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.sidebar-toggle-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #1E293B;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+/* Search bar */
+.topbar-search {
+    position: relative;
+    width: 440px;
+    max-width: 100%;
+}
+
+.topbar-search i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94A3B8;
+    font-size: 13.5px;
+}
+
+.topbar-search input {
+    width: 100%;
+    padding: 8.5px 14px 8.5px 38px;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #0F172A;
+    background-color: #FFFFFF;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.topbar-search input:focus {
+    border-color: #0052CC;
+}
+
+/* Right actions */
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.topbar-icon-btn {
+    position: relative;
+    background: none;
+    border: none;
+    color: #475569;
+    font-size: 17px;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.topbar-icon-btn:hover {
+    color: #0052CC;
+}
+
+.badge-unread-count {
+    position: absolute;
+    top: -4px;
+    right: -6px;
+    background-color: #DC2626;
+    color: #FFFFFF;
+    font-size: 9.5px;
+    font-weight: 700;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+/* User Profile avatar dropdown */
+.topbar-user-profile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.topbar-user-profile:hover {
+    background-color: #F1F5F9;
+}
+
+.user-avatar-img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: 50% 15%;
+    border: 1px solid #CBD5E1;
+}
+
+.user-name-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0F172A;
+}
+
+.profile-dropdown-arrow {
+    font-size: 10px;
+    color: #64748B;
+}
+
+/* Content Area */
+.user-content-wrapper {
+    padding: 28px 32px 48px;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+/* Mobile Overlay */
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(15, 23, 42, 0.4);
+    z-index: 998;
+    backdrop-filter: blur(2px);
+}
+
+.sidebar-backdrop.show {
+    display: block;
+}
+
+/* Responsive Breakpoints - Identical to Company Portal */
+@media (max-width: 900px) {
+    .user-layout-grid {
+        display: block;
+    }
+
+    .user-main-area {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .sidebar-toggle-btn {
+        display: block;
+    }
+
+    .user-sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 260px;
+        height: 100vh;
+        z-index: 999;
+        overflow-y: auto;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .user-sidebar.open,
+    .user-sidebar.show {
+        left: 0;
+    }
+
+    .user-topbar {
+        padding: 12px 18px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 56px;
+        z-index: 900;
+        background-color: #FFFFFF;
+        box-sizing: border-box;
+    }
+
+    .topbar-search {
+        width: auto;
+        flex-grow: 1;
+    }
+
+    .user-content-wrapper {
+        padding: 14px 12px;
+        margin-top: 56px;
+        min-width: 0;
+        max-width: 100vw;
+        overflow-x: hidden;
+        box-sizing: border-box;
+    }
+}
+
+@media (max-width: 600px) {
+    .user-topbar {
+        padding: 10px 14px;
+        gap: 10px;
+        position: fixed;
+    }
+
+    .user-name-text,
+    .profile-dropdown-arrow {
+        display: none;
+    }
+
+    .user-content-wrapper {
+        padding: 12px 10px;
+        margin-top: 56px;
+    }
+}

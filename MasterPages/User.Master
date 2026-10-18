@@ -1,0 +1,178 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="User.master.cs" Inherits="SkillLinksX.MasterPages.User" %>
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkillLinkX - Candidate Portal</title>
+
+    <!-- Font-Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="<%= ResolveUrl("~/assets/CSS/user-master.css") %>" />
+    <link rel="stylesheet" href="<%= ResolveUrl("~/assets/CSS/user-pages.css") %>" />
+
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <!-- Mobile Dim Overlay Backdrop -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+        <!-- Desktop Grid Layout (260px Sidebar / 1fr Body) -->
+        <div class="user-layout-grid">
+            
+            <!-- Left Sidebar -->
+            <aside class="user-sidebar" id="userSidebar">
+                <!-- Brand / Logo -->
+                <div class="sidebar-brand">
+                    <a href="<%= ResolveUrl("~/User/Dashboard.aspx") %>" class="sidebar-logo-link">
+                        <img src='<%= ResolveUrl("~/assets/images/logo.svg") %>' alt="SkillLinkX Logo" class="sidebar-logo-img" />
+                        <div class="sidebar-text-stack">
+                            <span class="sidebar-logo-text">SkillLinkX</span>
+                            <span class="sidebar-logo-sub">PROFESSIONAL HUB</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Primary Action Button: Search a job -->
+                <div class="sidebar-action-box">
+                    <a href="<%= ResolveUrl("~/User/Jobs.aspx") %>" class="btn-sidebar-search-job">
+                        <i class="fa-solid fa-magnifying-glass"></i> Search a job
+                    </a>
+                </div>
+
+                <!-- Navigation Menu Links -->
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li>
+                            <a href="<%= ResolveUrl("~/User/Dashboard.aspx") %>" class="sidebar-link active">
+                                <i class="fa-solid fa-table-cells-large"></i> Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/User/Profile.aspx") %>" class="sidebar-link">
+                                <i class="fa-regular fa-user"></i> My Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/User/Portfolio.aspx") %>" class="sidebar-link">
+                                <i class="fa-regular fa-folder-open"></i> Portfolio
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/User/Internships.aspx") %>" class="sidebar-link">
+                                <i class="fa-solid fa-graduation-cap"></i> Internships
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/User/Applications.aspx") %>" class="sidebar-link">
+                                <i class="fa-solid fa-clipboard-list"></i> Applications
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/User/SavedOpportunities.aspx") %>" class="sidebar-link">
+                                <i class="fa-regular fa-bookmark"></i> Saved Opportunities
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/User/Networking.aspx") %>" class="sidebar-link">
+                                <i class="fa-solid fa-user-group"></i> Networking
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/User/Messages.aspx") %>" class="sidebar-link">
+                                <i class="fa-regular fa-message"></i> Messages
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/User/Notifications.aspx") %>" class="sidebar-link">
+                                <i class="fa-regular fa-bell"></i> Notifications
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/User/CareerAssistant.aspx") %>" class="sidebar-link">
+                                <i class="fa-solid fa-brain"></i> AI Career Assistant
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/User/Settings.aspx") %>" class="sidebar-link">
+                                <i class="fa-solid fa-gear"></i> Settings
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- Sidebar Footer Links -->
+                <div class="sidebar-footer">
+                    <a href="<%= ResolveUrl("~/User/HelpCenter.aspx") %>" class="sidebar-footer-link">
+                        <i class="fa-regular fa-circle-question"></i> Help Center
+                    </a>
+                    <a href="<%= ResolveUrl("~/Public/Login.aspx") %>" class="sidebar-footer-link logout">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Right Body -->
+            <div class="user-main-area">
+                
+                <!-- Top Header Bar -->
+                <header class="user-topbar">
+                    <!-- Left: Mobile Toggle -->
+                    <button type="button" class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Navigation">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+
+                    <!-- Search Input -->
+                    <div class="topbar-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" placeholder="Search jobs, internships, people..." />
+                    </div>
+
+                    <!-- Right: Quick Actions & Profile -->
+                    <div class="topbar-actions">
+                        <!-- Notification Bell -->
+                        <a href="<%= ResolveUrl("~/User/Notifications.aspx") %>" class="topbar-icon-btn" title="Notifications">
+                            <i class="fa-regular fa-bell"></i>
+                        </a>
+
+                        <!-- Messages with unread badge 3 -->
+                        <a href="<%= ResolveUrl("~/User/Messages.aspx") %>" class="topbar-icon-btn" title="Messages">
+                            <i class="fa-regular fa-message"></i>
+                            <span class="badge-unread-count">3</span>
+                        </a>
+
+                        <!-- User Profile Pill (Links to Profile Page) -->
+                        <a href="<%= ResolveUrl("~/User/Profile.aspx") %>" class="topbar-user-profile" title="View Profile">
+                            <img src='<%= ResolveUrl("~/assets/images/user-male-logo.png") %>' alt="Raviraj Dhadhal" class="user-avatar-img" />
+                            <span class="user-name-text">Raviraj Dhadhal</span>
+                            <i class="fa-solid fa-chevron-down profile-dropdown-arrow"></i>
+                        </a>
+                    </div>
+                </header>
+
+                <!-- Main Content Placeholder -->
+                <main class="user-content-wrapper">
+                    <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+                    </asp:ContentPlaceHolder>
+                </main>
+
+            </div>
+
+        </div>
+    </form>
+
+    <!-- JS -->
+    <script src="<%= ResolveUrl("~/assets/JS/user.js") %>"></script>
+</body>
+</html>
