@@ -23,6 +23,7 @@ namespace SkillLinksX.Public
         protected global::System.Web.UI.WebControls.RegularExpressionValidator revRegPhone;
         protected global::System.Web.UI.WebControls.TextBox txtRegPassword;
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvRegPassword;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator revRegPassword;
         protected global::System.Web.UI.WebControls.TextBox txtRegCity;
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvRegCity;
         protected global::System.Web.UI.WebControls.DropDownList ddlRegState;

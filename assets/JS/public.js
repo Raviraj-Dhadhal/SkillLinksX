@@ -135,4 +135,28 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    /* ----------------------------------------------------------------------
+       6. Help Center Search Button Handler
+       ---------------------------------------------------------------------- */
+    const helpSearchBtn = document.querySelector(".help-search-container a.btn-search-submit");
+    if (helpSearchBtn) {
+        helpSearchBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            const searchInput = document.querySelector(".help-search-input");
+            const term = searchInput ? searchInput.value.trim() : "";
+            if (term) {
+                alert("Searching help articles for: \"" + term + "\"");
+            }
+        });
+    }
+
+    const popularTags = document.querySelectorAll(".help-popular-tags a.popular-tag-btn, .help-categories-grid a.help-cat-card");
+    popularTags.forEach(function (tag) {
+        tag.addEventListener("click", function (e) {
+            if (tag.getAttribute("href") === "#") {
+                e.preventDefault();
+            }
+        });
+    });
+
 });

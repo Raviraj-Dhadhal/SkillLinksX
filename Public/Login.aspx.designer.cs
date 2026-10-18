@@ -18,6 +18,7 @@ namespace SkillLinksX.Public
         protected global::System.Web.UI.WebControls.RegularExpressionValidator revLoginEmail;
         protected global::System.Web.UI.WebControls.TextBox txtLoginPassword;
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvLoginPassword;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator revLoginPassword;
         protected global::System.Web.UI.WebControls.CheckBox chkRememberMe;
         protected global::System.Web.UI.WebControls.Button btnLogin;
     }

@@ -13,7 +13,7 @@
             <div class="help-search-container">
                 <i class="fa-solid fa-magnifying-glass" style="color: #64748B; margin-left: 10px;"></i>
                 <asp:TextBox ID="txtHelpSearch" runat="server" CssClass="help-search-input" placeholder="Search jobs, internships, people..."></asp:TextBox>
-                <asp:Button ID="btnHelpSearch" runat="server" Text="Search" CssClass="btn-search-submit" style="padding: 9px 24px; border-radius: 6px;" OnClick="btnHelpSearch_Click" />
+                <a href="#" class="btn-search-submit" style="padding: 9px 24px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Search</a>
             </div>
 
             <div class="help-popular-tags">
