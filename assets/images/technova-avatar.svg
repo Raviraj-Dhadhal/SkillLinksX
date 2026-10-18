@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+  <!-- Circular Avatar Background Matching Figma -->
+  <circle cx="20" cy="20" r="19" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.5" />
+  
+  <!-- Stylized Geometric TN Monogram -->
+  <g transform="translate(6.5, 7.5)">
+    <!-- Slanted TechNova Glyphs -->
+    <polygon points="2,0 12,0 9.5,15 4.5,15" fill="#0A3B8C" />
+    <polygon points="6,0 16,0 21,15 16,15" fill="#0052CC" />
+    <polygon points="13.5,0 22.5,0 27.5,15 23.5,15" fill="#2563EB" />
+    <!-- Crossbar -->
+    <polygon points="0,4.5 18,4.5 16.5,7.5 0,7.5" fill="#0A2540" />
+    
+    <!-- Mini Brand Subtext -->
+    <text x="13.5" y="21.5" font-family="'Inter', -apple-system, sans-serif" font-size="5" font-weight="900" fill="#0F172A" text-anchor="middle" letter-spacing="0.3">TechNova</text>
+  </g>
+</svg>

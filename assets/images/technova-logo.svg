@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+  <rect width="160" height="160" rx="16" fill="#F8FAFC" />
+  <g transform="translate(25, 32)">
+    <!-- TechNova Geometric Logo Monogram (TN) -->
+    <polygon points="5,0 45,0 35,46 15,46" fill="#0A3B8C" />
+    <polygon points="20,0 60,0 80,46 60,46" fill="#0052CC" />
+    <polygon points="50,0 85,0 105,46 90,46" fill="#2563EB" />
+    <!-- Crossbar -->
+    <polygon points="0,14 70,14 65,24 0,24" fill="#0A2540" />
+    <text x="55" y="72" font-family="'Inter', sans-serif" font-size="18" font-weight="900" fill="#0F172A" text-anchor="middle" letter-spacing="1">TechNova</text>
+    <text x="55" y="84" font-family="'Inter', sans-serif" font-size="6.5" font-weight="700" fill="#64748B" text-anchor="middle" letter-spacing="1.2">INNOVATION TECHNOLOGY GROUP</text>
+  </g>
+</svg>

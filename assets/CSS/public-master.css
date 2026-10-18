@@ -8,6 +8,8 @@
 
 html, body {
     height: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
 }
 
 body {
@@ -330,6 +332,14 @@ footer {
         text-align: center;
         border-top: 1px solid #F0F2F5;
         padding: 12px 0;
+    }
+
+    .nav-links {
+        text-decoration: none;
+    }
+
+    .nav-links.active::after {
+        display: none !important;
     }
 
     .auth-nav.show {
