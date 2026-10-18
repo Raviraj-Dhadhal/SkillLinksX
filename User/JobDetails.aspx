@@ -180,7 +180,7 @@
                         </div>
                         <div class="side-company-meta">
                             <h4 class="side-company-name">TechFlow Mumbai</h4>
-                            <a href="#" class="side-company-link">View Profile</a>
+                            <a href="javascript:void(0);" class="side-company-link">View Profile</a>
                         </div>
                     </div>
                     <p class="side-company-desc">
@@ -214,7 +214,7 @@
                             <div class="app-detail-icon"><i class="fa-regular fa-calendar"></i></div>
                             <div class="app-detail-content">
                                 <span class="app-detail-label">Deadline</span>
-                                <span class="app-detail-val">October 30, 2026</span>
+                                <span class="app-detail-val">October 30, 2023</span>
                             </div>
                         </div>
                         <div class="app-detail-item">

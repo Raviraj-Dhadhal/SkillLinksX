@@ -89,7 +89,7 @@
                         </div>
                     </div>
                     <div class="chat-header-actions">
-                        <a href="#" class="btn-view-profile-outline">View Profile</a>
+                        <a href="javascript:void(0);" class="btn-view-profile-outline">View Profile</a>
                     </div>
                 </div>
 

@@ -250,12 +250,12 @@
 
                     <!-- Pagination Row -->
                     <div class="opp-pagination-wrap">
-                        <a href="#" class="btn-page-step" style="opacity: 0.5; pointer-events: none;">Previous</a>
-                        <a href="#" class="btn-page-num active">1</a>
-                        <a href="#" class="btn-page-num">2</a>
-                        <a href="#" class="btn-page-num">3</a>
+                        <button type="button" class="btn-page-step" disabled="disabled">Previous</button>
+                        <button type="button" class="btn-page-num active">1</button>
+                        <button type="button" class="btn-page-num">2</button>
+                        <button type="button" class="btn-page-num">3</button>
                         <span class="page-ellipsis">&hellip;</span>
-                        <a href="#" class="btn-page-step">Next</a>
+                        <button type="button" class="btn-page-step">Next</button>
                     </div>
                 </div>
 

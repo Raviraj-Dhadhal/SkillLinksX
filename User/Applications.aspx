@@ -204,14 +204,14 @@
                                 <div class="step-dot"></div>
                                 <div class="step-info">
                                     <div class="step-title">Applied</div>
-                                    <div class="step-date">Oct 15, 2026</div>
+                                    <div class="step-date">Oct 15, 2023</div>
                                 </div>
                             </div>
                             <div class="timeline-step done">
                                 <div class="step-dot"></div>
                                 <div class="step-info">
                                     <div class="step-title">Shortlisted</div>
-                                    <div class="step-date">Oct 20, 2026</div>
+                                    <div class="step-date">Oct 20, 2023</div>
                                 </div>
                             </div>
                             <div class="timeline-step active">

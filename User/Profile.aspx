@@ -99,7 +99,7 @@
                                 <p class="timeline-sub">B.Tech Computer Engineering</p>
                                 <div class="timeline-meta-row">
                                     <span><i class="fa-regular fa-calendar"></i> 2021 - 2025</span>
-                                    <span class="badge-grade"><i class="fa-regular fa-star"></i> CGPA: 9.5/10.0</span>
+                                    <span class="badge-grade"><i class="fa-regular fa-star"></i> CGPA: 8.8/10.0</span>
                                 </div>
                             </div>
                         </div>
@@ -213,9 +213,9 @@
                             </div>
                         </div>
 
-                        <a href="<%= ResolveUrl("~/User/CareerAssistant.aspx") %>" class="btn-improve-profile" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
+                        <button type="button" class="btn-improve-profile">
                             <i class="fa-solid fa-wand-magic-sparkles"></i> Improve My Profile
-                        </a>
+                        </button>
                     </div>
                 </div>
 
