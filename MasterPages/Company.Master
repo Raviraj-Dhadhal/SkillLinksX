@@ -78,11 +78,6 @@
                             </a>
                         </li>
                         <li>
-                            <a href="<%= ResolveUrl("~/Company/Candidates.aspx") %>" class="sidebar-link">
-                                <i class="fa-solid fa-user-check"></i> Candidates
-                            </a>
-                        </li>
-                        <li>
                             <a href="<%= ResolveUrl("~/Company/Interviews.aspx") %>" class="sidebar-link">
                                 <i class="fa-regular fa-comments"></i> Interviews
                             </a>
