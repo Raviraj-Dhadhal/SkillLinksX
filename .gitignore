@@ -1,0 +1,62 @@
+## ==============================================================================
+## GitIgnore for ASP.NET Web Forms / .NET Framework Solutions
+## Standard Visual Studio, Build Artifacts, User Cache, and Sensitive Files
+## ==============================================================================
+
+# User-specific files & Visual Studio temporary cache
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.csproj.user
+
+# Visual Studio 2015+ / 2022 cache & Roslyn compiler cache
+.vs/
+.idea/
+.vscode/
+*.DotSettings.user
+
+# Build results and binaries (NEVER push compiled dlls/exes)
+[Bb]in/
+[Oo]bj/
+[Aa]pp_Data/*.sdf
+
+# NuGet packages (Packages should be restored via NuGet, not committed)
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+# ASP.NET compilation temporary files
+**/_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+ClientBin/
+[Aa]ssets/_temp/
+
+# Publish output & web deployment packages
+*.publishproj
+*.pubxml
+*.pubxml.user
+Publish/
+publish/
+
+# Log files and crash dumps
+*.log
+*.tlog
+*.dump
+*.dmp
+*.crash
+
+# Windows System files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+
+# Environment & Sensitive configs (keep templates, ignore local secrets if any)
+*.env
+*.env.local
+*.local.config
