@@ -224,13 +224,44 @@ document.addEventListener("DOMContentLoaded", function () {
         // 5A. Opportunity Type (Job / Internship)
         const oppButtons = document.querySelectorAll("#oppTypeSelector .pill-btn");
         const hfOppType = document.querySelector("input[id*='hfOpportunityType']");
+        const salaryLabel = document.querySelector(".form-step-card:nth-of-type(4) .form-label");
+        const ddlPeriod = document.querySelector("select[id*='ddlSalaryPeriod']");
+        const ddlEmpType = document.querySelector("select[id*='ddlEmploymentType']");
+        const titleInput = document.querySelector("input[id*='txtJobTitle']");
+
+        function applyOppType(type) {
+            oppButtons.forEach(b => {
+                if (b.getAttribute("data-type") === type) b.classList.add("active");
+                else b.classList.remove("active");
+            });
+
+            if (hfOppType) hfOppType.value = type;
+
+            if (type === "Internship") {
+                if (salaryLabel) salaryLabel.innerHTML = 'Stipend Range (&#8377;)';
+                if (ddlPeriod) ddlPeriod.value = "Per Month";
+                if (ddlEmpType) ddlEmpType.value = "Internship";
+                if (titleInput && !titleInput.value) titleInput.placeholder = "e.g. Frontend Developer Intern";
+            } else {
+                if (salaryLabel) salaryLabel.innerHTML = 'Salary Range (&#8377;)';
+                if (ddlPeriod) ddlPeriod.value = "Per Year";
+                if (ddlEmpType && ddlEmpType.value === "Internship") ddlEmpType.value = "Full-time";
+                if (titleInput && !titleInput.value) titleInput.placeholder = "e.g. Senior Frontend Developer";
+            }
+        }
+
+        // Auto-select type based on URL parameter if present (?type=internship)
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramType = urlParams.get("type");
+        if (paramType) {
+            if (paramType.toLowerCase() === "internship") applyOppType("Internship");
+            else if (paramType.toLowerCase() === "job") applyOppType("Job");
+        }
+
         oppButtons.forEach(function (btn) {
             btn.addEventListener("click", function () {
-                oppButtons.forEach(b => b.classList.remove("active"));
-                btn.classList.add("active");
-                if (hfOppType) {
-                    hfOppType.value = btn.getAttribute("data-type");
-                }
+                const selectedType = btn.getAttribute("data-type");
+                applyOppType(selectedType);
             });
         });
 

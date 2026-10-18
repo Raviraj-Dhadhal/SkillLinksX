@@ -20,6 +20,9 @@
     <link rel="stylesheet" href="<%= ResolveUrl("~/assets/CSS/company-master.css") %>" />
     <link rel="stylesheet" href="<%= ResolveUrl("~/assets/CSS/company-pages.css") %>" />
 
+    <!-- ApexCharts Library -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
 </head>

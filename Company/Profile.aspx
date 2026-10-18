@@ -44,7 +44,7 @@
                     <button type="button" class="btn-profile-share" title="Share Profile">
                         <i class="fa-solid fa-share-nodes"></i> Share Profile
                     </button>
-                    <a href="#" class="btn-profile-edit" title="Edit Profile">
+                    <a href="<%= ResolveUrl("~/Company/Settings.aspx") %>" class="btn-profile-edit" title="Edit Profile">
                         <i class="fa-regular fa-pen-to-square"></i> Edit Profile
                     </a>
                 </div>

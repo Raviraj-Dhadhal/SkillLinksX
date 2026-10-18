@@ -14,7 +14,7 @@
                 <p class="manage-jobs-sub">Create, manage and track all your Internship opportunities in one place.</p>
             </div>
             <div>
-                <a href="<%= ResolveUrl("~/Company/PostJob.aspx") %>" class="btn-post-new-job-blue">
+                <a href="<%= ResolveUrl("~/Company/PostJob.aspx?type=internship") %>" class="btn-post-new-job-blue">
                     <i class="fa-solid fa-plus"></i> Post New Internship
                 </a>
             </div>

@@ -123,15 +123,15 @@
                     </a>
 
                     <!-- Action 2: Post Internship -->
-                    <a href="<%= ResolveUrl("~/Company/PostInternship.aspx") %>" class="quick-action-tile">
+                    <a href="<%= ResolveUrl("~/Company/PostJob.aspx") %>" class="quick-action-tile">
                         <i class="fa-solid fa-graduation-cap quick-action-icon"></i>
                         <span class="quick-action-label">Post<br />Internship</span>
                     </a>
 
-                    <!-- Action 3: Find Candidates -->
-                    <a href="<%= ResolveUrl("~/Company/Candidates.aspx") %>" class="quick-action-tile">
-                        <i class="fa-solid fa-user-gear quick-action-icon color-teal"></i>
-                        <span class="quick-action-label">Find<br />Candidates</span>
+                    <!-- Action 3: Review Applicants / Candidates -->
+                    <a href="<%= ResolveUrl("~/Company/Applicants.aspx") %>" class="quick-action-tile">
+                        <i class="fa-solid fa-user-group quick-action-icon color-teal"></i>
+                        <span class="quick-action-label">Review<br />Applicants</span>
                     </a>
 
                     <!-- Action 4: Schedule Interview -->

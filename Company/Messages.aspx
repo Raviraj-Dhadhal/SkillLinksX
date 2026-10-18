@@ -90,9 +90,6 @@
                     </div>
                     <div class="chat-header-actions">
                         <a href="<%= ResolveUrl("~/Company/CandidateProfile.aspx") %>" class="btn-view-profile-outline">View Profile</a>
-                        <button type="button" class="btn-chat-options" aria-label="Chat Options">
-                            <i class="fa-solid fa-ellipsis-vertical"></i>
-                        </button>
                     </div>
                 </div>
 

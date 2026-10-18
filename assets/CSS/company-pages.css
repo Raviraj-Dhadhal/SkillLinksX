@@ -3847,45 +3847,39 @@
         height: 140px;
     }
 
-    /* Messages Mobile Adaptations */
+    /* Messages Mobile Adaptations - Identical to User Messages */
     .company-messages-page {
-        padding: 0 !important;
+        margin: -14px -12px !important;
         height: calc(100vh - 56px) !important;
-        overflow: hidden;
+        overflow: hidden !important;
+        padding: 0 !important;
     }
 
-    .chat-workspace-grid {
-        display: flex !important;
-        flex-direction: column !important;
+    .company-messages-page .chat-workspace-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
         height: 100% !important;
     }
 
-    .chat-sidebar-column {
-        display: flex;
-        flex-direction: column;
-        max-height: 200px;
-        min-height: 150px;
-        border-right: none;
-        border-bottom: 1px solid #E2E8F0;
-        flex-shrink: 0;
+    .company-messages-page .chat-sidebar-column {
+        display: none !important;
     }
 
-    .chat-main-column {
-        flex: 1;
-        min-height: 0;
-        display: flex;
-        flex-direction: column;
-        height: calc(100% - 200px);
+    .company-messages-page .chat-main-column {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+        width: 100% !important;
     }
 
-    .chat-scroll-area {
-        flex: 1;
-        overflow-y: auto;
-        padding: 12px 14px !important;
+    .company-messages-page .chat-scroll-area {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        padding: 16px 14px !important;
     }
 
-    .chat-input-bar {
-        padding: 10px 12px !important;
+    .company-messages-page .chat-input-bar {
+        padding: 10px 14px !important;
         gap: 8px !important;
     }
 
