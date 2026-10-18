@@ -196,7 +196,7 @@
                                 <span class="closing-timer color-red">
                                     <i class="fa-regular fa-clock"></i> 2 DAYS LEFT
                                 </span>
-                                <a href="javascript:void(0);" class="btn-closing-apply">Apply</a>
+                                <a href="<%= ResolveUrl("~/User/JobDetails.aspx") %>" class="btn-closing-apply">Apply</a>
                             </div>
                         </div>
 
@@ -217,14 +217,14 @@
                                 <span class="closing-timer color-red">
                                     <i class="fa-regular fa-clock"></i> 4 DAYS LEFT
                                 </span>
-                                <a href="javascript:void(0);" class="btn-closing-apply">Apply</a>
+                                <a href="<%= ResolveUrl("~/User/JobDetails.aspx") %>" class="btn-closing-apply">Apply</a>
                             </div>
                         </div>
 
                     </div>
 
                     <div class="closing-card-footer">
-                        <a href="javascript:void(0);" class="closing-view-all-link">View all deadlines</a>
+                        <a href="<%= ResolveUrl("~/User/JobDetails.aspx") %>" class="closing-view-all-link">View all deadlines</a>
                     </div>
                 </div>
             </aside>
