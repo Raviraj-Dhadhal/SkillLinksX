@@ -1,0 +1,375 @@
+/* Base Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    background-color: #FFFFFF;
+    color: #334155;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Page Flex Wrapper for Sticky Footer */
+#form1 {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1 0 auto;
+}
+
+/* ==========================================================================
+   Header / Navigation Bar
+   ========================================================================== */
+.navbar {
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #E7EAF0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-container {
+    padding: 14px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* ==========================================================================
+   Header Logo Styling (Modify this block to change Header Logo appearance)
+   ========================================================================== */
+.header-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.header-logo-img {
+    width: 40px;
+    height: 40px;
+    display: block;
+}
+
+.header-logo-text-stack {
+    display: flex;
+    flex-direction: column;
+}
+
+.header-logo-text {
+    color: #0040A2;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.3px;
+}
+
+.header-logo-sub-text {
+    color: #64748B;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+/* Nav Menu */
+.nav-menu {
+    display: flex;
+    align-items: center;
+}
+
+.nav-menu ul {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    gap: 32px;
+}
+
+.nav-items {
+    display: inline-block;
+}
+
+.nav-links {
+    text-decoration: none;
+    color: #4B5563;
+    font-weight: 500;
+    font-size: 15px;
+    padding: 6px 0;
+    position: relative;
+    transition: color 0.2s ease;
+}
+
+.nav-links:hover {
+    color: #0052CC;
+}
+
+.nav-links.active {
+    color: #0052CC;
+    font-weight: 600;
+}
+
+.nav-links.active::after {
+    content: "";
+    position: absolute;
+    bottom: -15px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: #0052CC;
+    border-radius: 2px;
+}
+
+/* Auth Buttons */
+.auth-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.log-in-btn,
+.register-btn {
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.log-in-btn {
+    color: #0056D2;
+    background-color: #F0F5FF;
+}
+
+.log-in-btn:hover {
+    background-color: #E1ECFC;
+}
+
+.register-btn {
+    background-color: #0056D2;
+    color: #FFFFFF;
+}
+
+.register-btn:hover {
+    background-color: #0045B5;
+}
+
+/* Hamburger (Mobile) */
+.hamburger {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.hamburger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background-color: #0F172A;
+    border-radius: 2px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.hamburger.active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+.hamburger.active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+footer {
+    background-color: #EDF0F7;
+    border-top: 1px solid #E2E8F0;
+}
+
+.footer-container {
+    padding: 48px 40px 36px 40px;
+}
+
+/* Footer Main Grid */
+.footer-main {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+}
+
+.footer-left-box {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==========================================================================
+   Footer Logo Styling (Modify this block to change Footer Logo appearance)
+   ========================================================================== */
+.footer-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    margin-bottom: 14px;
+}
+
+.footer-logo-img {
+    width: 32px;
+    height: 32px;
+    display: block;
+}
+
+.footer-logo-text {
+    color: #0F172A;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.2px;
+}
+
+.footer-description {
+    color: #64748B;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.footer-copyright {
+    color: #64748B;
+    font-size: 13.5px;
+    margin-top: 42px;
+}
+
+/* Footer Columns & Section Headers */
+.footer-explore {
+    display: flex;
+    flex-direction: column;
+}
+
+.footer-title-text {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 18px;
+}
+
+.footer-explore ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Footer Links (Underlined as shown in the picture) */
+.footer-links {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+    color: #334155;
+    font-size: 14px;
+    transition: color 0.2s ease;
+}
+
+.footer-links:hover {
+    color: #0056D2;
+}
+
+/* ==========================================================================
+   Responsive (Mobile & Tablet)
+   ========================================================================== */
+@media (max-width: 900px) {
+    .navbar-container {
+        padding: 14px 20px;
+        flex-wrap: wrap;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .nav-menu,
+    .auth-nav {
+        display: none;
+        width: 100%;
+    }
+
+    .nav-menu.show {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin-top: 16px;
+    }
+
+    .nav-menu.show ul {
+        flex-direction: column;
+        width: 100%;
+        gap: 0;
+    }
+
+    .nav-items {
+        width: 100%;
+        text-align: center;
+        border-top: 1px solid #F0F2F5;
+        padding: 12px 0;
+    }
+
+    .auth-nav.show {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin-top: 12px;
+        gap: 10px;
+        padding-top: 12px;
+        border-top: 1px solid #F0F2F5;
+    }
+
+    .log-in-btn,
+    .register-btn {
+        width: 100%;
+        text-align: center;
+        padding: 11px;
+    }
+
+    .footer-main {
+        grid-template-columns: 1fr 1fr;
+        gap: 36px 24px;
+    }
+
+    .footer-left-box {
+        grid-column: span 2;
+    }
+
+    .footer-copyright {
+        margin-top: 24px;
+    }
+}
+
+@media (max-width: 540px) {
+    .footer-main {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .footer-left-box {
+        grid-column: span 1;
+    }
+}

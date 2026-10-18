@@ -1,0 +1,127 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Public.master.cs" Inherits="SkillLinksX.MasterPages.Public" %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkillLinkX - Connecting Talent With Opportunity</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Font-Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+
+    <!-- Public Master & Pages Stylesheets -->
+    <link rel="stylesheet" href="<%= ResolveUrl("~/assets/CSS/public-master.css") %>" />
+    <link rel="stylesheet" href="<%= ResolveUrl("~/assets/CSS/public-pages.css") %>" />
+
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <!-- ========================================================= -->
+        <!-- Header / Navigation Bar                                   -->
+        <!-- ========================================================= -->
+        <header class="navbar">
+            <div class="navbar-container">
+                <!-- Header Logo -->
+                <a href='<%= ResolveUrl("~/Public/Home.aspx") %>' class="header-logo" id="headerLogoLink">
+                    <img src='<%= ResolveUrl("~/assets/images/logo.svg") %>' alt="SkillLinkX Logo" class="header-logo-img" id="headerLogoImg" />
+                    <div class="header-logo-text-stack">
+                        <span class="header-logo-text">SkillLinkX</span>
+                        <span class="header-logo-sub-text">PROFESSIONAL HUB</span>
+                    </div>
+                </a>
+
+                <!-- Mobile Hamburger Button -->
+                <button type="button" class="hamburger" id="hamburger" aria-label="Toggle Navigation">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+                <!-- Nav Menu -->
+                <nav class="nav-menu" id="navMenu">
+                    <ul>
+                        <li class="nav-items"><a href='<%= ResolveUrl("~/Public/Home.aspx") %>' class="nav-links">Home</a></li>
+                        <li class="nav-items"><a href='<%= ResolveUrl("~/Public/Login.aspx") %>' class="nav-links">Jobs</a></li>
+                        <li class="nav-items"><a href='<%= ResolveUrl("~/Public/Login.aspx") %>' class="nav-links">Internships</a></li>
+                        <li class="nav-items"><a href='<%= ResolveUrl("~/Public/Login.aspx") %>' class="nav-links">Companies</a></li>
+                        <li class="nav-items"><a href='<%= ResolveUrl("~/Public/About.aspx") %>' class="nav-links">About</a></li>
+                    </ul>
+                </nav>
+
+                <!-- Auth Buttons -->
+                <div class="auth-nav" id="authNav">
+                    <a href='<%= ResolveUrl("~/Public/Login.aspx") %>' class="log-in-btn">Login</a>
+                    <a href='<%= ResolveUrl("~/Public/Register.aspx") %>' class="register-btn">Register</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- ========================================================= -->
+        <!-- Main Content Area                                         -->
+        <!-- ========================================================= -->
+        <main class="main-content">
+            <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+            </asp:ContentPlaceHolder>
+        </main>
+
+        <!-- ========================================================= -->
+        <!-- Footer                                                    -->
+        <!-- ========================================================= -->
+        <footer>
+            <div class="footer-container">
+                <div class="footer-main">
+                    <!-- Column 1: Brand Info & Copyright -->
+                    <div class="footer-left-box">
+                        <a href='<%= ResolveUrl("~/Public/Home.aspx") %>' class="footer-logo" id="footerLogoLink">
+                            <img src='<%= ResolveUrl("~/assets/images/logo.svg") %>' alt="SkillLinkX Logo" class="footer-logo-img" id="footerLogoImg" />
+                            <span class="footer-logo-text">SkillLinkX</span>
+                        </a>
+                        <p class="footer-description">Connecting talent with opportunity.</p>
+                        <p class="footer-copyright">&copy; 2026 SkillLinkX. All rights reserved.</p>
+                    </div>
+
+                    <!-- Column 2: Platform Links -->
+                    <div class="footer-explore">
+                        <h4 class="footer-title-text">Platform</h4>
+                        <ul>
+                            <li><a href='<%= ResolveUrl("~/Public/Login.aspx") %>' class="footer-links">Career Advice</a></li>
+                            <li><a href='<%= ResolveUrl("~/Public/HelpCenter.aspx") %>' class="footer-links">Help Center</a></li>
+                            <li><a href='<%= ResolveUrl("~/Public/Login.aspx") %>' class="footer-links">Browse Jobs</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Company Links -->
+                    <div class="footer-explore">
+                        <h4 class="footer-title-text">Company</h4>
+                        <ul>
+                            <li><a href='<%= ResolveUrl("~/Public/About.aspx") %>' class="footer-links">About Us</a></li>
+                            <li><a href='<%= ResolveUrl("~/Public/Contact.aspx") %>' class="footer-links">Contact Us</a></li>
+                            <li><a href='<%= ResolveUrl("~/Public/Login.aspx") %>' class="footer-links">Partners</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Legal Links -->
+                    <div class="footer-explore">
+                        <h4 class="footer-title-text">Legal</h4>
+                        <ul>
+                            <li><a href='<%= ResolveUrl("~/Public/Privacy.aspx") %>' class="footer-links">Privacy Policy</a></li>
+                            <li><a href='<%= ResolveUrl("~/Public/Terms.aspx") %>' class="footer-links">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </form>
+
+    <!-- Public JavaScript -->
+    <script src="<%= ResolveUrl("~/assets/JS/public.js") %>"></script>
+</body>
+</html>
