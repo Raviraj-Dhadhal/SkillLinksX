@@ -1,0 +1,136 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Admin.master.cs" Inherits="SkillLinksX.MasterPages.Admin" %>
+<!DOCTYPE html>
+
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkillLinkX - Admin Portal</title>
+
+    <!-- Font-Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- ApexCharts Library -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- Admin CSS -->
+    <link rel="stylesheet" href="<%= ResolveUrl("~/assets/CSS/admin-master.css") %>" />
+    <link rel="stylesheet" href="<%= ResolveUrl("~/assets/CSS/admin-pages.css") %>" />
+
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <!-- Mobile Dim Overlay Backdrop -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+        <!-- Desktop Grid Layout (260px Sidebar / 1fr Body - Identical to User and Company) -->
+        <div class="admin-layout-grid">
+            
+            <!-- Left Sidebar -->
+            <aside class="admin-sidebar" id="adminSidebar">
+                <!-- Brand / Logo -->
+                <div class="sidebar-brand">
+                    <a href="<%= ResolveUrl("~/Admin/Dashboard.aspx") %>" class="sidebar-logo-link">
+                        <img src='<%= ResolveUrl("~/assets/images/logo.svg") %>' alt="SkillLinkX Logo" class="sidebar-logo-img" />
+                        <div class="sidebar-text-stack">
+                            <span class="sidebar-logo-text">SkillLinkX</span>
+                            <span class="sidebar-logo-sub">PROFESSIONAL HUB</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Admin/Dashboard.aspx") %>" class="sidebar-link">
+                                <i class="fa-solid fa-table-cells-large"></i> Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Admin/Students.aspx") %>" class="sidebar-link">
+                                <i class="fa-regular fa-user"></i> Students
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Admin/Companies.aspx") %>" class="sidebar-link">
+                                <i class="fa-solid fa-building"></i> Companies
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Admin/JobsInternships.aspx") %>" class="sidebar-link">
+                                <i class="fa-solid fa-briefcase"></i> Jobs &amp; Internships
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Admin/Applications.aspx") %>" class="sidebar-link">
+                                <i class="fa-solid fa-clipboard-list"></i> Applications
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Admin/Analytics.aspx") %>" class="sidebar-link">
+                                <i class="fa-solid fa-chart-line"></i> Reports &amp; Analytics
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- Sidebar Footer -->
+                <div class="sidebar-footer">
+                    <a href="<%= ResolveUrl("~/Admin/Settings.aspx") %>" class="sidebar-footer-link">
+                        <i class="fa-solid fa-gear"></i> Settings
+                    </a>
+                    <a href="<%= ResolveUrl("~/Public/Login.aspx") %>" class="sidebar-footer-link logout">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <div class="admin-main-area">
+                
+                <!-- Topbar -->
+                <header class="admin-topbar">
+                    <!-- Left: Mobile Toggle -->
+                    <button type="button" class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Navigation">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+
+                    <!-- Search Input -->
+                    <div class="topbar-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" placeholder="Search jobs, internships, people..." />
+                    </div>
+
+                    <!-- Actions & Admin Info -->
+                    <div class="topbar-actions">
+                        <a href="<%= ResolveUrl("~/Admin/Profile.aspx") %>" class="topbar-user-profile" title="Admin Profile">
+                            <img src='<%= ResolveUrl("~/assets/images/user-female-logo.png") %>' alt="Admin" class="user-avatar-img" />
+                            <span class="user-name-text">Admin</span>
+                            <i class="fa-solid fa-chevron-down profile-dropdown-arrow"></i>
+                        </a>
+                    </div>
+                </header>
+
+                <!-- Page Body Content PlaceHolder -->
+                <main class="admin-content-wrapper">
+                    <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+                    </asp:ContentPlaceHolder>
+                </main>
+
+            </div>
+
+        </div>
+    </form>
+
+    <!-- Admin JS -->
+    <script src="<%= ResolveUrl("~/assets/JS/admin.js") %>"></script>
+</body>
+</html>
