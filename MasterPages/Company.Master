@@ -48,7 +48,7 @@
                 <nav class="sidebar-nav">
                     <ul>
                         <li>
-                            <a href="<%= ResolveUrl("~/Company/Dashboard.aspx") %>" class="sidebar-link active">
+                            <a href="<%= ResolveUrl("~/Company/Dashboard.aspx") %>" class="sidebar-link">
                                 <i class="fa-solid fa-table-cells-large"></i> Dashboard
                             </a>
                         </li>
@@ -59,12 +59,7 @@
                         </li>
                         <li>
                             <a href="<%= ResolveUrl("~/Company/PostJob.aspx") %>" class="sidebar-link">
-                                <i class="fa-regular fa-square-plus"></i> Post Job
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<%= ResolveUrl("~/Company/PostInternship.aspx") %>" class="sidebar-link">
-                                <i class="fa-regular fa-circle-plus"></i> Post Internship
+                                <i class="fa-regular fa-square-plus"></i> Post Job or Internship
                             </a>
                         </li>
                         <li>
@@ -153,9 +148,9 @@
                                 <span class="user-name">TechNova</span>
                                 <span class="user-role">Recruiting Team</span>
                             </div>
-                            <!-- FontAwesome Initial T Icon Profile Logo -->
+                            <!-- TechNova SVG Avatar Logo -->
                             <div class="user-avatar-chip">
-                                <i class="fa-solid fa-t"></i>
+                                <img src='<%= ResolveUrl("~/assets/images/technova-avatar.svg") %>' alt="TechNova" class="company-avatar-svg-img" />
                             </div>
                         </a>
                     </div>
