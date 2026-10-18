@@ -74,7 +74,7 @@
                 <!-- Calendar Controls Header -->
                 <div class="cal-header-row">
                     <div class="cal-title-nav">
-                        <h2 class="cal-month-title">October 2023</h2>
+                        <h2 class="cal-month-title">October 2026</h2>
                         <div class="cal-nav-buttons">
                             <button type="button" class="cal-nav-btn"><i class="fa-solid fa-chevron-left"></i></button>
                             <button type="button" class="cal-nav-btn"><i class="fa-solid fa-chevron-right"></i></button>

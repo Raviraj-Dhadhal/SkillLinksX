@@ -313,6 +313,74 @@ document.addEventListener("DOMContentLoaded", function () {
         console.warn("SkillLinkX: Post job form warning", err);
     }
 
+    /* ----------------------------------------------------------------------
+       7. Schedule Interview Modal & Google Meet Generator
+       ---------------------------------------------------------------------- */
+    try {
+        const btnOpenScheduleModal = document.getElementById("btnOpenScheduleModal");
+        const scheduleInterviewModal = document.getElementById("scheduleInterviewModal");
+        const btnGenMeetLink = document.getElementById("btnGenMeetLink");
+        const meetLinkInput = document.getElementById("meetLinkInput");
+        const btnConfirmScheduleInterview = document.getElementById("btnConfirmScheduleInterview");
+
+        if (btnOpenScheduleModal && scheduleInterviewModal) {
+            btnOpenScheduleModal.addEventListener("click", function (e) {
+                e.preventDefault();
+                scheduleInterviewModal.style.display = "flex";
+            });
+        }
+
+        if (btnGenMeetLink && meetLinkInput) {
+            btnGenMeetLink.addEventListener("click", function () {
+                // Generate random Google Meet format code: xxx-yyyy-zzz
+                const chars = "abcdefghijklmnopqrstuvwxyz";
+                const genPart = (len) => Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+                const newCode = `${genPart(3)}-${genPart(4)}-${genPart(3)}`;
+                meetLinkInput.value = `https://meet.google.com/${newCode}`;
+                
+                // Visual feedback on button
+                btnGenMeetLink.innerHTML = '<i class="fa-solid fa-check"></i> Generated!';
+                setTimeout(() => {
+                    btnGenMeetLink.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> New Link';
+                }, 1500);
+            });
+        }
+
+        if (btnConfirmScheduleInterview && scheduleInterviewModal) {
+            btnConfirmScheduleInterview.addEventListener("click", function () {
+                const stageSelect = document.getElementById("interviewStageSelect");
+                const dateInput = document.getElementById("interviewDateInput");
+                const timeInput = document.getElementById("interviewTimeInput");
+
+                const stage = stageSelect ? stageSelect.value : "Interview";
+                const date = dateInput ? dateInput.value : "";
+                const time = timeInput ? timeInput.value : "";
+
+                alert(`Interview scheduled successfully!\n\nRound: ${stage}\nDate: ${date}\nTime: ${time}\nCalendar invite sent with Google Meet.`);
+                scheduleInterviewModal.style.display = "none";
+            });
+        }
+    } catch (err) {
+        console.warn("SkillLinkX: Schedule interview modal error", err);
+    }
+
+    /* ----------------------------------------------------------------------
+       8. Pagination Controls (Prevent Default & Active Switch)
+       ---------------------------------------------------------------------- */
+    try {
+        const paginationNavBtns = document.querySelectorAll(".table-pagination-row a.pagination-nav-btn, .table-pagination-row a.btn-pg-num, .table-pagination-row a.btn-pg-arrow");
+        paginationNavBtns.forEach(btn => {
+            btn.addEventListener("click", function (e) {
+                e.preventDefault();
+                if (btn.classList.contains("btn-pg-num")) {
+                    btn.parentElement.querySelectorAll(".btn-pg-num").forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                }
+            });
+        });
+    } catch (err) {
+        console.warn("SkillLinkX: Company pagination error", err);
+    }
 });
 
 /* ----------------------------------------------------------------------

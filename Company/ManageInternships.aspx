@@ -120,7 +120,7 @@
                             <td>Bengaluru (Hybrid)</td>
                             <td>Full-time</td>
                             <td>124</td>
-                            <td>Oct 12, 2024</td>
+                            <td>Oct 12, 2026</td>
                             <td>
                                 <span class="job-status-badge status-active">Active</span>
                             </td>
@@ -139,7 +139,7 @@
                             <td>Ahmedabad (On-site)</td>
                             <td>Full-time</td>
                             <td>86</td>
-                            <td>Oct 10, 2024</td>
+                            <td>Oct 10, 2026</td>
                             <td>
                                 <span class="job-status-badge status-active">Active</span>
                             </td>
@@ -184,12 +184,12 @@
                 </div>
                 <div class="pagination-controls">
                     <span>1-10 of 24</span>
-                    <button type="button" class="pagination-nav-btn" aria-label="Previous Page">
+                    <a href="#" class="pagination-nav-btn" aria-label="Previous Page">
                         <i class="fa-solid fa-chevron-left"></i>
-                    </button>
-                    <button type="button" class="pagination-nav-btn" aria-label="Next Page">
+                    </a>
+                    <a href="#" class="pagination-nav-btn" aria-label="Next Page">
                         <i class="fa-solid fa-chevron-right"></i>
-                    </button>
+                    </a>
                 </div>
             </div>
 

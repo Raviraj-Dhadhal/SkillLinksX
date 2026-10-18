@@ -35,9 +35,9 @@
                         <a href="<%= ResolveUrl("~/Company/Messages.aspx") %>" class="btn-cand-msg" style="text-decoration: none;">
                             <i class="fa-regular fa-message"></i> Message Candidate
                         </a>
-                        <a href="<%= ResolveUrl("~/Company/Interviews.aspx") %>" class="btn-cand-schedule" style="text-decoration: none;">
+                        <button type="button" class="btn-cand-schedule" id="btnOpenScheduleModal">
                             <i class="fa-regular fa-calendar"></i> Schedule Interview
-                        </a>
+                        </button>
                         <button type="button" class="btn-cand-shortlist">
                             <i class="fa-regular fa-bookmark"></i> Shortlist
                         </button>
@@ -354,5 +354,55 @@
 
         </div>
 
+    </div>
+
+    <!-- Schedule Interview Modal -->
+    <div class="modal-backdrop-overlay" id="scheduleInterviewModal" style="display:none;">
+        <div class="modal-dialog-box">
+            <div class="modal-header-row">
+                <h3 class="modal-title"><i class="fa-regular fa-calendar-check" style="color:#2563EB; margin-right:8px;"></i>Schedule Interview</h3>
+                <button type="button" class="btn-modal-close" onclick="document.getElementById('scheduleInterviewModal').style.display='none';">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body-content">
+                <div class="admin-form-group">
+                    <label class="admin-input-label">Candidate</label>
+                    <input type="text" class="admin-profile-input" value="Raviraj Dhadhal (raviraj08@gmail.com)" readonly="readonly" style="background-color:#F8FAFC;" />
+                </div>
+                <div class="admin-form-group">
+                    <label class="admin-input-label">Interview Stage / Round</label>
+                    <select class="admin-filter-select" id="interviewStageSelect">
+                        <option value="Technical Round 1">Technical Round 1</option>
+                        <option value="System Design">System Design Round</option>
+                        <option value="HR & Cultural Fit">HR &amp; Cultural Fit</option>
+                        <option value="Final Leadership Round">Final Leadership Round</option>
+                    </select>
+                </div>
+                <div class="form-2col-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div class="admin-form-group">
+                        <label class="admin-input-label">Interview Date *</label>
+                        <input type="date" class="admin-profile-input" id="interviewDateInput" value="2026-10-24" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-input-label">Interview Time *</label>
+                        <input type="time" class="admin-profile-input" id="interviewTimeInput" value="14:00" />
+                    </div>
+                </div>
+                <div class="admin-form-group">
+                    <label class="admin-input-label">Meeting Provider &amp; Link</label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" class="admin-profile-input" id="meetLinkInput" value="https://meet.google.com/abc-defg-hij" />
+                        <button type="button" class="btn-cancel-modal" id="btnGenMeetLink" style="white-space:nowrap; background:#EFF6FF; border-color:#BFDBFE; color:#1D4ED8;">
+                            <i class="fa-solid fa-arrows-rotate"></i> New Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer-row" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                <button type="button" class="btn-cancel-modal" onclick="document.getElementById('scheduleInterviewModal').style.display='none';">Cancel</button>
+                <button type="button" class="btn-submit-modal" id="btnConfirmScheduleInterview" style="background-color:#2563EB;">Send Invite</button>
+            </div>
+        </div>
     </div>
 </asp:Content>

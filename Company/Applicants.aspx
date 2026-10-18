@@ -175,12 +175,12 @@
                 <div class="table-pagination-row">
                     <span style="font-size: 12px; color: #64748B;">Showing 1-10 of 1,248</span>
                     <div class="pagination-controls">
-                        <button type="button" class="pagination-nav-btn" aria-label="Previous Page">
+                        <a href="#" class="pagination-nav-btn" aria-label="Previous Page">
                             <i class="fa-solid fa-chevron-left"></i>
-                        </button>
-                        <button type="button" class="pagination-nav-btn" aria-label="Next Page">
+                        </a>
+                        <a href="#" class="pagination-nav-btn" aria-label="Next Page">
                             <i class="fa-solid fa-chevron-right"></i>
-                        </button>
+                        </a>
                     </div>
                 </div>
 
