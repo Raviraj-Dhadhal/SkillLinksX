@@ -1,0 +1,439 @@
+/* ==========================================================================
+   SkillLinkX - Company Master Layout CSS (company-master.css)
+   Desktop Grid System: Fixed Sidebar (260px) + Scrollable Body Area
+   ========================================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+    background-color: #F8FAFC;
+    color: #0F172A;
+    min-height: 100vh;
+}
+
+/* Desktop Grid Layout (260px Sidebar / 1fr Body) */
+.company-layout-grid {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* Left Sidebar (260px) - Fixed to Viewport Height (Does NOT scroll with page) */
+.company-sidebar {
+    background-color: #FFFFFF;
+    border-right: 1px solid #E2E8F0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    overflow: hidden;
+}
+
+/* Sidebar Brand / Logo (Top) */
+.sidebar-brand {
+    padding: 22px 18px 18px;
+    flex-shrink: 0;
+}
+
+.sidebar-logo-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.sidebar-logo-img {
+    width: 42px;
+    height: 42px;
+    border-radius: 9px;
+    flex-shrink: 0;
+}
+
+.sidebar-text-stack {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.sidebar-logo-text {
+    font-size: 21px;
+    font-weight: 800;
+    color: #0040A2;
+    line-height: 1.1;
+    letter-spacing: -0.4px;
+}
+
+.sidebar-logo-sub {
+    font-size: 9.5px;
+    font-weight: 800;
+    color: #334155;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-top: 3px;
+    line-height: 1;
+}
+
+/* Sidebar Navigation (Scrolls internally only if menu exceeds screen height) */
+.sidebar-nav {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 10px 14px 14px;
+    overflow-y: auto;
+}
+
+    .sidebar-nav::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb {
+        background-color: #E2E8F0;
+        border-radius: 4px;
+    }
+
+    .sidebar-nav ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9.5px 14px;
+    color: #475569;
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+    .sidebar-link i {
+        font-size: 15px;
+        width: 20px;
+        text-align: center;
+        color: #64748B;
+    }
+
+    .sidebar-link:hover {
+        background-color: #F1F5F9;
+        color: #0F172A;
+    }
+
+    .sidebar-link.active {
+        background-color: #E0EAFF;
+        color: #0040A2;
+        font-weight: 600;
+    }
+
+        .sidebar-link.active i {
+            color: #0040A2;
+        }
+
+/* Sidebar Footer (Pinned to the Bottom of Sidebar / Viewport) */
+.sidebar-footer {
+    margin-top: auto;
+    padding: 14px 14px;
+    border-top: 1px solid #F1F5F9;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    background-color: #FFFFFF;
+    flex-shrink: 0;
+}
+
+.sidebar-footer-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 14px;
+    color: #64748B;
+    text-decoration: none;
+    font-size: 13px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+    .sidebar-footer-link i {
+        font-size: 14px;
+        width: 20px;
+        text-align: center;
+    }
+
+    .sidebar-footer-link:hover {
+        background-color: #F1F5F9;
+        color: #0F172A;
+    }
+
+    .sidebar-footer-link.active {
+        background-color: #E0EAFF;
+        color: #0040A2;
+        font-weight: 600;
+    }
+
+        .sidebar-footer-link.active i {
+            color: #0040A2;
+        }
+
+    .sidebar-footer-link.logout:hover {
+        background-color: #FEF2F2;
+        color: #DC2626;
+    }
+
+/* Main Content Area (Right Side - Scrolls independently) */
+.company-main-area {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 100vh;
+}
+
+/* Topbar */
+.company-topbar {
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #E2E8F0;
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.sidebar-toggle-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #1E293B;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+}
+
+    .sidebar-toggle-btn:hover {
+        background-color: #F1F5F9;
+    }
+
+.topbar-search {
+    position: relative;
+    width: 360px;
+}
+
+    .topbar-search i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94A3B8;
+        font-size: 14px;
+    }
+
+    .topbar-search input {
+        width: 100%;
+        padding: 9px 14px 9px 38px;
+        border: 1px solid #CBD5E1;
+        border-radius: 8px;
+        font-size: 13.5px;
+        background-color: #F8FAFC;
+        outline: none;
+        transition: all 0.2s ease;
+    }
+
+        .topbar-search input:focus {
+            border-color: #0052CC;
+            background-color: #FFFFFF;
+            box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1);
+        }
+
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.topbar-icon-btn {
+    position: relative;
+    background: none;
+    border: none;
+    color: #475569;
+    font-size: 17px;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.topbar-icon-btn:hover {
+    color: #0052CC;
+}
+
+.badge-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 6px;
+    height: 6px;
+    background-color: #DC2626;
+    border-radius: 50%;
+}
+
+.topbar-user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 2px 4px;
+}
+
+.user-info-text {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+}
+
+.user-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0F172A;
+    line-height: 1.2;
+}
+
+.user-role {
+    font-size: 10.5px;
+    color: #64748B;
+    font-weight: 500;
+}
+
+/* FontAwesome Initial T Profile Logo Circle */
+.user-avatar-chip {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #EFF6FF;
+    border: 1.5px solid #BFDBFE;
+    color: #0052CC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    flex-shrink: 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.user-info-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #191B23;
+    line-height: 1.2;
+}
+
+.user-role {
+    font-size: 11px;
+    color: #64748B;
+}
+
+/* Page Content Wrapper */
+.company-content-wrapper {
+    padding: 24px 32px;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+/* Mobile Dim Backdrop Overlay */
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(15, 23, 42, 0.4);
+    z-index: 998;
+    backdrop-filter: blur(2px);
+}
+
+    .sidebar-backdrop.show {
+        display: block;
+    }
+
+/* Mobile Responsive Breakpoints */
+@media (max-width: 900px) {
+    .company-layout-grid {
+        grid-template-columns: 100%;
+    }
+
+    .sidebar-toggle-btn {
+        display: block;
+    }
+
+    .company-sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 260px;
+        height: 100vh;
+        z-index: 999;
+        overflow-y: auto;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+        .company-sidebar.open {
+            left: 0;
+        }
+
+    .company-topbar {
+        padding: 12px 18px;
+    }
+
+    .topbar-search {
+        width: auto;
+        flex-grow: 1;
+    }
+
+    .company-content-wrapper {
+        padding: 18px;
+    }
+}
+
+@media (max-width: 600px) {
+    .company-topbar {
+        padding: 10px 14px;
+        gap: 10px;
+    }
+
+    .topbar-actions {
+        gap: 8px;
+    }
+
+    .topbar-user-profile .user-info-text {
+        display: none;
+    }
+
+    .topbar-search {
+        display: none;
+    }
+}

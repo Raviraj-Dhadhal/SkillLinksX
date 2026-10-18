@@ -1,0 +1,178 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Company.Master.cs" Inherits="SkillLinksX.MasterPages.Company" %>
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkillLinkX - Company Portal</title>
+
+    <!-- Font-Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="<%= ResolveUrl("~/assets/CSS/company-master.css") %>" />
+    <link rel="stylesheet" href="<%= ResolveUrl("~/assets/CSS/company-pages.css") %>" />
+
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <!-- Mobile Dim Overlay Backdrop -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+        <!-- Desktop Grid Layout (260px Sidebar / 1fr Body) -->
+        <div class="company-layout-grid">
+            
+            <!-- Left Sidebar -->
+            <aside class="company-sidebar" id="companySidebar">
+                <!-- Brand / Logo -->
+                <div class="sidebar-brand">
+                    <a href="<%= ResolveUrl("~/Company/Dashboard.aspx") %>" class="sidebar-logo-link">
+                        <img src='<%= ResolveUrl("~/assets/images/logo.svg") %>' alt="SkillLinkX Logo" class="sidebar-logo-img" />
+                        <div class="sidebar-text-stack">
+                            <span class="sidebar-logo-text">SkillLinkX</span>
+                            <span class="sidebar-logo-sub">PROFESSIONAL HUB</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Navigation Menu Links -->
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Company/Dashboard.aspx") %>" class="sidebar-link active">
+                                <i class="fa-solid fa-table-cells-large"></i> Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Company/Profile.aspx") %>" class="sidebar-link">
+                                <i class="fa-regular fa-building"></i> Company Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Company/PostJob.aspx") %>" class="sidebar-link">
+                                <i class="fa-regular fa-square-plus"></i> Post Job
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Company/PostInternship.aspx") %>" class="sidebar-link">
+                                <i class="fa-regular fa-circle-plus"></i> Post Internship
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Company/ManageJobs.aspx") %>" class="sidebar-link">
+                                <i class="fa-solid fa-briefcase"></i> Manage Jobs
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Company/ManageInternships.aspx") %>" class="sidebar-link">
+                                <i class="fa-solid fa-graduation-cap"></i> Manage Internships
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Company/Applicants.aspx") %>" class="sidebar-link">
+                                <i class="fa-solid fa-user-group"></i> Applicants
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Company/Candidates.aspx") %>" class="sidebar-link">
+                                <i class="fa-solid fa-user-check"></i> Candidates
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Company/Interviews.aspx") %>" class="sidebar-link">
+                                <i class="fa-regular fa-comments"></i> Interviews
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Company/Messages.aspx") %>" class="sidebar-link">
+                                <i class="fa-regular fa-message"></i> Messages
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Company/Notifications.aspx") %>" class="sidebar-link">
+                                <i class="fa-regular fa-bell"></i> Notifications
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Company/Analytics.aspx") %>" class="sidebar-link">
+                                <i class="fa-solid fa-chart-simple"></i> Analytics
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Company/Settings.aspx") %>" class="sidebar-link">
+                                <i class="fa-solid fa-gear"></i> Settings
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- Sidebar Footer Links -->
+                <div class="sidebar-footer">
+                    <a href="<%= ResolveUrl("~/Public/Login.aspx") %>" class="sidebar-footer-link logout">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                    </a>
+                </div>
+            </aside>
+
+            <!-- Right Body -->
+            <div class="company-main-area">
+                
+                <!-- Top Header Bar -->
+                <header class="company-topbar">
+                    <!-- Left: Mobile Hamburger Icon -->
+                    <button type="button" class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Navigation">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+
+                    <!-- Center: Search Input -->
+                    <div class="topbar-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" placeholder="Search jobs, internships, people..." />
+                    </div>
+
+                    <!-- Right: Quick Actions & Profile -->
+                    <div class="topbar-actions">
+                        <a href="<%= ResolveUrl("~/Company/Notifications.aspx") %>" class="topbar-icon-btn topbar-notif-btn" title="Notifications">
+                            <i class="fa-regular fa-bell"></i>
+                            <span class="badge-dot"></span>
+                        </a>
+                        <a href="<%= ResolveUrl("~/Company/Messages.aspx") %>" class="topbar-icon-btn" title="Messages">
+                            <i class="fa-regular fa-message"></i>
+                        </a>
+                        <a href="<%= ResolveUrl("~/Company/Profile.aspx") %>" class="topbar-user-profile" title="Company Profile">
+                            <div class="user-info-text">
+                                <span class="user-name">TechNova</span>
+                                <span class="user-role">Recruiting Team</span>
+                            </div>
+                            <!-- FontAwesome Initial T Icon Profile Logo -->
+                            <div class="user-avatar-chip">
+                                <i class="fa-solid fa-t"></i>
+                            </div>
+                        </a>
+                    </div>
+                </header>
+
+                <!-- Main Content Placeholder -->
+                <main class="company-content-wrapper">
+                    <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+                    </asp:ContentPlaceHolder>
+                </main>
+
+            </div>
+
+        </div>
+    </form>
+
+    <!-- JS -->
+    <script src="<%= ResolveUrl("~/assets/JS/company.js") %>"></script>
+</body>
+</html>
