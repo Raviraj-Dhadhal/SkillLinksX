@@ -239,7 +239,9 @@
                         <div class="interview-date-row">
                             <i class="fa-regular fa-calendar"></i> Oct 24, 10:00 AM
                         </div>
-                        <a href="#" class="btn-join-meeting">Join Virtual Meeting</a>
+                        <a href="https://meet.google.com/abc-defg-hij" target="_blank" rel="noopener noreferrer" class="btn-join-meeting">
+                            <i class="fa-solid fa-video" style="margin-right: 6px;"></i> Join Google Meet
+                        </a>
                     </div>
                 </div>
 
@@ -322,7 +324,10 @@
 
                 <!-- Suggested Connections Card -->
                 <div class="widget-white-card">
-                    <h3 class="widget-card-title">Suggested Connections</h3>
+                    <div class="widget-header-with-action" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                        <h3 class="widget-card-title" style="margin-bottom:0;">Suggested Connections</h3>
+                        <a href="<%= ResolveUrl("~/User/Networking.aspx") %>" class="dash-view-all-link" style="font-size:12px;">View all</a>
+                    </div>
                     <div class="connections-list">
                         <!-- Connection 1: Mahek Godvani -->
                         <div class="connection-item">
@@ -333,9 +338,9 @@
                                     <div class="connection-role">SDE at Google</div>
                                 </div>
                             </div>
-                            <button type="button" class="btn-connect-action" aria-label="Connect">
+                            <a href="<%= ResolveUrl("~/User/Networking.aspx") %>" class="btn-connect-action" aria-label="Connect" title="Connect on Networking page">
                                 <i class="fa-solid fa-user-plus"></i>
-                            </button>
+                            </a>
                         </div>
 
                         <!-- Connection 2: Ananya Sharma -->
@@ -347,9 +352,9 @@
                                     <div class="connection-role">Senior Recruiter</div>
                                 </div>
                             </div>
-                            <button type="button" class="btn-connect-action" aria-label="Connect">
+                            <a href="<%= ResolveUrl("~/User/Networking.aspx") %>" class="btn-connect-action" aria-label="Connect" title="Connect on Networking page">
                                 <i class="fa-solid fa-user-plus"></i>
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>

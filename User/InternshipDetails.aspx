@@ -121,7 +121,7 @@
                             </div>
                             <div class="meta-field-content">
                                 <span class="meta-field-name">Start Date</span>
-                                <span class="meta-field-val">08/06/2023</span>
+                                <span class="meta-field-val">08/06/2026</span>
                             </div>
                         </div>
 
@@ -141,7 +141,7 @@
                             </div>
                             <div class="meta-field-content">
                                 <span class="meta-field-name">Apply By</span>
-                                <span class="meta-field-val">24 Oct, 2023</span>
+                                <span class="meta-field-val">24 Oct, 2026</span>
                             </div>
                         </div>
                     </div>
