@@ -112,8 +112,8 @@
                     <!-- Actions & Admin Info -->
                     <div class="topbar-actions">
                         <a href="<%= ResolveUrl("~/Admin/Profile.aspx") %>" class="topbar-user-profile" title="Admin Profile">
-                            <img src='<%= ResolveUrl("~/assets/images/user-female-logo.png") %>' alt="Admin" class="user-avatar-img" />
-                            <span class="user-name-text">Admin</span>
+                            <img src='<%= ResolveUrl("~/assets/images/user-female-logo.png") %>' alt='<%= Session["UserName"] ?? "Administrator" %>' class="user-avatar-img" />
+                            <span class="user-name-text"><%= Session["UserName"] ?? "Administrator" %></span>
                             <i class="fa-solid fa-chevron-down profile-dropdown-arrow"></i>
                         </a>
                     </div>

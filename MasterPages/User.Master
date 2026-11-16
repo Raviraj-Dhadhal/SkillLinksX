@@ -114,7 +114,7 @@
 
                 <!-- Sidebar Footer Links -->
                 <div class="sidebar-footer">
-                    <a href="<%= ResolveUrl("~/User/HelpCenter.aspx") %>" class="sidebar-footer-link">
+                    <a href="<%= ResolveUrl("~/Public/HelpCenter.aspx") %>" class="sidebar-footer-link">
                         <i class="fa-regular fa-circle-question"></i> Help Center
                     </a>
                     <a href="<%= ResolveUrl("~/Public/Login.aspx") %>" class="sidebar-footer-link logout">
@@ -154,8 +154,8 @@
 
                         <!-- User Profile Pill (Links to Profile Page) -->
                         <a href="<%= ResolveUrl("~/User/Profile.aspx") %>" class="topbar-user-profile" title="View Profile">
-                            <img src='<%= ResolveUrl("~/assets/images/user-male-logo.png") %>' alt="Raviraj Dhadhal" class="user-avatar-img" />
-                            <span class="user-name-text">Raviraj Dhadhal</span>
+                            <img src='<%= ResolveUrl("~/assets/images/user-male-logo.png") %>' alt='<%= Session["UserName"] ?? "Student" %>' class="user-avatar-img" />
+                            <span class="user-name-text"><%= Session["UserName"] ?? "Student" %></span>
                             <i class="fa-solid fa-chevron-down profile-dropdown-arrow"></i>
                         </a>
                     </div>

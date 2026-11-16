@@ -143,12 +143,12 @@
                         </a>
                         <a href="<%= ResolveUrl("~/Company/Profile.aspx") %>" class="topbar-user-profile" title="Company Profile">
                             <div class="user-info-text">
-                                <span class="user-name">TechNova</span>
+                                <span class="user-name"><%= Session["UserName"] ?? "Company" %></span>
                                 <span class="user-role">Recruiting Team</span>
                             </div>
                             <!-- TechNova SVG Avatar Logo -->
                             <div class="user-avatar-chip">
-                                <img src='<%= ResolveUrl("~/assets/images/technova-avatar.svg") %>' alt="TechNova" class="company-avatar-svg-img" />
+                                <img src='<%= ResolveUrl("~/assets/images/technova-avatar.svg") %>' alt='<%= Session["UserName"] ?? "Company" %>' class="company-avatar-svg-img" />
                             </div>
                         </a>
                     </div>
