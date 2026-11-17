@@ -18,43 +18,47 @@
             </button>
         </div>
 
-        <!-- 5 Summary Metrics Cards -->
+        <!-- =========================================================================
+             [DYNAMIC METRIC TILES]: Aggregated Company counts from SQL Server
+             ========================================================================= -->
         <div class="admin-metrics-5grid">
             <div class="admin-stat-card">
                 <div class="stat-top-row">
                     <span class="stat-label">TOTAL COMPANIES</span>
                 </div>
-                <div class="stat-num-val">1,845</div>
+                <div class="stat-num-val"><%= TotalCompaniesCount %></div>
             </div>
 
             <div class="admin-stat-card">
                 <div class="stat-top-row">
                     <span class="stat-label">VERIFIED</span>
                 </div>
-                <div class="stat-num-val color-green">1,620</div>
+                <div class="stat-num-val color-green"><%= VerifiedCompaniesCount %></div>
             </div>
 
             <div class="admin-stat-card">
                 <div class="stat-top-row">
                     <span class="stat-label">PENDING VERIFICATION</span>
                 </div>
-                <div class="stat-num-val color-blue">42</div>
+                <div class="stat-num-val color-blue"><%= PendingCompaniesCount %></div>
             </div>
 
             <div class="admin-stat-card">
                 <div class="stat-top-row">
-                    <span class="stat-label">ACTIVE</span>
+                    <span class="stat-label">TOTAL JOBS POSTED</span>
                 </div>
-                <div class="stat-num-val">1,580</div>
+                <div class="stat-num-val"><%= TotalJobsPostedCount %></div>
             </div>
 
             <div class="admin-stat-card">
                 <div class="stat-top-row">
-                    <span class="stat-label">NEW THIS MONTH</span>
+                    <span class="stat-label">VERIFIED RATIO</span>
                 </div>
-                <div class="stat-num-val">28</div>
+                <div class="stat-num-val"><%= TotalCompaniesCount > 0 ? (VerifiedCompaniesCount * 100 / TotalCompaniesCount) : 100 %>%</div>
             </div>
         </div>
+
+        <asp:Label ID="lblAdminCompanyStatus" runat="server" ForeColor="Green" style="margin: 10px 14px; display:block; font-size:13px; font-weight:600;" EnableViewState="false" />
 
         <!-- Filter Bar Row -->
         <div class="admin-filter-bar-card">
@@ -114,90 +118,42 @@
                                     <th>LOCATION</th>
                                     <th>JOBS</th>
                                     <th>STATUS</th>
+                                    <th>ACTION</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Company 1: TechNova Solutions -->
-                                <tr class="company-row"
-                                    data-company-name="TechNova Solutions"
-                                    data-initials="TN"
-                                    data-status="Verified"
-                                    data-industry="IT & Software"
-                                    data-location="Bengaluru, HQ"
-                                    data-website="technova.io"
-                                    data-email="careers@technova.io"
-                                    data-phone="+91 98450 12345"
-                                    data-size="500-1000"
-                                    data-founded="2015"
-                                    data-jobs="12"
-                                    data-applicants="850"
-                                    data-hires="34">
-                                    <td><input type="checkbox" /></td>
-                                    <td>
-                                        <div class="company-cell-flex">
-                                            <div class="company-avatar-box">TN</div>
-                                            <span class="company-name-bold">TechNova Solutions</span>
-                                        </div>
-                                    </td>
-                                    <td>IT</td>
-                                    <td>Bengaluru</td>
-                                    <td>12</td>
-                                    <td><span class="badge-status-verified">&bull; Verified</span></td>
-                                </tr>
-
-                                <!-- Company 2: RetailGenius (Selected by default) -->
-                                <tr class="company-row selected"
-                                    data-company-name="RetailGenius"
-                                    data-initials="RG"
-                                    data-status="Pending"
-                                    data-industry="E-Commerce"
-                                    data-location="Mumbai, HQ"
-                                    data-website="retailgenius.com"
-                                    data-email="hr@retailgenius.com"
-                                    data-phone="+91 98765 43210"
-                                    data-size="50-200"
-                                    data-founded="2018"
-                                    data-jobs="8"
-                                    data-applicants="450"
-                                    data-hires="12">
-                                    <td><input type="checkbox" checked="checked" /></td>
-                                    <td>
-                                        <div class="company-cell-flex">
-                                            <div class="company-avatar-box bg-purple-tint">RG</div>
-                                            <span class="company-name-bold">RetailGenius</span>
-                                        </div>
-                                    </td>
-                                    <td>E-Commerce</td>
-                                    <td>Mumbai</td>
-                                    <td>8</td>
-                                    <td><span class="badge-status-pending">&bull; Pending</span></td>
-                                </tr>
-
-                                <!-- Company 3: HealthFirst -->
-                                <tr class="company-row"
-                                    data-company-name="HealthFirst"
-                                    data-initials="HF"
-                                    data-status="Verified"
-                                    data-industry="Healthcare"
-                                    data-location="Pune, HQ"
-                                    data-website="healthfirst.org"
-                                    data-email="talent@healthfirst.org"
-                                    data-phone="+91 98220 99887"
-                                    data-size="200-500"
-                                    data-founded="2012"
-                                    data-jobs="5"
-                                    data-applicants="320"
-                                    data-hires="9">
-                                    <td><input type="checkbox" /></td>
-                                    <td>
-                                        <div class="company-cell-flex">
-                                            <div class="company-avatar-box bg-blue-tint">HF</div>
-                                            <span class="company-name-bold">HealthFirst</span>
-                                        </div>
-                                    </td>
-                                    <td>Healthcare</td>
-                                    <td>Pune</td>
-                                    <td>5</td>
+                                <!-- =========================================================
+                                     [DYNAMIC COMPANIES REPEATER]: Binds all partner employers
+                                     ========================================================= -->
+                                <asp:Repeater ID="rptCompaniesTable" runat="server" OnItemCommand="rptCompaniesTable_ItemCommand">
+                                    <ItemTemplate>
+                                        <tr class="company-row">
+                                            <td><%# Container.ItemIndex + 1 %></td>
+                                            <td>
+                                                <div class="company-cell-flex">
+                                                    <div class="company-avatar-box"><%# Eval("Initials") %></div>
+                                                    <span class="company-name-bold"><%# Eval("CompanyName") %></span>
+                                                </div>
+                                            </td>
+                                            <td><%# Eval("Industry") %></td>
+                                            <td><%# Eval("Location") %></td>
+                                            <td>
+                                                <span style="font-weight:600; color:#2563eb;"><%# Eval("JobCount") %></span>
+                                            </td>
+                                            <td>
+                                                <span class='badge-status-<%# Eval("VerificationStatus").ToString().ToLower() %>'>
+                                                    &bull; <%# Eval("VerificationStatus") %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <asp:LinkButton ID="btnToggleVerify" runat="server" CommandName="ToggleVerify" CommandArgument='<%# Eval("CompanyId") + "|" + Eval("VerificationStatus") %>' CssClass="btn btn-sm btn-outline-primary" style="font-size:11.5px; text-decoration:none; padding:3px 8px; border:1px solid #2563eb; color:#2563eb; border-radius:4px;">
+                                                    <%# Eval("VerificationStatus").ToString() == "Verified" ? "Unverify" : "Verify" %>
+                                                </asp:LinkButton>
+                                            </td>
+                                        </tr>
+                                    </ItemTemplate>
+                                </asp:Repeater>
+                            </tbody>
                                     <td><span class="badge-status-verified">&bull; Verified</span></td>
                                 </tr>
 
