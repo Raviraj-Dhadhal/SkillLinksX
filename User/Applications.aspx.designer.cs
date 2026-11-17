@@ -11,5 +11,6 @@ namespace SkillLinksX.User
 {
     public partial class Applications
     {
+        protected global::System.Web.UI.WebControls.Repeater rptApplicationsList;
     }
 }

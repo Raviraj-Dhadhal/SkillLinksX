@@ -13,32 +13,34 @@
             <p class="apps-page-sub">Track and manage all your job and internship applications in one place.</p>
         </div>
 
-        <!-- 5 Metric Tiles Row -->
+        <!-- =========================================================================
+             [DYNAMIC METRIC TILES]: Real-time application counters from SQL Server
+             ========================================================================= -->
         <div class="apps-metrics-grid">
             <!-- 1. Total Applications -->
             <div class="app-metric-tile">
                 <span class="app-metric-label">Total Applications</span>
-                <span class="app-metric-val">24</span>
+                <span class="app-metric-val"><%= TotalApplications %></span>
             </div>
             <!-- 2. Under Review -->
             <div class="app-metric-tile">
                 <span class="app-metric-label">Under Review</span>
-                <span class="app-metric-val color-blue">8</span>
+                <span class="app-metric-val color-blue"><%= UnderReviewCount %></span>
             </div>
             <!-- 3. Shortlisted -->
             <div class="app-metric-tile">
                 <span class="app-metric-label">Shortlisted</span>
-                <span class="app-metric-val color-green">4</span>
+                <span class="app-metric-val color-green"><%= ShortlistedCount %></span>
             </div>
             <!-- 4. Interviews -->
             <div class="app-metric-tile">
                 <span class="app-metric-label">Interviews</span>
-                <span class="app-metric-val color-orange">2</span>
+                <span class="app-metric-val color-orange"><%= InterviewCount %></span>
             </div>
             <!-- 5. Selected -->
             <div class="app-metric-tile">
                 <span class="app-metric-label">Selected</span>
-                <span class="app-metric-val color-teal">1</span>
+                <span class="app-metric-val color-teal"><%= SelectedCount %></span>
             </div>
         </div>
 
@@ -60,34 +62,38 @@
                     <button type="button" class="app-tab-pill">Rejected</button>
                 </div>
 
-                <!-- Applications List Group -->
+                <!-- =================================================================
+                     [APPLICATIONS REPEATER]: Binds all submitted applications for user
+                     ================================================================= -->
                 <div class="apps-list-container">
-
-                    <!-- App 1: Software Development Intern at Razorpay -->
-                    <div class="app-row-card">
-                        <div class="app-row-left">
-                            <div class="app-company-logo">
-                                <img src="<%= ResolveUrl("~/assets/images/razorpay-logo.svg") %>" alt="Razorpay" class="app-logo-img" />
-                            </div>
-                            <div class="app-details-stack">
-                                <h3 class="app-role-name">Software Development Intern</h3>
-                                <div class="app-meta-line">
-                                    <span class="app-comp">Razorpay</span> &bull; 
-                                    <span class="app-loc">Ahmedabad</span> &bull; 
-                                    <span class="app-time">Applied 2 days ago</span>
+                    <asp:Repeater ID="rptApplicationsList" runat="server">
+                        <ItemTemplate>
+                            <div class="app-row-card">
+                                <div class="app-row-left">
+                                    <div class="app-company-logo">
+                                        <i class="fa-solid fa-briefcase" style="font-size:20px; color:#2563eb;"></i>
+                                    </div>
+                                    <div class="app-details-stack">
+                                        <h3 class="app-role-name"><%# Eval("JobTitle") %></h3>
+                                        <div class="app-meta-line">
+                                            <span class="app-comp"><%# Eval("CompanyName") %></span> &bull; 
+                                            <span class="app-loc"><%# Eval("Location") %></span> &bull; 
+                                            <span class="app-time"><%# Eval("AppliedTime") %></span>
+                                        </div>
+                                        <div class="app-type-badge-wrap">
+                                            <span class="app-type-pill"><%# Eval("JobType") %></span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="app-type-badge-wrap">
-                                    <span class="app-type-pill">Internship</span>
+                                <div class="app-row-right">
+                                    <span class='app-status-badge <%# Eval("StatusBadgeClass") %>'>&bull; <%# Eval("Status") %></span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="app-row-right">
-                            <span class="app-status-badge badge-under-review">&bull; Under Review</span>
-                        </div>
-                    </div>
+                        </ItemTemplate>
+                    </asp:Repeater>
+                </div>
 
-                    <!-- App 2: Product Management Intern at Flipkart -->
-                    <div class="app-row-card">
+            </div>
                         <div class="app-row-left">
                             <div class="app-company-logo">
                                 <img src="<%= ResolveUrl("~/assets/images/technova-avatar.svg") %>" alt="Flipkart" class="app-logo-img" />
