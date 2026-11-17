@@ -13,16 +13,18 @@
             <p class="admin-greeting-sub">Monitor and manage the SkillLinkX platform from one place.</p>
         </div>
 
-        <!-- 3 Summary Metrics Cards Row -->
+        <!-- =========================================================================
+             [DYNAMIC PLATFORM METRICS]: Real-time platform aggregates from SQL Server
+             ========================================================================= -->
         <div class="admin-metrics-3grid">
             
             <!-- Card 1: Total Students -->
             <div class="admin-metric-card">
                 <div class="admin-metric-info">
                     <span class="admin-metric-label">TOTAL STUDENTS</span>
-                    <span class="admin-metric-num">45,231</span>
+                    <span class="admin-metric-num"><%= TotalStudents %></span>
                     <span class="admin-metric-trend">
-                        <i class="fa-solid fa-arrow-trend-up"></i> +12.5% this month
+                        <i class="fa-solid fa-arrow-trend-up"></i> Registered Students
                     </span>
                 </div>
                 <div class="admin-metric-icon-box icon-blue-subtle">
@@ -34,9 +36,9 @@
             <div class="admin-metric-card">
                 <div class="admin-metric-info">
                     <span class="admin-metric-label">TOTAL COMPANIES</span>
-                    <span class="admin-metric-num">1,845</span>
+                    <span class="admin-metric-num"><%= TotalCompanies %></span>
                     <span class="admin-metric-trend">
-                        <i class="fa-solid fa-arrow-trend-up"></i> +4.2% this month
+                        <i class="fa-solid fa-arrow-trend-up"></i> Partner Employers
                     </span>
                 </div>
                 <div class="admin-metric-icon-box icon-gray-subtle">
@@ -47,10 +49,10 @@
             <!-- Card 3: Active Jobs/Internships -->
             <div class="admin-metric-card">
                 <div class="admin-metric-info">
-                    <span class="admin-metric-label">ACTIVE JOBS/INTERNSHIPS</span>
-                    <span class="admin-metric-num">8,402</span>
+                    <span class="admin-metric-label">ACTIVE OPPORTUNITIES</span>
+                    <span class="admin-metric-num"><%= ActiveOpportunities %></span>
                     <span class="admin-metric-trend">
-                        <i class="fa-solid fa-arrow-trend-up"></i> +8.1% this month
+                        <i class="fa-solid fa-arrow-trend-up"></i> Live Postings
                     </span>
                 </div>
                 <div class="admin-metric-icon-box icon-green-subtle">
@@ -145,64 +147,41 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Row 1: TechNova Solutions -->
-                        <tr>
-                            <td>
-                                <div class="entity-cell-flex">
-                                    <div class="entity-avatar-box">
-                                        <img src="<%= ResolveUrl("~/assets/images/technova-avatar.svg") %>" alt="TechNova" class="entity-avatar-img" />
-                                    </div>
-                                    <div>
-                                        <div class="entity-name-bold">TechNova Solutions</div>
-                                        <div class="entity-sub-desc">IT Services</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Company</td>
-                            <td>Bengaluru</td>
-                            <td>Oct 24, 2026</td>
-                            <td>
-                                <span class="badge-status-pending">Pending</span>
-                            </td>
-                            <td>
-                                <div class="row-actions-group">
-                                    <button type="button" class="btn-action-icon action-approve" title="Approve" onclick="alert('TechNova approved successfully');">
-                                        <i class="fa-solid fa-check"></i>
-                                    </button>
-                                    <button type="button" class="btn-action-icon action-reject" title="Reject" onclick="alert('TechNova rejected');">
-                                        <i class="fa-solid fa-xmark"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Row 2: Raviraj Dhadhal -->
-                        <tr>
-                            <td>
-                                <div class="entity-cell-flex">
-                                    <div class="entity-avatar-box round">
-                                        <img src="<%= ResolveUrl("~/assets/images/user-male-logo.png") %>" alt="Raviraj Dhadhal" class="entity-avatar-img" />
-                                    </div>
-                                    <div>
-                                        <div class="entity-name-bold">Raviraj Dhadhal</div>
-                                        <div class="entity-sub-desc">B.Tech CS, IIT Bombay</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Student</td>
-                            <td>Mumbai</td>
-                            <td>Oct 24, 2026</td>
-                            <td>
-                                <span class="badge-status-verified">Verified</span>
-                            </td>
-                            <td>
-                                <div class="row-actions-group">
-                                    <button type="button" class="btn-action-icon action-view" title="View Profile" onclick="alert('Viewing Raviraj Dhadhal profile');">
-                                        <i class="fa-regular fa-eye"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                        <!-- =========================================================
+                             [DYNAMIC RECENT USERS REPEATER]: Binds recent signups
+                             ========================================================= -->
+                        <asp:Repeater ID="rptRecentUsers" runat="server">
+                            <ItemTemplate>
+                                <tr>
+                                    <td>
+                                        <div class="entity-cell-flex">
+                                            <div class="entity-avatar-box round">
+                                                <img src='<%# ResolveUrl("~/assets/images/user-male-logo.png") %>' alt="User" class="entity-avatar-img" />
+                                            </div>
+                                            <div>
+                                                <div class="entity-name-bold"><%# Eval("FullName") %></div>
+                                                <div class="entity-sub-desc"><%# Eval("Email") %></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><%# Eval("Role") %></td>
+                                    <td>India</td>
+                                    <td><%# Eval("JoinedDate") %></td>
+                                    <td>
+                                        <span class='badge-status-<%# Eval("AccountStatus").ToString().ToLower() %>'>
+                                            <%# Eval("AccountStatus") %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="row-actions-group">
+                                            <a href='<%# ResolveUrl("~/Admin/Students.aspx") %>' class="btn-action-icon action-view" title="Manage Account">
+                                                <i class="fa-regular fa-eye"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ItemTemplate>
+                        </asp:Repeater>
                     </tbody>
                 </table>
             </div>
