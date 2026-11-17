@@ -8,5 +8,11 @@ namespace SkillLinksX.Company
 {
     public partial class Applicants
     {
+        protected global::System.Web.UI.WebControls.DropDownList ddlOpportunityFilter;
+        protected global::System.Web.UI.WebControls.TextBox txtCandidateSearch;
+        protected global::System.Web.UI.WebControls.Button btnShortlist;
+        protected global::System.Web.UI.WebControls.Button btnReject;
+        protected global::System.Web.UI.WebControls.Label lblActionMessage;
+        protected global::System.Web.UI.WebControls.Repeater rptApplicants;
     }
 }
