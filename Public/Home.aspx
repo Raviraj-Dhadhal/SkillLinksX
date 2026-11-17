@@ -102,26 +102,26 @@
                     <div class="featured-big-header">
                         <div class="featured-big-header-left">
                             <div class="company-logo-badge">
-                                <img src='<%= ResolveUrl("~/assets/images/logo.svg") %>' alt="TechFlow Systems" />
+                                <img src='<%= ResolveUrl("~/assets/images/logo.svg") %>' alt='<%= FeaturedCompany %>' />
                             </div>
                             <div>
-                                <h3 class="featured-big-role-title">Senior Frontend Developer</h3>
-                                <div class="featured-big-company">TechFlow Systems</div>
+                                <h3 class="featured-big-role-title"><%= FeaturedTitle %></h3>
+                                <div class="featured-big-company"><%= FeaturedCompany %></div>
                             </div>
                         </div>
-                        <button type="button" class="btn-bookmark-action" aria-label="Bookmark Job">
+                        <button type="button" class="btn-bookmark-action" aria-label="Bookmark Job" onclick="alert('Please log in to save opportunities.');">
                             <i class="fa-solid fa-bookmark" style="color:#334155;"></i>
                         </button>
                     </div>
 
                     <div class="featured-big-tags">
-                        <span class="figma-pill"><i class="fa-solid fa-location-dot"></i> Dehli, India</span>
-                        <span class="figma-pill"><i class="fa-regular fa-clock"></i> Full-time</span>
-                        <span class="figma-pill"><i class="fa-solid fa-money-bill-wave"></i> ₹120k - 150k</span>
+                        <span class="figma-pill"><i class="fa-solid fa-location-dot"></i> <%= FeaturedLocation %></span>
+                        <span class="figma-pill"><i class="fa-regular fa-clock"></i> <%= FeaturedJobType %></span>
+                        <span class="figma-pill"><i class="fa-solid fa-money-bill-wave"></i> <%= FeaturedSalary %></span>
                     </div>
 
                     <p class="featured-big-desc">
-                        We are seeking an experienced Frontend Developer to lead our UI architecture. You will be responsible for building highly performant, scalable, and beautifully designed user interfaces using modern web technologies.
+                        We are seeking an ambitious candidate to join our high-performing team. In this role, you will work on enterprise-grade software products and scale modern applications across our global clients.
                     </p>
 
                     <div>
@@ -129,58 +129,27 @@
                     </div>
                 </div>
 
-                <!-- Right: 3 Stacked Cards -->
+                <!-- Right: 3 Stacked Cards (Dynamic from Database) -->
                 <div class="featured-stacked-column">
-                    <!-- Right Card 1: UX Designer Intern -->
-                    <div class="featured-stack-card">
-                        <div class="stack-card-top">
-                            <div class="stack-card-icon-box">
-                                <i class="fa-solid fa-desktop" style="color:#0052CC;"></i>
+                    <asp:Repeater ID="rptStackedJobs" runat="server">
+                        <ItemTemplate>
+                            <div class="featured-stack-card">
+                                <div class="stack-card-top">
+                                    <div class="stack-card-icon-box">
+                                        <i class="fa-solid fa-laptop-code" style="color:#0052CC;"></i>
+                                    </div>
+                                    <div class="stack-card-details">
+                                        <h4 class="stack-role-title"><%# Eval("Title") %></h4>
+                                        <div class="stack-company-name"><%# Eval("CompanyName") %></div>
+                                    </div>
+                                </div>
+                                <div class="stack-card-bottom">
+                                    <span class="stack-loc"><i class="fa-solid fa-location-dot"></i> <%# Eval("Location") %></span>
+                                    <span class="stack-status-active">Active</span>
+                                </div>
                             </div>
-                            <div class="stack-card-details">
-                                <h4 class="stack-role-title">UX Designer Intern</h4>
-                                <div class="stack-company-name">DataStream</div>
-                            </div>
-                        </div>
-                        <div class="stack-card-bottom">
-                            <span class="stack-loc"><i class="fa-solid fa-location-dot"></i> Dehli</span>
-                            <span class="stack-status-active">Active</span>
-                        </div>
-                    </div>
-
-                    <!-- Right Card 2: Financial Analyst -->
-                    <div class="featured-stack-card">
-                        <div class="stack-card-top">
-                            <div class="stack-card-icon-box">
-                                <i class="fa-solid fa-award" style="color:#854D0E;"></i>
-                            </div>
-                            <div class="stack-card-details">
-                                <h4 class="stack-role-title">Financial Analyst</h4>
-                                <div class="stack-company-name">Apex Capital</div>
-                            </div>
-                        </div>
-                        <div class="stack-card-bottom">
-                            <span class="stack-loc"><i class="fa-solid fa-location-dot"></i> Mumbai</span>
-                            <span class="stack-status-new">New</span>
-                        </div>
-                    </div>
-
-                    <!-- Right Card 3: Marketing Manager -->
-                    <div class="featured-stack-card">
-                        <div class="stack-card-top">
-                            <div class="stack-card-icon-box">
-                                <i class="fa-solid fa-rectangle-ad" style="color:#0284C7;"></i>
-                            </div>
-                            <div class="stack-card-details">
-                                <h4 class="stack-role-title">Marketing Manager</h4>
-                                <div class="stack-company-name">BrandLift</div>
-                            </div>
-                        </div>
-                        <div class="stack-card-bottom">
-                            <span class="stack-loc"><i class="fa-solid fa-location-dot"></i> Bangluru</span>
-                            <span class="stack-status-ago">2 days ago</span>
-                        </div>
-                    </div>
+                        </ItemTemplate>
+                    </asp:Repeater>
                 </div>
             </div>
 
