@@ -34,8 +34,10 @@
                     <span class="stat-label" style="font-size:12px; font-weight:700; color:#475569;">Total Students</span>
                     <span class="stat-icon-wrap" style="color:#0D9488; font-size:18px;"><i class="fa-solid fa-graduation-cap"></i></span>
                 </div>
-                <div class="stat-num-val" style="font-size:26px; font-weight:800; color:#0F172A; margin-bottom:4px;">25,480</div>
-                <div class="stat-sub-trend-line font-green" style="font-size:12px; font-weight:600; color:#10B981;"><i class="fa-solid fa-arrow-up"></i> +12.5% vs last month</div>
+                <div class="stat-num-val" style="font-size:26px; font-weight:800; color:#0F172A; margin-bottom:4px;">
+                    <asp:Literal ID="litTotalStudents" runat="server">0</asp:Literal>
+                </div>
+                <div class="stat-sub-trend-line font-green" style="font-size:12px; font-weight:600; color:#10B981;"><i class="fa-solid fa-arrow-up"></i> Live registered candidates</div>
             </div>
         </div>
 
