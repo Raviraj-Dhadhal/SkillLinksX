@@ -18,18 +18,18 @@
                 <div class="cand-profile-hero-details">
                     <div class="cand-profile-title-row">
                         <div class="cand-name-and-tagline">
-                            <h1 class="cand-profile-name">Raviraj Dhadhal</h1>
-                            <p class="cand-profile-tagline">B.Tech Computer Engineering Student | Aspiring Full Stack Developer</p>
+                            <h1 class="cand-profile-name"><%= StudentName %></h1>
+                            <p class="cand-profile-tagline"><%= StudentBio %></p>
                             <div class="cand-profile-meta-row">
-                                <span><i class="fa-solid fa-location-dot"></i> Ahmedabad, Gujarat</span>
-                                <span><i class="fa-solid fa-building-columns"></i> Gujarat Technological University</span>
-                                <span><i class="fa-regular fa-calendar"></i> Graduation: 2025</span>
+                                <span><i class="fa-solid fa-location-dot"></i> <%= StudentCity %></span>
+                                <span><i class="fa-solid fa-building-columns"></i> <%= StudentCollege %></span>
+                                <span><i class="fa-regular fa-envelope"></i> <%= StudentEmail %></span>
                             </div>
                         </div>
 
                         <!-- Action Buttons: Share & Edit -->
                         <div class="cand-profile-hero-actions">
-                            <button type="button" class="btn-profile-hero-share">
+                            <button type="button" class="btn-profile-hero-share" onclick="alert('Profile link copied to clipboard!');">
                                 <i class="fa-solid fa-share-nodes"></i> Share Profile
                             </button>
                             <a href="<%= ResolveUrl("~/User/Settings.aspx") %>" class="btn-profile-hero-edit" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
@@ -259,22 +259,26 @@
                             <i class="fa-solid fa-crosshairs section-icon-blue"></i>
                             <h2 class="cand-card-title">Top Skills</h2>
                         </div>
-                        <button type="button" class="btn-card-edit" aria-label="Edit Skills">
+                        <a href="<%= ResolveUrl("~/User/Settings.aspx") %>" class="btn-card-edit" aria-label="Edit Skills">
                             <i class="fa-regular fa-pen-to-square"></i>
-                        </button>
+                        </a>
                     </div>
                     <div class="cand-card-body">
+                        <!-- =========================================================
+                             [DYNAMIC PROFILE SKILLS REPEATER]: Binds skills from DB
+                             ========================================================= -->
                         <div class="cand-skills-chips-wrap">
-                            <span class="skill-dot-chip">C# <span class="skill-level-dot dot-blue"></span></span>
-                            <span class="skill-dot-chip">ASP.NET MVC <span class="skill-level-dot dot-blue"></span></span>
-                            <span class="skill-dot-chip">SQL Server <span class="skill-level-dot dot-blue"></span></span>
-                            <span class="skill-dot-chip">Flutter <span class="skill-level-dot dot-blue"></span></span>
-                            <span class="skill-dot-chip">Dart <span class="skill-level-dot dot-blue"></span></span>
-                            <span class="skill-dot-chip">HTML/CSS/JS <span class="skill-level-dot dot-blue"></span></span>
+                            <asp:Repeater ID="rptProfileSkills" runat="server">
+                                <ItemTemplate>
+                                    <span class="skill-dot-chip">
+                                        <%# Container.DataItem %> 
+                                        <span class="skill-level-dot dot-blue"></span>
+                                    </span>
+                                </ItemTemplate>
+                            </asp:Repeater>
                         </div>
                         <div class="skills-legend-row">
-                            <span class="legend-item"><span class="legend-dot bg-blue"></span> Advanced</span>
-                            <span class="legend-item"><span class="legend-dot bg-purple"></span> Intermediate</span>
+                            <span class="legend-item"><span class="legend-dot bg-blue"></span> Verified Profile Skill</span>
                         </div>
                     </div>
                 </div>

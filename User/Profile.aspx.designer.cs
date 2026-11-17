@@ -11,5 +11,6 @@ namespace SkillLinksX.User
 {
     public partial class Profile
     {
+        protected global::System.Web.UI.WebControls.Repeater rptProfileSkills;
     }
 }
