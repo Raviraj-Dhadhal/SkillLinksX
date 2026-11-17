@@ -13,9 +13,9 @@
                 <h1 class="notif-page-title">Notifications</h1>
                 <p class="notif-page-sub">Stay updated with your applications, opportunities and professional network.</p>
             </div>
-            <a href="javascript:void(0);" class="btn-mark-all-read" onclick="markAllAsRead()">
+            <asp:LinkButton ID="btnMarkAllRead" runat="server" CssClass="btn-mark-all-read" OnClick="btnMarkAllRead_Click">
                 <i class="fa-solid fa-check-double"></i> Mark All as Read
-            </a>
+            </asp:LinkButton>
         </div>
 
         <!-- 4 Metric Tiles Row -->
@@ -27,7 +27,7 @@
                         <i class="fa-regular fa-bell"></i>
                     </div>
                 </div>
-                <span class="notif-metric-val">3</span>
+                <span class="notif-metric-val"><asp:Literal ID="litUnreadCount" runat="server">0</asp:Literal></span>
             </div>
 
             <div class="notif-metric-tile">
@@ -37,7 +37,7 @@
                         <i class="fa-regular fa-file-lines"></i>
                     </div>
                 </div>
-                <span class="notif-metric-val">1</span>
+                <span class="notif-metric-val"><asp:Literal ID="litAppNotifs" runat="server">0</asp:Literal></span>
             </div>
 
             <div class="notif-metric-tile">
@@ -47,7 +47,7 @@
                         <i class="fa-solid fa-video"></i>
                     </div>
                 </div>
-                <span class="notif-metric-val">1</span>
+                <span class="notif-metric-val"><asp:Literal ID="litInterviewNotifs" runat="server">0</asp:Literal></span>
             </div>
 
             <div class="notif-metric-tile">
@@ -57,7 +57,7 @@
                         <i class="fa-solid fa-user-group"></i>
                     </div>
                 </div>
-                <span class="notif-metric-val">2</span>
+                <span class="notif-metric-val"><asp:Literal ID="litNetworkNotifs" runat="server">0</asp:Literal></span>
             </div>
         </div>
 
@@ -73,63 +73,28 @@
 
         <!-- Notifications Feed List -->
         <div class="notif-feed-stack" id="notifFeed">
-
-            <!-- Item 1: Application Shortlisted (Unread) -->
-            <div class="notif-card-item unread">
-                <div class="notif-unread-blue-dot"></div>
-                <div class="notif-icon-circle bg-blue-light">
-                    <i class="fa-regular fa-file-lines"></i>
-                </div>
-                <div class="notif-text-content">
-                    <p class="notif-body-line">
-                        Your application for <strong>Software Developer Intern</strong> at <strong>TechNova</strong> has been shortlisted.
-                    </p>
-                    <span class="notif-time-ago">2m ago</span>
-                </div>
-            </div>
-
-            <!-- Item 2: Connection Request Accepted -->
-            <div class="notif-card-item">
-                <div class="notif-unread-blue-dot invisible"></div>
-                <div class="notif-avatar-circle">
-                    <img src="<%= ResolveUrl("~/assets/images/user-female-logo.png") %>" alt="Mahek Godvani" class="notif-avatar-img" />
-                </div>
-                <div class="notif-text-content">
-                    <p class="notif-body-line">
-                        <strong>Mahek Godvani</strong> accepted your connection request.
-                    </p>
-                    <span class="notif-time-ago">1h ago</span>
-                </div>
-            </div>
-
-            <!-- Item 3: Interview Scheduled (Unread) -->
-            <div class="notif-card-item unread">
-                <div class="notif-unread-blue-dot"></div>
-                <div class="notif-icon-circle bg-green-light">
-                    <i class="fa-solid fa-video"></i>
-                </div>
-                <div class="notif-text-content">
-                    <p class="notif-body-line">
-                        Your interview for <strong>Software Developer</strong> at <strong>Zomato</strong> is scheduled for tomorrow at 11:00 AM.
-                    </p>
-                    <span class="notif-time-ago">3h ago</span>
-                </div>
-            </div>
-
-            <!-- Item 4: Internship Match -->
-            <div class="notif-card-item">
-                <div class="notif-unread-blue-dot invisible"></div>
-                <div class="notif-icon-circle bg-sky-light">
-                    <i class="fa-solid fa-briefcase"></i>
-                </div>
-                <div class="notif-text-content">
-                    <p class="notif-body-line">
-                        A new internship matches <strong>94%</strong> of your skills.
-                    </p>
-                    <span class="notif-time-ago">5h ago</span>
-                </div>
-            </div>
-
+            <asp:Repeater ID="rptNotifications" runat="server">
+                <ItemTemplate>
+                    <div class='notif-card-item <%# Convert.ToBoolean(Eval("is_read")) ? "" : "unread" %>'>
+                        <div class='notif-unread-blue-dot <%# Convert.ToBoolean(Eval("is_read")) ? "invisible" : "" %>'></div>
+                        <div class='notif-icon-circle <%# Eval("category").ToString() == "Interviews" ? "bg-green-light" : "bg-blue-light" %>'>
+                            <i class='<%# Eval("category").ToString() == "Interviews" ? "fa-solid fa-video" : "fa-regular fa-file-lines" %>'></i>
+                        </div>
+                        <div class="notif-text-content">
+                            <p class="notif-body-line">
+                                <strong><%# Eval("title") %>:</strong> <%# Eval("message") %>
+                            </p>
+                            <span class="notif-time-ago"><%# Convert.ToDateTime(Eval("created_at")).ToString("dd MMM, hh:mm tt") %></span>
+                        </div>
+                    </div>
+                </ItemTemplate>
+                <FooterTemplate>
+                    <asp:Panel ID="pnlNoNotifs" runat="server" Visible='<%# rptNotifications.Items.Count == 0 %>' CssClass="text-center" style="padding: 30px; color: #64748b;">
+                        <i class="fa-regular fa-bell-slash" style="font-size: 28px; margin-bottom: 8px;"></i>
+                        <p>No notifications at the moment.</p>
+                    </asp:Panel>
+                </FooterTemplate>
+            </asp:Repeater>
         </div>
 
         <!-- Load More Button -->

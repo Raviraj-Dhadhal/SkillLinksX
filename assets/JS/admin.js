@@ -82,15 +82,27 @@ document.addEventListener("DOMContentLoaded", function () {
         // Clear existing chart container
         chartContainer.innerHTML = "";
 
+        // =========================================================================
+        // [DATABASE DYNAMIC INJECTION]:
+        // Read database-fed series data passed from Admin/Dashboard.aspx.cs
+        // =========================================================================
+        const liveStudentData = (typeof window.dbAdminStudentGrowth !== "undefined" && Array.isArray(window.dbAdminStudentGrowth)) 
+            ? window.dbAdminStudentGrowth 
+            : [12000, 18500, 24000, 31000, 38500, 45231];
+
+        const liveCompanyData = (typeof window.dbAdminCompanyGrowth !== "undefined" && Array.isArray(window.dbAdminCompanyGrowth))
+            ? window.dbAdminCompanyGrowth
+            : [420, 680, 950, 1250, 1580, 1845];
+
         const chartOptions = {
             series: [
                 {
                     name: 'Students',
-                    data: [12000, 18500, 24000, 31000, 38500, 45231]
+                    data: liveStudentData // Live dynamic series from SQL database
                 },
                 {
                     name: 'Companies',
-                    data: [420, 680, 950, 1250, 1580, 1845]
+                    data: liveCompanyData // Live dynamic series from SQL database
                 }
             ],
             chart: {

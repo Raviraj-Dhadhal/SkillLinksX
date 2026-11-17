@@ -103,11 +103,19 @@ document.addEventListener("DOMContentLoaded", function () {
         // Clear existing chart if any
         chartContainer.innerHTML = "";
 
+        // =========================================================================
+        // [DATABASE DYNAMIC INJECTION]:
+        // Read database-fed monthly application counts from Company/Analytics.aspx.cs
+        // =========================================================================
+        const liveAppData = (typeof window.dbCompanyAppMonthly !== "undefined" && Array.isArray(window.dbCompanyAppMonthly))
+            ? window.dbCompanyAppMonthly
+            : [180, 290, 240, 420, 380, 520, 520, 490];
+
         // Options configuring the ApexCharts bar graph
         const chartOptions = {
             series: [{
                 name: 'Applications',
-                data: [180, 290, 240, 420, 380, 520, 520, 490] // Monthly application counts
+                data: liveAppData // Live dynamic series queried from SQL Server applications table
             }],
             chart: {
                 type: 'bar',
