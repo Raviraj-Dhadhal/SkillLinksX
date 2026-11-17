@@ -14,6 +14,7 @@ namespace SkillLinksX.User
         // [PAGE PROPERTIES]: Exposed for data binding in JobDetails.aspx
         // =========================================================================
         public int JobId { get; set; } = 1;
+        public int TargetCompanyId { get; set; } = 1;
         public string JobTitle { get; set; } = ".Net Developer";
         public string CompanyName { get; set; } = "Tech Company";
         public string CompanyLocation { get; set; } = "Mumbai";
@@ -76,6 +77,7 @@ namespace SkillLinksX.User
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     DataRow r = dt.Rows[0];
+                    TargetCompanyId = (r["company_id"] != DBNull.Value) ? Convert.ToInt32(r["company_id"]) : 1;
                     JobTitle = r["job_title"] != DBNull.Value ? r["job_title"].ToString() : ".Net Developer";
                     CompanyName = r["comp_name"] != DBNull.Value ? r["comp_name"].ToString() : "Hiring Company";
                     
@@ -118,36 +120,54 @@ namespace SkillLinksX.User
                     // Compute dynamic AI Match Score using student's actual skills from member_master_table
                     int studentId = Convert.ToInt32(Session["UserId"]);
                     object sObj = DBHelper.ExecuteScalar("SELECT skills FROM member_master_table WHERE id = @id", new SqlParameter("@id", studentId));
-                    string studentSkills = (sObj != null && sObj != DBNull.Value) ? sObj.ToString() : "";
+                    string studentSkills = (sObj != null && sObj != DBNull.Value) ? sObj.ToString().Trim() : "";
 
                     var studentTokens = new System.Collections.Generic.HashSet<string>(
                         studentSkills.Split(new[] { ',', ';', '|', '/', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
                                      .Select(s => s.Trim().ToLower())
                     );
 
+                    MatchingSkills.Clear();
+                    MissingSkills.Clear();
+
                     foreach (var req in RequiredSkillsList)
                     {
-                        bool isMatch = studentTokens.Any(st => st.Equals(req.ToLower()) || req.ToLower().Contains(st) || st.Contains(req.ToLower()));
+                        bool isMatch = studentTokens.Count > 0 && studentTokens.Any(st => 
+                            st.Equals(req.ToLower()) || 
+                            req.ToLower().Contains(st) || 
+                            st.Contains(req.ToLower()));
+
                         if (isMatch)
                             MatchingSkills.Add(req);
                         else
                             MissingSkills.Add(req);
                     }
 
-                    if (string.IsNullOrWhiteSpace(studentSkills))
+                    if (string.IsNullOrWhiteSpace(studentSkills) || studentTokens.Count == 0)
                     {
-                        AiMatchScore = 40;
-                        AiMatchBlurb = "You have not added any skills to your profile yet. Add your skills in Profile Settings to improve your AI match score.";
+                        AiMatchScore = 0;
+                        AiMatchBlurb = "Add your skills in your profile to see your AI Career Match.";
                     }
                     else
                     {
-                        AiMatchScore = AIService.CalculateMatchScore(studentSkills, JobRequirements);
-                        if (AiMatchScore >= 80)
-                            AiMatchBlurb = $"Outstanding fit! Your skillset aligns strongly with the requirements for {JobTitle}.";
-                        else if (AiMatchScore >= 60)
-                            AiMatchBlurb = $"Moderate fit. You match several core competencies for this role. Learning {string.Join(", ", MissingSkills.Take(2))} will boost your match.";
+                        if (RequiredSkillsList.Count > 0)
+                        {
+                            double ratio = (double)MatchingSkills.Count / RequiredSkillsList.Count;
+                            AiMatchScore = (int)Math.Round(ratio * 100);
+                        }
                         else
-                            AiMatchBlurb = $"Basic match. This role requires additional skills like {string.Join(", ", MissingSkills.Take(2))}.";
+                        {
+                            AiMatchScore = 75;
+                        }
+
+                        if (AiMatchScore >= 80)
+                            AiMatchBlurb = $"Outstanding fit ({AiMatchScore}%)! Your skills align strongly with the requirements for {JobTitle}.";
+                        else if (AiMatchScore >= 50)
+                            AiMatchBlurb = $"Moderate fit ({AiMatchScore}%). You match several competencies. Learning {string.Join(", ", MissingSkills.Take(2))} will boost your score.";
+                        else if (AiMatchScore > 0)
+                            AiMatchBlurb = $"Basic match ({AiMatchScore}%). This role requires additional skills like {string.Join(", ", MissingSkills.Take(2))}.";
+                        else
+                            AiMatchBlurb = $"Low match (0%). None of the required skills were found in your profile. Consider learning {string.Join(", ", MissingSkills.Take(2))}.";
                     }
                 }
             }
@@ -213,6 +233,38 @@ namespace SkillLinksX.User
                     btnApplyNow.Text = "Application Submitted";
                     lblFeedback.ForeColor = System.Drawing.Color.Green;
                     lblFeedback.Text = "Application submitted successfully! Track your status under Applications.";
+
+                    // Send notification to Candidate
+                    try
+                    {
+                        string candNotifSql = @"
+                            INSERT INTO notifications (user_id, title, message, category, link_url, is_read, created_at)
+                            VALUES (@uid, 'Application Submitted', @msg, 'Applications', '~/User/Applications.aspx', 0, GETDATE())";
+                        string candMsg = $"You successfully applied for {JobTitle} at {CompanyName}.";
+                        DBHelper.ExecuteNonQuery(candNotifSql,
+                            new SqlParameter("@uid", studentId),
+                            new SqlParameter("@msg", candMsg));
+                    }
+                    catch { }
+
+                    // Send notification to Company
+                    try
+                    {
+                        object sNameObj = DBHelper.ExecuteScalar("SELECT full_name FROM member_master_table WHERE id = @id", new SqlParameter("@id", studentId));
+                        string sName = (sNameObj != null && sNameObj != DBNull.Value) ? sNameObj.ToString() : "A candidate";
+
+                        string compNotifSql = @"
+                            INSERT INTO notifications (user_id, title, message, category, link_url, is_read, created_at)
+                            SELECT user_id, 'New Applicant: ' + @sname, @sname + ' applied for ' + @jtitle + '.', 'Applications', '~/Company/Applicants.aspx', 0, GETDATE()
+                            FROM company_table 
+                            WHERE company_id = @cid AND user_id IS NOT NULL";
+
+                        DBHelper.ExecuteNonQuery(compNotifSql,
+                            new SqlParameter("@sname", sName),
+                            new SqlParameter("@jtitle", JobTitle),
+                            new SqlParameter("@cid", companyId));
+                    }
+                    catch { }
                 }
             }
             catch (Exception ex)

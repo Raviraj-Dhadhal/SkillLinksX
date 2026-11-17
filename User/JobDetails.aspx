@@ -173,7 +173,7 @@
                         </div>
                         <div class="side-company-meta">
                             <h4 class="side-company-name"><%= CompanyName %></h4>
-                            <a href="<%= CompanyWebsite %>" target="_blank" rel="noopener noreferrer" class="side-company-link">Visit Website</a>
+                            <a href="javascript:void(0);" onclick="openCompanyModal();" class="side-company-link">View Profile</a>
                         </div>
                     </div>
                     <p class="side-company-desc">
@@ -198,6 +198,62 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Company Details Modal Popup -->
+                <div id="companyProfileModal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.6); align-items:center; justify-content:center; backdrop-filter:blur(3px);">
+                    <div style="background:#fff; border-radius:14px; max-width:540px; width:90%; padding:28px 24px; box-shadow:0 20px 40px rgba(0,0,0,0.2); position:relative; animation:fadeIn 0.2s ease;">
+                        <button type="button" onclick="closeCompanyModal();" style="position:absolute; right:18px; top:18px; background:none; border:none; font-size:18px; color:#94a3b8; cursor:pointer;" aria-label="Close Modal">&times;</button>
+                        
+                        <div style="display:flex; align-items:center; gap:16px; margin-bottom:18px;">
+                            <span style="width:56px; height:56px; border-radius:12px; background:#eff6ff; display:inline-flex; align-items:center; justify-content:center; color:#2563eb; font-weight:700; font-size:24px;">
+                                <%= !string.IsNullOrEmpty(CompanyName) ? CompanyName.Substring(0, 1).ToUpper() : "C" %>
+                            </span>
+                            <div>
+                                <h3 style="margin:0 0 4px; font-size:18px; font-weight:700; color:#0f172a;"><%= CompanyName %></h3>
+                                <span style="display:inline-flex; align-items:center; gap:4px; font-size:12px; color:#10b981; font-weight:600;"><i class="fa-solid fa-circle-check"></i> Verified Company</span>
+                            </div>
+                        </div>
+
+                        <div style="background:#f8fafc; border-radius:10px; padding:14px 16px; margin-bottom:18px; font-size:13.5px; color:#475569; line-height:1.6;">
+                            <%= CompanyDescription %>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
+                            <div style="border:1px solid #e2e8f0; border-radius:8px; padding:10px 12px;">
+                                <span style="font-size:11px; text-transform:uppercase; color:#64748b; font-weight:700; display:block; margin-bottom:2px;">Industry</span>
+                                <strong style="font-size:13px; color:#1e293b;"><%= CompanyIndustry %></strong>
+                            </div>
+                            <div style="border:1px solid #e2e8f0; border-radius:8px; padding:10px 12px;">
+                                <span style="font-size:11px; text-transform:uppercase; color:#64748b; font-weight:700; display:block; margin-bottom:2px;">Company Size</span>
+                                <strong style="font-size:13px; color:#1e293b;"><%= CompanySize %></strong>
+                            </div>
+                            <div style="border:1px solid #e2e8f0; border-radius:8px; padding:10px 12px;">
+                                <span style="font-size:11px; text-transform:uppercase; color:#64748b; font-weight:700; display:block; margin-bottom:2px;">Headquarters</span>
+                                <strong style="font-size:13px; color:#1e293b;"><%= CompanyLocation %></strong>
+                            </div>
+                            <div style="border:1px solid #e2e8f0; border-radius:8px; padding:10px 12px;">
+                                <span style="font-size:11px; text-transform:uppercase; color:#64748b; font-weight:700; display:block; margin-bottom:2px;">Official Website</span>
+                                <a href="<%= CompanyWebsite %>" target="_blank" rel="noopener noreferrer" style="font-size:13px; color:#2563eb; font-weight:600; text-decoration:none;"><%= CompanyWebsite.Replace("https://", "").Replace("http://", "").TrimEnd('/') %></a>
+                            </div>
+                        </div>
+
+                        <div style="display:flex; justify-content:flex-end; gap:10px;">
+                            <button type="button" onclick="closeCompanyModal();" style="padding:9px 18px; border-radius:8px; border:1px solid #cbd5e1; background:#fff; font-size:13px; font-weight:600; cursor:pointer;">Close</button>
+                            <a href="<%= CompanyWebsite %>" target="_blank" rel="noopener noreferrer" style="padding:9px 18px; border-radius:8px; background:#2563eb; color:#fff; font-size:13px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">Visit Official Site <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:11px;"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function openCompanyModal() {
+                        const m = document.getElementById("companyProfileModal");
+                        if (m) { m.style.display = "flex"; }
+                    }
+                    function closeCompanyModal() {
+                        const m = document.getElementById("companyProfileModal");
+                        if (m) { m.style.display = "none"; }
+                    }
+                </script>
 
                 <!-- 2. Application Details Card -->
                 <div class="job-side-card">

@@ -51,7 +51,7 @@
             <!-- Right Main Content Column -->
             <main class="opps-main-column">
 
-                <!-- Recommended For You Hero Banner (.NET Developer at TechFlow Mumbai) -->
+                <!-- Recommended For You Hero Banner (Dynamic AI Match) -->
                 <div class="recommended-hero-banner">
                     <div class="rec-banner-top">
                         <div class="rec-tag-title">
@@ -59,26 +59,57 @@
                         </div>
                         <!-- Match score ring -->
                         <div class="rec-score-chip">
-                            <span class="rec-score-number">95%</span>
+                            <span class="rec-score-number"><%= RecommendedScore %>%</span>
                         </div>
                     </div>
 
                     <div class="rec-banner-body">
-                        <h2 class="rec-role-title">.NET Developer</h2>
+                        <h2 class="rec-role-title"><%= RecommendedTitle %></h2>
                         <div class="rec-company-loc">
-                            <i class="fa-regular fa-building"></i> TechFlow Mumbai
+                            <i class="fa-regular fa-building"></i> <%= RecommendedCompany %> &bull; <%= RecommendedLocation %>
                         </div>
 
                         <div class="rec-skills-row">
-                            <span class="rec-skill-tag"><i class="fa-solid fa-check"></i> C#</span>
-                            <span class="rec-skill-tag"><i class="fa-solid fa-check"></i> ASP.NET</span>
-                            <span class="rec-skill-tag tag-muted"><i class="fa-regular fa-circle-plus"></i> Azure</span>
+                            <asp:Repeater ID="rptRecommendedSkills" runat="server">
+                                <ItemTemplate>
+                                    <span class="rec-skill-tag"><i class="fa-solid fa-check"></i> <%# Container.DataItem %></span>
+                                </ItemTemplate>
+                            </asp:Repeater>
                         </div>
                     </div>
 
                     <div class="rec-banner-actions">
-                        <a href="<%= ResolveUrl("~/User/JobDetails.aspx") %>" class="btn-rec-apply">Apply Now</a>
+                        <a href='<%= ResolveUrl("~/User/JobDetails.aspx?id=" + RecommendedJobId) %>' class="btn-rec-apply">View &amp; Apply</a>
                     </div>
+                </div>
+
+                <!-- Dynamic Jobs Listing Section -->
+                <div class="opps-listings-list" style="margin-top: 24px; display: flex; flex-direction: column; gap: 16px;">
+                    <asp:Repeater ID="rptJobsList" runat="server">
+                        <ItemTemplate>
+                            <div class="job-list-card" style="background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:18px; display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                                        <h3 style="font-size:16px; font-weight:600; color:#0f172a; margin:0;"><%# Eval("Title") %></h3>
+                                        <span class="badge-role-match" style="font-size:11px; padding:2px 8px; background:#eff6ff; color:#2563eb; border-radius:6px; font-weight:600;">
+                                            <%# Eval("AiMatchScore") %>% Match
+                                        </span>
+                                    </div>
+                                    <div style="font-size:13px; color:#64748b; margin-bottom:8px;">
+                                        <i class="fa-regular fa-building"></i> <%# Eval("CompanyName") %> &bull; <i class="fa-solid fa-location-dot"></i> <%# Eval("Location") %> &bull; <i class="fa-solid fa-money-bill-wave"></i> <%# Eval("SalaryRange") %>
+                                    </div>
+                                    <div style="font-size:12px; color:#475569;">
+                                        <strong>Skills:</strong> <%# Eval("RequiredSkills") %>
+                                    </div>
+                                </div>
+                                <div>
+                                    <a href='<%# ResolveUrl("~/User/JobDetails.aspx?id=" + Eval("JobId")) %>' class="btn btn-primary" style="padding:8px 16px; font-size:13px; border-radius:8px; text-decoration:none; background:#2563eb; color:#fff; font-weight:500;">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </ItemTemplate>
+                    </asp:Repeater>
                 </div>
 
             </main>
