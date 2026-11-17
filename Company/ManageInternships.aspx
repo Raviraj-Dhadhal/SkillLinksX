@@ -22,49 +22,49 @@
 
         <!-- 5-Metric Tiles Grid (Horizontal scrollable on mobile) -->
         <div class="manage-metrics-5col">
-            <!-- Total Internship (24) -->
+            <!-- Total Internship -->
             <div class="manage-metric-tile">
                 <div class="metric-tile-icon-box c-blue">
                     <i class="fa-solid fa-briefcase"></i>
                 </div>
-                <div class="metric-tile-number">24</div>
+                <div class="metric-tile-number"><%= TotalInternshipsCount %></div>
                 <div class="metric-tile-desc">Total Internship</div>
             </div>
 
-            <!-- Active Internship (16) -->
+            <!-- Active Internship -->
             <div class="manage-metric-tile">
                 <div class="metric-tile-icon-box c-green">
                     <i class="fa-solid fa-check"></i>
                 </div>
-                <div class="metric-tile-number">16</div>
+                <div class="metric-tile-number"><%= ActiveInternshipsCount %></div>
                 <div class="metric-tile-desc">Active Internship</div>
             </div>
 
-            <!-- Drafts (4) -->
+            <!-- Drafts / Closed -->
             <div class="manage-metric-tile">
                 <div class="metric-tile-icon-box c-indigo">
                     <i class="fa-regular fa-file-lines"></i>
                 </div>
-                <div class="metric-tile-number">4</div>
-                <div class="metric-tile-desc">Drafts</div>
+                <div class="metric-tile-number"><%= DraftsCount %></div>
+                <div class="metric-tile-desc">Drafts / Closed</div>
             </div>
 
-            <!-- Applications (482) -->
+            <!-- Applications -->
             <div class="manage-metric-tile">
                 <div class="metric-tile-icon-box c-purple">
                     <i class="fa-solid fa-user-group"></i>
                 </div>
-                <div class="metric-tile-number">482</div>
+                <div class="metric-tile-number"><%= TotalApplicationsCount %></div>
                 <div class="metric-tile-desc">Applications</div>
             </div>
 
-            <!-- Internship Expiring Soon (3) -->
+            <!-- Active Rate -->
             <div class="manage-metric-tile">
                 <div class="metric-tile-icon-box c-red">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <i class="fa-solid fa-chart-line"></i>
                 </div>
-                <div class="metric-tile-number">3</div>
-                <div class="metric-tile-desc">Internship Expiring Soon</div>
+                <div class="metric-tile-number"><%= TotalInternshipsCount > 0 ? (int)((double)ActiveInternshipsCount / TotalInternshipsCount * 100) : 100 %>%</div>
+                <div class="metric-tile-desc">Active Rate</div>
             </div>
         </div>
 
@@ -75,26 +75,8 @@
             <div class="table-filter-bar">
                 <div class="table-search-input-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Search jobs, internships, people..." />
+                    <input type="text" placeholder="Search internships..." />
                 </div>
-                <select class="table-filter-select">
-                    <option>Status</option>
-                    <option>Active</option>
-                    <option>Draft</option>
-                    <option>Closed</option>
-                </select>
-                <select class="table-filter-select">
-                    <option>Location</option>
-                    <option>Bengaluru</option>
-                    <option>Ahmedabad</option>
-                    <option>Remote</option>
-                </select>
-                <select class="table-filter-select">
-                    <option>Work Mode</option>
-                    <option>Hybrid</option>
-                    <option>On-site</option>
-                    <option>Remote</option>
-                </select>
             </div>
 
             <!-- Data Table -->
@@ -104,7 +86,8 @@
                         <tr>
                             <th>Intern Title</th>
                             <th>Location</th>
-                            <th>Type</th>
+                            <th>Duration</th>
+                            <th>Stipend</th>
                             <th>Applications</th>
                             <th>Posted Date</th>
                             <th>Status</th>
@@ -112,65 +95,49 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Row 1: Software Engineer -->
-                        <tr>
-                            <td>
-                                <a href="#" class="job-table-title-link">Software Engineer</a>
-                            </td>
-                            <td>Bengaluru (Hybrid)</td>
-                            <td>Full-time</td>
-                            <td>124</td>
-                            <td>Oct 12, 2026</td>
-                            <td>
-                                <span class="job-status-badge status-active">Active</span>
-                            </td>
-                            <td style="text-align: right;">
-                                <button type="button" class="btn-table-more" aria-label="More Options">
-                                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <!-- Row 2: Product Manager -->
-                        <tr>
-                            <td>
-                                <a href="#" class="job-table-title-link">Product Manager</a>
-                            </td>
-                            <td>Ahmedabad (On-site)</td>
-                            <td>Full-time</td>
-                            <td>86</td>
-                            <td>Oct 10, 2026</td>
-                            <td>
-                                <span class="job-status-badge status-active">Active</span>
-                            </td>
-                            <td style="text-align: right;">
-                                <button type="button" class="btn-table-more" aria-label="More Options">
-                                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <!-- Row 3: UX Designer -->
-                        <tr>
-                            <td>
-                                <a href="#" class="job-table-title-link">UX Designer</a>
-                            </td>
-                            <td>Remote</td>
-                            <td>Contract</td>
-                            <td>0</td>
-                            <td>-</td>
-                            <td>
-                                <span class="job-status-badge status-draft">Draft</span>
-                            </td>
-                            <td style="text-align: right;">
-                                <button type="button" class="btn-table-more" aria-label="More Options">
-                                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                                </button>
-                            </td>
-                        </tr>
+                        <asp:Repeater ID="rptInternships" runat="server" OnItemCommand="rptInternships_ItemCommand">
+                            <ItemTemplate>
+                                <tr>
+                                    <td>
+                                        <a href='<%# ResolveUrl("~/Company/Applicants.aspx") %>' class="job-table-title-link" style="font-weight:600;">
+                                            <%# Eval("Title") %>
+                                        </a>
+                                    </td>
+                                    <td><%# Eval("Location") %></td>
+                                    <td><%# Eval("Duration") %></td>
+                                    <td><%# Eval("Stipend") %></td>
+                                    <td>
+                                        <span style="font-weight:600; color:#2563eb;"><%# Eval("ApplicationCount") %></span>
+                                    </td>
+                                    <td><%# Eval("PostedDate") %></td>
+                                    <td>
+                                        <span class='job-status-badge <%# Eval("Status").ToString() == "Active" ? "status-active" : "status-draft" %>'>
+                                            <%# Eval("Status") %>
+                                        </span>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <asp:LinkButton ID="btnToggle" runat="server" CommandName="ToggleStatus" CommandArgument='<%# Eval("InternshipId") %>' ToolTip="Toggle Status" style="color:#64748b; margin-right:8px;">
+                                            <i class="fa-solid fa-power-off"></i>
+                                        </asp:LinkButton>
+                                        <asp:LinkButton ID="btnDelete" runat="server" CommandName="DeleteInternship" CommandArgument='<%# Eval("InternshipId") %>' OnClientClick="return confirm('Delete this internship?');" ToolTip="Delete Internship" style="color:#ef4444;">
+                                            <i class="fa-regular fa-trash-can"></i>
+                                        </asp:LinkButton>
+                                    </td>
+                                </tr>
+                            </ItemTemplate>
+                        </asp:Repeater>
                     </tbody>
                 </table>
             </div>
+
+            <% if (TotalInternshipsCount == 0) { %>
+                <div style="padding:32px 16px; text-align:center; color:#64748b;">
+                    <i class="fa-solid fa-graduation-cap" style="font-size:32px; color:#cbd5e1; margin-bottom:8px; display:block;"></i>
+                    <h4 style="font-size:15px; font-weight:600; color:#334155; margin-bottom:4px;">No Internships Posted Yet</h4>
+                    <p style="font-size:13px; margin:0 0 12px;">Create an internship opportunity to start receiving candidate applications.</p>
+                    <a href="<%= ResolveUrl("~/Company/PostJob.aspx?type=internship") %>" class="btn-post-new-job-blue" style="display:inline-block;">Post New Internship</a>
+                </div>
+            <% } %>
 
             <!-- Table Pagination -->
             <div class="table-pagination-row">
