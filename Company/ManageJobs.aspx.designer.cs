@@ -11,5 +11,7 @@ namespace SkillLinksX.Company
 {
     public partial class ManageJobs
     {
+        protected global::System.Web.UI.WebControls.Label lblActionMessage;
+        protected global::System.Web.UI.WebControls.Repeater rptCompanyJobs;
     }
 }

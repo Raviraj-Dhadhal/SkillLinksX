@@ -20,51 +20,53 @@
             </div>
         </div>
 
-        <!-- 5-Metric Tiles Grid -->
+        <!-- =========================================================================
+             [DYNAMIC METRIC TILES]: Aggregated counts from 'jobs' & 'applications'
+             ========================================================================= -->
         <div class="manage-metrics-5col">
-            <!-- Total Jobs (24) -->
+            <!-- Total Jobs -->
             <div class="manage-metric-tile">
                 <div class="metric-tile-icon-box c-blue">
                     <i class="fa-solid fa-briefcase"></i>
                 </div>
-                <div class="metric-tile-number">24</div>
+                <div class="metric-tile-number"><%= TotalJobsCount %></div>
                 <div class="metric-tile-desc">Total Jobs</div>
             </div>
 
-            <!-- Active Jobs (16) -->
+            <!-- Active Jobs -->
             <div class="manage-metric-tile">
                 <div class="metric-tile-icon-box c-green">
                     <i class="fa-solid fa-check"></i>
                 </div>
-                <div class="metric-tile-number">16</div>
+                <div class="metric-tile-number"><%= ActiveJobsCount %></div>
                 <div class="metric-tile-desc">Active Jobs</div>
             </div>
 
-            <!-- Drafts (4) -->
+            <!-- Drafts / Paused -->
             <div class="manage-metric-tile">
                 <div class="metric-tile-icon-box c-indigo">
                     <i class="fa-regular fa-file-lines"></i>
                 </div>
-                <div class="metric-tile-number">4</div>
-                <div class="metric-tile-desc">Drafts</div>
+                <div class="metric-tile-number"><%= ClosedJobsCount %></div>
+                <div class="metric-tile-desc">Closed / Paused</div>
             </div>
 
-            <!-- Applications (482) -->
+            <!-- Applications -->
             <div class="manage-metric-tile">
                 <div class="metric-tile-icon-box c-purple">
                     <i class="fa-solid fa-user-group"></i>
                 </div>
-                <div class="metric-tile-number">482</div>
+                <div class="metric-tile-number"><%= TotalApplicationsCount %></div>
                 <div class="metric-tile-desc">Applications</div>
             </div>
 
-            <!-- Jobs Expiring Soon (3) -->
+            <!-- Jobs Active (Quick Status) -->
             <div class="manage-metric-tile">
                 <div class="metric-tile-icon-box c-red">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <i class="fa-solid fa-circle-check"></i>
                 </div>
-                <div class="metric-tile-number">3</div>
-                <div class="metric-tile-desc">Jobs Expiring Soon</div>
+                <div class="metric-tile-number"><%= ActiveJobsCount %></div>
+                <div class="metric-tile-desc">Live on Portal</div>
             </div>
         </div>
 
@@ -97,6 +99,8 @@
                 </select>
             </div>
 
+            <asp:Label ID="lblActionMessage" runat="server" ForeColor="Green" style="display:block; margin: 10px 14px; font-size:13px; font-weight:600;" EnableViewState="false" />
+
             <!-- Data Table -->
             <div style="overflow-x: auto;">
                 <table class="jobs-data-table">
@@ -112,62 +116,39 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Row 1: Software Engineer -->
-                        <tr>
-                            <td>
-                                <a href="#" class="job-table-title-link">Software Engineer</a>
-                            </td>
-                            <td>Bengaluru (Hybrid)</td>
-                            <td>Full-time</td>
-                            <td>124</td>
-                            <td>Oct 12, 2026</td>
-                            <td>
-                                <span class="job-status-badge status-active">Active</span>
-                            </td>
-                            <td style="text-align: right;">
-                                <button type="button" class="btn-table-more" aria-label="More Options">
-                                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <!-- Row 2: Product Manager -->
-                        <tr>
-                            <td>
-                                <a href="#" class="job-table-title-link">Product Manager</a>
-                            </td>
-                            <td>Ahmedabad (On-site)</td>
-                            <td>Full-time</td>
-                            <td>86</td>
-                            <td>Oct 10, 2026</td>
-                            <td>
-                                <span class="job-status-badge status-active">Active</span>
-                            </td>
-                            <td style="text-align: right;">
-                                <button type="button" class="btn-table-more" aria-label="More Options">
-                                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                                </button>
-                            </td>
-                        </tr>
-
-                        <!-- Row 3: UX Designer -->
-                        <tr>
-                            <td>
-                                <a href="#" class="job-table-title-link">UX Designer</a>
-                            </td>
-                            <td>Remote</td>
-                            <td>Contract</td>
-                            <td>0</td>
-                            <td>-</td>
-                            <td>
-                                <span class="job-status-badge status-draft">Draft</span>
-                            </td>
-                            <td style="text-align: right;">
-                                <button type="button" class="btn-table-more" aria-label="More Options">
-                                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                                </button>
-                            </td>
-                        </tr>
+                        <!-- =========================================================
+                             [COMPANY JOBS REPEATER]: Binds all jobs for this company
+                             ========================================================= -->
+                        <asp:Repeater ID="rptCompanyJobs" runat="server" OnItemCommand="rptCompanyJobs_ItemCommand">
+                            <ItemTemplate>
+                                <tr>
+                                    <td>
+                                        <a href='<%# ResolveUrl("~/Company/Applicants.aspx") %>' class="job-table-title-link" style="font-weight:600;">
+                                            <%# Eval("Title") %>
+                                        </a>
+                                    </td>
+                                    <td><%# Eval("Location") %></td>
+                                    <td><%# Eval("JobType") %></td>
+                                    <td>
+                                        <span style="font-weight:600; color:#2563eb;"><%# Eval("ApplicationCount") %></span>
+                                    </td>
+                                    <td><%# Eval("PostedDate") %></td>
+                                    <td>
+                                        <span class='job-status-badge <%# Eval("Status").ToString() == "Active" ? "status-active" : "status-draft" %>'>
+                                            <%# Eval("Status") %>
+                                        </span>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <asp:LinkButton ID="btnToggleStatus" runat="server" CommandName="ToggleStatus" CommandArgument='<%# Eval("JobId") + "|" + Eval("Status") %>' CssClass="btn btn-sm" style="font-size:12px; margin-right:8px; text-decoration:none; color:#2563eb;">
+                                            <%# Eval("Status").ToString() == "Active" ? "Close" : "Reopen" %>
+                                        </asp:LinkButton>
+                                        <asp:LinkButton ID="btnDeleteJob" runat="server" CommandName="DeleteJob" CommandArgument='<%# Eval("JobId") %>' OnClientClick="return confirm('Are you sure you want to delete this job posting?');" CssClass="btn btn-sm" style="font-size:12px; text-decoration:none; color:#dc2626;">
+                                            Delete
+                                        </asp:LinkButton>
+                                    </td>
+                                </tr>
+                            </ItemTemplate>
+                        </asp:Repeater>
                     </tbody>
                 </table>
             </div>
