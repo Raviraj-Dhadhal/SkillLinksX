@@ -35,14 +35,14 @@ namespace SkillLinksX.Admin
 
         // =========================================================================
         // [DATABASE & BACKEND CONNECTION]: Load Companies with Job Counts
-        // Queries 'companies' joined with job counts from the 'jobs' table
+        // Queries 'company_table' joined with job counts from the 'jobs' table
         // =========================================================================
         private void LoadAdminCompanies()
         {
             string sql = @"
-                SELECT c.company_id, c.company_name, c.industry, c.location,
+                SELECT c.company_id, c.comp_name AS company_name, c.city, c.state,
                        (SELECT COUNT(*) FROM jobs j WHERE j.company_id = c.company_id) AS JobCount
-                FROM companies c
+                FROM company_table c
                 ORDER BY c.company_id ASC";
 
             DataTable dt = DBHelper.ExecuteQuery(sql);
@@ -58,16 +58,19 @@ namespace SkillLinksX.Admin
 
             foreach (DataRow r in dt.Rows)
             {
-                string name = r["company_name"].ToString();
+                string name = r["company_name"] != DBNull.Value ? r["company_name"].ToString() : "Company";
                 string initials = name.Length >= 2 ? name.Substring(0, 2).ToUpper() : "CO";
+                string city = r["city"] != DBNull.Value ? r["city"].ToString() : "";
+                string state = r["state"] != DBNull.Value ? r["state"].ToString() : "";
+                string loc = (!string.IsNullOrEmpty(city) && !string.IsNullOrEmpty(state)) ? $"{city}, {state}" : "India";
 
                 list.Add(new
                 {
                     CompanyId = r["company_id"],
                     CompanyName = name,
                     Initials = initials,
-                    Industry = r["industry"] != DBNull.Value ? r["industry"].ToString() : "Technology",
-                    Location = r["location"] != DBNull.Value ? r["location"].ToString() : "India",
+                    Industry = "Technology",
+                    Location = loc,
                     JobCount = Convert.ToInt32(r["JobCount"]),
                     VerificationStatus = "Verified"
                 });

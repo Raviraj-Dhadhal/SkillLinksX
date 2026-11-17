@@ -27,15 +27,15 @@ namespace SkillLinksX.Admin
 
         // =========================================================================
         // [DATABASE & BACKEND CONNECTION]: Load All Platform Opportunities
-        // Queries 'jobs' joined with 'companies'
+        // Queries 'jobs' joined with 'company_table'
         // =========================================================================
         private void LoadAllOpportunities()
         {
             string sql = @"
                 SELECT j.job_id, j.title, j.location, j.job_type, j.status,
-                       c.company_name
+                       c.comp_name AS company_name
                 FROM jobs j
-                INNER JOIN companies c ON j.company_id = c.company_id
+                INNER JOIN company_table c ON j.company_id = c.company_id
                 ORDER BY j.created_at DESC";
 
             DataTable dt = DBHelper.ExecuteQuery(sql);

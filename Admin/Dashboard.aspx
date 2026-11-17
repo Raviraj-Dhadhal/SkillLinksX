@@ -75,6 +75,12 @@
                 </div>
                 <!-- Interactive Linear Growth Chart Container rendered by ApexCharts in admin.js -->
                 <div class="admin-chart-wrapper" id="userGrowthChart"></div>
+                
+                <!-- Database-injected chart data payload -->
+                <script type="text/javascript">
+                    window.dbAdminStudentGrowth = <%= ChartStudentSeriesJson %>;
+                    window.dbAdminCompanyGrowth = <%= ChartCompanySeriesJson %>;
+                </script>
             </div>
 
             <!-- Right: System Health & Critical Alerts Stack -->
