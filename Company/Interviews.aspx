@@ -76,7 +76,7 @@
                 <!-- Calendar Controls Header -->
                 <div class="cal-header-row">
                     <div class="cal-title-nav">
-                        <h2 class="cal-month-title">October 2026</h2>
+                        <h2 class="cal-month-title"><%= CurrentMonthYear %></h2>
                         <div class="cal-nav-buttons">
                             <button type="button" class="cal-nav-btn"><i class="fa-solid fa-chevron-left"></i></button>
                             <button type="button" class="cal-nav-btn"><i class="fa-solid fa-chevron-right"></i></button>
@@ -99,68 +99,7 @@
                         <div class="cal-day-header">SAT</div>
                         <div class="cal-day-header">SUN</div>
 
-                        <!-- Week 1: 25, 26, 27, 28, 29, 30, 1 -->
-                        <div class="cal-day-cell other-month">25</div>
-                        <div class="cal-day-cell other-month">26</div>
-                        <div class="cal-day-cell other-month">27</div>
-                        <div class="cal-day-cell other-month">28</div>
-                        <div class="cal-day-cell other-month">29</div>
-                        <div class="cal-day-cell other-month">30</div>
-                        <div class="cal-day-cell weekend-day">1</div>
-
-                        <!-- Week 2: 2, 3, 4, 5, 6, 7, 8 -->
-                        <div class="cal-day-cell">2</div>
-                        <div class="cal-day-cell">3</div>
-                        <div class="cal-day-cell">
-                            <span class="day-num">4</span>
-                        </div>
-                        <div class="cal-day-cell">5</div>
-                        <div class="cal-day-cell">
-                            <span class="day-num">6</span>
-                        </div>
-                        <div class="cal-day-cell weekend-day">7</div>
-                        <div class="cal-day-cell weekend-day">8</div>
-
-                        <!-- Week 3: 9, 10 (Active Today), 11, 12, 13, 14, 15 -->
-                        <div class="cal-day-cell">9</div>
-                        <div class="cal-day-cell active-today-cell">
-                            <span class="day-num today-circle">10</span>
-                            <% if (UpcomingCount > 0) { %>
-                                <div class="cal-event-pill today-event"><%= UpcomingCount %> Scheduled</div>
-                            <% } %>
-                        </div>
-                        <div class="cal-day-cell">11</div>
-                        <div class="cal-day-cell">12</div>
-                        <div class="cal-day-cell">13</div>
-                        <div class="cal-day-cell">14</div>
-                        <div class="cal-day-cell">15</div>
-
-                        <!-- Week 4: 16, 17, 18, 19, 20, 21, 22 -->
-                        <div class="cal-day-cell">16</div>
-                        <div class="cal-day-cell">17</div>
-                        <div class="cal-day-cell">18</div>
-                        <div class="cal-day-cell">19</div>
-                        <div class="cal-day-cell">20</div>
-                        <div class="cal-day-cell">21</div>
-                        <div class="cal-day-cell">22</div>
-
-                        <!-- Week 5: 23, 24, 25, 26, 27, 28, 29 -->
-                        <div class="cal-day-cell">23</div>
-                        <div class="cal-day-cell">24</div>
-                        <div class="cal-day-cell">25</div>
-                        <div class="cal-day-cell">26</div>
-                        <div class="cal-day-cell">27</div>
-                        <div class="cal-day-cell">28</div>
-                        <div class="cal-day-cell">29</div>
-
-                        <!-- Week 6: 30, 31, 1, 2, 3, 4, 5 -->
-                        <div class="cal-day-cell">30</div>
-                        <div class="cal-day-cell">31</div>
-                        <div class="cal-day-cell other-month">1</div>
-                        <div class="cal-day-cell other-month">2</div>
-                        <div class="cal-day-cell other-month">3</div>
-                        <div class="cal-day-cell other-month">4</div>
-                        <div class="cal-day-cell other-month">5</div>
+                        <%= CalendarGridHtml %>
                     </div>
                 </div>
 
@@ -168,10 +107,10 @@
 
             <!-- Upcoming List Card (Right Side) -->
             <div class="upcoming-interviews-card">
-                <div class="upcoming-header-row">
-                    <h3 class="upcoming-title">Upcoming List</h3>
-                    <button type="button" class="btn-cal-filter" aria-label="Filter List">
-                        <i class="fa-solid fa-sliders"></i>
+                <div class="upcoming-header-row" style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                    <h3 class="upcoming-title" style="margin:0;">Upcoming List</h3>
+                    <button type="button" onclick="openScheduleModal(0, '', '', '', 'https://meet.google.com/new', 'Scheduled');" style="background:#2563eb; color:#fff; border:none; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+                        <i class="fa-solid fa-pencil"></i> Schedule Interview
                     </button>
                 </div>
 
@@ -190,7 +129,15 @@
                                             <div class="upcoming-cand-role"><%# Eval("JobTitle") %></div>
                                         </div>
                                     </div>
-                                    <span class='int-status-badge status-<%# Eval("StatusClass") %>'><%# Eval("Status") %></span>
+                                    <div style="display:flex; align-items:center; gap:6px;">
+                                        <span class='int-status-badge status-<%# Eval("StatusClass") %>'><%# Eval("Status") %></span>
+                                        <button type="button" 
+                                                onclick='openScheduleModal(<%# Eval("InterviewId") %>, "<%# Eval("StudentName") %>", "<%# Eval("JobTitle") %>", "<%# Eval("RawInterviewDate") %>", "<%# Eval("MeetingLink") %>", "<%# Eval("Status") %>");'
+                                                title="Edit / Reschedule"
+                                                style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:4px 8px; cursor:pointer; color:#334155; font-size:12px; display:inline-flex; align-items:center; gap:3px;">
+                                            <i class="fa-solid fa-pencil"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="upcoming-details-list">
                                     <div class="upcoming-meta-row">
@@ -215,6 +162,86 @@
                 </div>
 
             </div>
+
+        </div>
+
+    </div>
+
+    <!-- Schedule / Edit Interview Modal -->
+    <div id="scheduleModal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(15,23,42,0.6); align-items:center; justify-content:center; backdrop-filter:blur(3px);">
+        <div style="background:#fff; border-radius:12px; max-width:480px; width:90%; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.2); position:relative;">
+            <button type="button" onclick="closeScheduleModal();" style="position:absolute; right:16px; top:16px; background:none; border:none; font-size:20px; color:#94a3b8; cursor:pointer;">&times;</button>
+            <h3 id="modalTitle" style="margin:0 0 6px; font-size:17px; font-weight:700; color:#0f172a;">Schedule / Edit Interview</h3>
+            <p style="font-size:12.5px; color:#64748b; margin:0 0 14px;">Set interview date, time, and meeting link. Candidate will receive a notification.</p>
+            <asp:Label ID="lblScheduleMsg" runat="server" style="display:block; margin-bottom:10px; font-size:13px; font-weight:600;" EnableViewState="false" />
+            
+            <asp:HiddenField ID="hfInterviewId" runat="server" Value="0" />
+            
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <div>
+                    <label style="font-size:12px; font-weight:600; color:#334155; display:block; margin-bottom:4px;">Candidate Name</label>
+                    <asp:TextBox ID="txtCandidateName" runat="server" placeholder="e.g. Raviraj Dhadhal" style="width:100%; padding:8px 12px; border:1px solid #cbd5e1; border-radius:6px; font-size:13px;" />
+                </div>
+                <div>
+                    <label style="font-size:12px; font-weight:600; color:#334155; display:block; margin-bottom:4px;">Job Title / Role</label>
+                    <asp:TextBox ID="txtRoleTitle" runat="server" placeholder="e.g. .NET Developer" style="width:100%; padding:8px 12px; border:1px solid #cbd5e1; border-radius:6px; font-size:13px;" />
+                </div>
+                <div>
+                    <label style="font-size:12px; font-weight:600; color:#334155; display:block; margin-bottom:4px;">Interview Date &amp; Time</label>
+                    <asp:TextBox ID="txtInterviewDate" runat="server" TextMode="DateTimeLocal" style="width:100%; padding:8px 12px; border:1px solid #cbd5e1; border-radius:6px; font-size:13px;" />
+                </div>
+                <div>
+                    <label style="font-size:12px; font-weight:600; color:#334155; display:block; margin-bottom:4px;">Google Meet / Meeting Link</label>
+                    <asp:TextBox ID="txtMeetingLink" runat="server" placeholder="https://meet.google.com/..." style="width:100%; padding:8px 12px; border:1px solid #cbd5e1; border-radius:6px; font-size:13px;" />
+                </div>
+                <div>
+                    <label style="font-size:12px; font-weight:600; color:#334155; display:block; margin-bottom:4px;">Status</label>
+                    <asp:DropDownList ID="ddlInterviewStatus" runat="server" style="width:100%; padding:8px 12px; border:1px solid #cbd5e1; border-radius:6px; font-size:13px;">
+                        <asp:ListItem Text="Scheduled" Value="Scheduled" Selected="True" />
+                        <asp:ListItem Text="Confirmed" Value="Confirmed" />
+                        <asp:ListItem Text="Completed" Value="Completed" />
+                        <asp:ListItem Text="Cancelled" Value="Cancelled" />
+                    </asp:DropDownList>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+                <button type="button" onclick="closeScheduleModal();" style="padding:8px 14px; border-radius:6px; border:1px solid #cbd5e1; background:#fff; font-size:13px; font-weight:600; cursor:pointer;">Cancel</button>
+                <asp:Button ID="btnSaveInterview" runat="server" Text="Save Interview" OnClick="btnSaveInterview_Click" style="padding:8px 18px; border-radius:6px; background:#2563eb; color:#fff; border:none; font-size:13px; font-weight:600; cursor:pointer;" />
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        function openScheduleModal(id, name, role, dateVal, link, status) {
+            var modal = document.getElementById("scheduleModal");
+            var hfId = document.getElementById("<%= hfInterviewId.ClientID %>");
+            var txtName = document.getElementById("<%= txtCandidateName.ClientID %>");
+            var txtRole = document.getElementById("<%= txtRoleTitle.ClientID %>");
+            var txtDate = document.getElementById("<%= txtInterviewDate.ClientID %>");
+            var txtLink = document.getElementById("<%= txtMeetingLink.ClientID %>");
+            var ddlStatus = document.getElementById("<%= ddlInterviewStatus.ClientID %>");
+            var title = document.getElementById("modalTitle");
+
+            if (hfId) hfId.value = id || 0;
+            if (txtName) txtName.value = name || "";
+            if (txtRole) txtRole.value = role || "";
+            if (txtDate && dateVal) txtDate.value = dateVal;
+            if (txtLink) txtLink.value = link || "https://meet.google.com/new";
+            if (ddlStatus && status) ddlStatus.value = status;
+
+            if (title) {
+                title.innerText = (id && id > 0) ? "Edit / Reschedule Interview" : "Schedule New Interview";
+            }
+
+            if (modal) modal.style.display = "flex";
+        }
+
+        function closeScheduleModal() {
+            var modal = document.getElementById("scheduleModal");
+            if (modal) modal.style.display = "none";
+        }
+    </script>
 
         </div>
 

@@ -9,5 +9,13 @@ namespace SkillLinksX.Company
     public partial class Interviews
     {
         protected global::System.Web.UI.WebControls.Repeater rptUpcomingInterviews;
+        protected global::System.Web.UI.WebControls.Label lblScheduleMsg;
+        protected global::System.Web.UI.WebControls.HiddenField hfInterviewId;
+        protected global::System.Web.UI.WebControls.TextBox txtCandidateName;
+        protected global::System.Web.UI.WebControls.TextBox txtRoleTitle;
+        protected global::System.Web.UI.WebControls.TextBox txtInterviewDate;
+        protected global::System.Web.UI.WebControls.TextBox txtMeetingLink;
+        protected global::System.Web.UI.WebControls.DropDownList ddlInterviewStatus;
+        protected global::System.Web.UI.WebControls.Button btnSaveInterview;
     }
 }

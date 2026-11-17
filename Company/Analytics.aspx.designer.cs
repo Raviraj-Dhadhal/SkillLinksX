@@ -11,5 +11,6 @@ namespace SkillLinksX.Company
 {
     public partial class Analytics
     {
+        protected global::System.Web.UI.WebControls.DropDownList ddlTimeFilter;
     }
 }

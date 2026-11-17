@@ -14,15 +14,13 @@
                 <p class="analytics-sub">Track your recruitment performance, candidate activity and hiring results.</p>
             </div>
             <div class="analytics-header-actions">
-                <select class="analytics-time-select">
-                    <option selected="selected">Last 30 Days</option>
-                    <option>Last 60 Days</option>
-                    <option>Last 90 Days</option>
-                    <option>Year to Date</option>
-                </select>
-                <button type="button" class="btn-analytics-export">
-                    <i class="fa-solid fa-download"></i> Export Report
-                </button>
+                <asp:DropDownList ID="ddlTimeFilter" runat="server" CssClass="analytics-time-select" AutoPostBack="true" OnSelectedIndexChanged="ddlTimeFilter_SelectedIndexChanged" style="padding: 8px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-weight: 600; color: #334155; background: #fff; cursor: pointer;">
+                    <asp:ListItem Text="Last 30 Days" Value="30" Selected="True" />
+                    <asp:ListItem Text="Last 60 Days" Value="60" />
+                    <asp:ListItem Text="Last 90 Days" Value="90" />
+                    <asp:ListItem Text="Year to Date" Value="365" />
+                    <asp:ListItem Text="All Time" Value="0" />
+                </asp:DropDownList>
             </div>
         </div>
 
@@ -33,8 +31,8 @@
                 <div class="analytics-metric-card">
                     <div class="an-metric-label">Job Views</div>
                     <div class="an-metric-row">
-                        <span class="an-metric-value">18,420</span>
-                        <span class="an-trend-badge trend-up"><i class="fa-solid fa-arrow-up"></i> 12%</span>
+                        <span class="an-metric-value"><%= TotalViews.ToString("N0") %></span>
+                        <span class="an-trend-badge trend-up"><i class="fa-solid fa-arrow-up"></i> Live</span>
                     </div>
                 </div>
 
@@ -42,8 +40,8 @@
                 <div class="analytics-metric-card">
                     <div class="an-metric-label">Applications</div>
                     <div class="an-metric-row">
-                        <span class="an-metric-value">1,284</span>
-                        <span class="an-trend-badge trend-up"><i class="fa-solid fa-arrow-up"></i> 8%</span>
+                        <span class="an-metric-value"><%= TotalApps %></span>
+                        <span class="an-trend-badge trend-up"><i class="fa-solid fa-arrow-up"></i> Live</span>
                     </div>
                 </div>
 
@@ -51,8 +49,8 @@
                 <div class="analytics-metric-card">
                     <div class="an-metric-label">Shortlisted</div>
                     <div class="an-metric-row">
-                        <span class="an-metric-value">286</span>
-                        <span class="an-trend-badge trend-down"><i class="fa-solid fa-arrow-down"></i> 3%</span>
+                        <span class="an-metric-value"><%= TotalShortlisted %></span>
+                        <span class="an-trend-badge trend-up"><i class="fa-solid fa-arrow-up"></i> Live</span>
                     </div>
                 </div>
 
@@ -60,8 +58,8 @@
                 <div class="analytics-metric-card">
                     <div class="an-metric-label">Interviews</div>
                     <div class="an-metric-row">
-                        <span class="an-metric-value">142</span>
-                        <span class="an-trend-badge trend-up"><i class="fa-solid fa-arrow-up"></i> 5%</span>
+                        <span class="an-metric-value"><%= TotalInterviews %></span>
+                        <span class="an-trend-badge trend-up"><i class="fa-solid fa-arrow-up"></i> Live</span>
                     </div>
                 </div>
 
@@ -69,8 +67,8 @@
                 <div class="analytics-metric-card">
                     <div class="an-metric-label">Hires</div>
                     <div class="an-metric-row">
-                        <span class="an-metric-value">48</span>
-                        <span class="an-trend-badge trend-up"><i class="fa-solid fa-arrow-up"></i> 15%</span>
+                        <span class="an-metric-value"><%= TotalHired %></span>
+                        <span class="an-trend-badge trend-up"><i class="fa-solid fa-arrow-up"></i> Live</span>
                     </div>
                 </div>
 
@@ -99,6 +97,11 @@
 
                 <!-- ApexCharts container -->
                 <div id="applicationsOverviewChart" style="min-height: 290px;"></div>
+
+                <!-- Database-injected chart data payload -->
+                <script type="text/javascript">
+                    window.dbCompanyAppMonthly = <%= ChartMonthlyAppsJson %>;
+                </script>
             </div>
 
             <!-- Right: Recruitment Funnel -->
@@ -115,7 +118,7 @@
                                 <span class="funnel-label-name">Views</span>
                             </div>
                         </div>
-                        <span class="funnel-count">18,420</span>
+                        <span class="funnel-count"><%= TotalViews.ToString("N0") %></span>
                     </div>
 
                     <!-- Funnel 2: Applications -->
@@ -125,7 +128,7 @@
                                 <span class="funnel-label-name">Applications</span>
                             </div>
                         </div>
-                        <span class="funnel-count">1,284</span>
+                        <span class="funnel-count"><%= TotalApps %></span>
                     </div>
 
                     <!-- Funnel 3: Shortlisted -->
@@ -135,7 +138,7 @@
                                 <span class="funnel-label-name">Shortlisted</span>
                             </div>
                         </div>
-                        <span class="funnel-count">286</span>
+                        <span class="funnel-count"><%= TotalShortlisted %></span>
                     </div>
 
                     <!-- Funnel 4: Interviews -->
@@ -145,17 +148,17 @@
                                 <span class="funnel-label-name">Interviews</span>
                             </div>
                         </div>
-                        <span class="funnel-count">142</span>
+                        <span class="funnel-count"><%= TotalInterviews %></span>
                     </div>
 
                     <!-- Funnel 5: Hired -->
                     <div class="funnel-row-item">
                         <div class="funnel-bar-track">
                             <div class="funnel-bar-fill fill-15">
-                                <span class="funnel-label-name">Hired</span>
+                                <span class="funnel-label-name">Hired / Selected</span>
                             </div>
                         </div>
-                        <span class="funnel-count">48</span>
+                        <span class="funnel-count"><%= TotalHired %></span>
                     </div>
                 </div>
 
