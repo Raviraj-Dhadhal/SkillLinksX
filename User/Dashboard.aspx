@@ -10,7 +10,7 @@
         <!-- 1. Top Greeting & Profile Completion Header -->
         <div class="dash-greeting-row">
             <div>
-                <h1 class="dash-greeting-title">Good morning, Raviraj!</h1>
+                <h1 class="dash-greeting-title">Good morning, <%= Session["UserName"] ?? "Student" %>!</h1>
                 <p class="dash-greeting-sub">Discover opportunities that match your skills and career goals.</p>
             </div>
 
@@ -30,33 +30,36 @@
             </div>
         </div>
 
-        <!-- 2. Metric Summary Cards (4 Columns) -->
+        <!-- =========================================================================
+             [DYNAMIC METRIC SUMMARY CARDS]: 4 Columns
+             Values are populated from database queries in Dashboard.aspx.cs
+             ========================================================================= -->
         <div class="dash-metrics-grid">
-            <!-- Card 1: Applications -->
+            <!-- Card 1: Applications (Queried from 'applications' table) -->
             <div class="metric-card">
                 <div class="metric-card-header">
                     <span class="metric-title">Applications</span>
                     <i class="fa-regular fa-clipboard metric-icon"></i>
                 </div>
-                <div class="metric-value">12</div>
+                <div class="metric-value"><%= TotalApplications %></div>
             </div>
 
-            <!-- Card 2: Interviews -->
+            <!-- Card 2: Interviews (Queried from 'interviews' table) -->
             <div class="metric-card">
                 <div class="metric-card-header">
                     <span class="metric-title">Interviews</span>
                     <i class="fa-regular fa-calendar-check metric-icon"></i>
                 </div>
-                <div class="metric-value">3</div>
+                <div class="metric-value"><%= TotalInterviews %></div>
             </div>
 
-            <!-- Card 3: Shortlisted -->
+            <!-- Card 3: Shortlisted (Queried from 'applications' where status = 'Shortlisted') -->
             <div class="metric-card">
                 <div class="metric-card-header">
                     <span class="metric-title">Shortlisted</span>
                     <i class="fa-regular fa-star metric-icon"></i>
                 </div>
-                <div class="metric-value">5</div>
+                <div class="metric-value"><%= TotalShortlisted %></div>
             </div>
 
             <!-- Card 4: Profile Views -->
@@ -65,7 +68,7 @@
                     <span class="metric-title">Profile Views</span>
                     <i class="fa-regular fa-eye metric-icon"></i>
                 </div>
-                <div class="metric-value">148</div>
+                <div class="metric-value"><%= ProfileViews %></div>
             </div>
         </div>
 
@@ -81,14 +84,16 @@
                         <i class="fa-solid fa-wand-magic-sparkles"></i>
                         <span>AI MATCH ANALYSIS</span>
                     </div>
-                    <h2 class="ai-match-title">92% AI Match</h2>
+                    <h2 class="ai-match-title"><%= TopAiMatchScore %>% AI Match</h2>
                     <p class="ai-match-sub">
-                        Based on your recent projects, we found 24 highly recommended opportunities.
+                        Based on your profile skills (<%= StudentSkillsSummary %>), we evaluated top matching opportunities for you.
                     </p>
                     <div class="ai-skills-pill-row">
-                        <span class="ai-skill-pill">C#</span>
-                        <span class="ai-skill-pill">SQL</span>
-                        <span class="ai-skill-pill">ASP.NET</span>
+                        <asp:Repeater ID="rptTopSkillsPills" runat="server">
+                            <ItemTemplate>
+                                <span class="ai-skill-pill"><%# Container.DataItem %></span>
+                            </ItemTemplate>
+                        </asp:Repeater>
                     </div>
                     <div>
                         <a href="<%= ResolveUrl("~/User/Jobs.aspx") %>" class="btn-ai-recommendations">
@@ -105,43 +110,27 @@
                     </div>
 
                     <div class="top-matches-grid">
-                        <!-- Match Card 1: Junior .NET Developer -->
-                        <div class="match-job-card">
-                            <div class="match-job-top">
-                                <div class="match-job-icon-box">
-                                    <i class="fa-regular fa-building"></i>
+                        <asp:Repeater ID="rptTopMatches" runat="server">
+                            <ItemTemplate>
+                                <div class="match-job-card">
+                                    <div class="match-job-top">
+                                        <div class="match-job-icon-box">
+                                            <i class="fa-solid fa-laptop-code"></i>
+                                        </div>
+                                        <span class="badge-role-match" style="font-size:11px; padding:3px 7px; background:#eff6ff; color:#2563eb; border-radius:6px; font-weight:600;">
+                                            <%# Eval("AiMatchScore") %>% Match
+                                        </span>
+                                    </div>
+                                    <h4 class="match-job-title"><%# Eval("Title") %></h4>
+                                    <div class="match-company-name"><%# Eval("CompanyName") %> &bull; <%# Eval("Location") %></div>
+                                    <div class="match-meta-row">
+                                        <span><i class="fa-solid fa-money-bill-wave"></i> <%# Eval("SalaryRange") %></span>
+                                        <span><i class="fa-solid fa-clock"></i> <%# Eval("JobType") %></span>
+                                    </div>
+                                    <a href='<%# ResolveUrl("~/User/JobDetails.aspx?id=" + Eval("JobId")) %>' class="btn-match-apply-blue">View &amp; Apply</a>
                                 </div>
-                                <button type="button" class="btn-match-bookmark" aria-label="Bookmark">
-                                    <i class="fa-regular fa-bookmark"></i>
-                                </button>
-                            </div>
-                            <h4 class="match-job-title">Junior .NET Developer</h4>
-                            <div class="match-company-name">TechFlow Mumbai</div>
-                            <div class="match-meta-row">
-                                <span><i class="fa-solid fa-money-bill-wave"></i> &#8377;6L - &#8377;8L</span>
-                                <span><i class="fa-solid fa-location-dot"></i> Mumbai</span>
-                            </div>
-                            <a href="<%= ResolveUrl("~/User/Jobs.aspx") %>" class="btn-match-apply-blue">Apply Now</a>
-                        </div>
-
-                        <!-- Match Card 2: Flutter Intern -->
-                        <div class="match-job-card">
-                            <div class="match-job-top">
-                                <div class="match-job-icon-box">
-                                    <i class="fa-solid fa-laptop-code"></i>
-                                </div>
-                                <button type="button" class="btn-match-bookmark" aria-label="Bookmark">
-                                    <i class="fa-regular fa-bookmark"></i>
-                                </button>
-                            </div>
-                            <h4 class="match-job-title">Flutter Intern</h4>
-                            <div class="match-company-name">AppGen Bengaluru</div>
-                            <div class="match-meta-row">
-                                <span><i class="fa-solid fa-money-bill-wave"></i> &#8377;25k stipend</span>
-                                <span><i class="fa-solid fa-location-dot"></i> Ahemadabad</span>
-                            </div>
-                            <a href="<%= ResolveUrl("~/User/Jobs.aspx") %>" class="btn-match-quick-apply-white">Quick Apply</a>
-                        </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
                     </div>
                 </div>
 
@@ -162,59 +151,26 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Row 1: Digital Solutions -->
-                                <tr>
-                                    <td>
-                                        <div class="table-company-cell">
-                                            <div class="table-company-icon">
-                                                <i class="fa-regular fa-building"></i>
-                                            </div>
-                                            <span class="table-company-name">Digital Solutions</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="table-role-text">Software Engineer</span>
-                                    </td>
-                                    <td>
-                                        <span class="status-pill status-review">Under Review</span>
-                                    </td>
-                                </tr>
-
-                                <!-- Row 2: Global Reach -->
-                                <tr>
-                                    <td>
-                                        <div class="table-company-cell">
-                                            <div class="table-company-icon">
-                                                <i class="fa-solid fa-globe"></i>
-                                            </div>
-                                            <span class="table-company-name">Global Reach</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="table-role-text">Backend Intern</span>
-                                    </td>
-                                    <td>
-                                        <span class="status-pill status-shortlisted">Shortlisted</span>
-                                    </td>
-                                </tr>
-
-                                <!-- Row 3: InnoTech Labs -->
-                                <tr>
-                                    <td>
-                                        <div class="table-company-cell">
-                                            <div class="table-company-icon">
-                                                <i class="fa-solid fa-code"></i>
-                                            </div>
-                                            <span class="table-company-name">InnoTech Labs</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="table-role-text">Full Stack Developer</span>
-                                    </td>
-                                    <td>
-                                        <span class="status-pill status-applied">Applied</span>
-                                    </td>
-                                </tr>
+                                <asp:Repeater ID="rptRecentApplications" runat="server">
+                                    <ItemTemplate>
+                                        <tr>
+                                            <td>
+                                                <div class="table-company-cell">
+                                                    <div class="table-company-icon">
+                                                        <i class="fa-regular fa-building"></i>
+                                                    </div>
+                                                    <span class="table-company-name"><%# Eval("CompanyName") %></span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="table-role-text"><%# Eval("JobTitle") %></span>
+                                            </td>
+                                            <td>
+                                                <span class='status-pill <%# Eval("StatusClass") %>'><%# Eval("Status") %></span>
+                                            </td>
+                                        </tr>
+                                    </ItemTemplate>
+                                </asp:Repeater>
                             </tbody>
                         </table>
                     </div>
@@ -228,19 +184,26 @@
                 <!-- Upcoming Interviews Card -->
                 <div class="widget-white-card">
                     <h3 class="widget-card-title">Upcoming Interviews</h3>
+                    <% if (HasUpcomingInterviews) { %>
                     <div class="interview-inner-card">
                         <div class="interview-header-row">
                             <div>
-                                <h4 class="interview-company-name">Apex Capital</h4>
-                                <div class="interview-role-name">Full Stack Developer</div>
+                                <h4 class="interview-company-name"><%= InterviewCompany %></h4>
+                                <div class="interview-role-name"><%= InterviewRole %></div>
                             </div>
                             <i class="fa-solid fa-video interview-video-icon"></i>
                         </div>
                         <div class="interview-date-row">
-                            <i class="fa-regular fa-calendar"></i> Oct 24, 10:00 AM
+                            <i class="fa-regular fa-calendar"></i> <%= InterviewDateFormatted %>
                         </div>
-                        <a href="#" class="btn-join-meeting">Join Virtual Meeting</a>
+                        <a href='<%= ResolveUrl("~/User/Interviews.aspx") %>' class="btn-join-meeting">View Interview Details</a>
                     </div>
+                    <% } else { %>
+                    <div style="padding: 16px 10px; text-align: center; color: #64748b; font-size: 13px;">
+                        <i class="fa-regular fa-calendar-xmark" style="font-size: 24px; color: #cbd5e1; display: block; margin-bottom: 6px;"></i>
+                        No interviews scheduled right now.
+                    </div>
+                    <% } %>
                 </div>
 
                 <!-- Skill Verification Card -->
@@ -251,60 +214,24 @@
                     </div>
 
                     <div class="skills-verify-list">
-                        <!-- C# -->
-                        <div class="skill-verify-item">
-                            <div class="skill-verify-info">
-                                <span class="skill-name">C#</span>
-                                <span class="skill-level">Expert</span>
-                            </div>
-                            <div class="skill-progress-bar">
-                                <div class="skill-progress-fill" style="width: 95%;"></div>
-                            </div>
+                        <asp:Repeater ID="rptSkillVerification" runat="server">
+                            <ItemTemplate>
+                                <div class="skill-verify-item">
+                                    <div class="skill-verify-info">
+                                        <span class="skill-name"><%# Container.DataItem %></span>
+                                        <span class="skill-level">Verified</span>
+                                    </div>
+                                    <div class="skill-progress-bar">
+                                        <div class="skill-progress-fill" style="width: 85%;"></div>
+                                    </div>
+                                </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
+                        <% if (rptSkillVerification.Items.Count == 0 && string.IsNullOrEmpty(StudentSkillsSummary)) { %>
+                        <div style="padding: 10px; text-align: center; color: #94a3b8; font-size: 12.5px;">
+                            Add skills in your profile to view verification.
                         </div>
-
-                        <!-- ASP.NET -->
-                        <div class="skill-verify-item">
-                            <div class="skill-verify-info">
-                                <span class="skill-name">ASP.NET</span>
-                                <span class="skill-level">Advanced</span>
-                            </div>
-                            <div class="skill-progress-bar">
-                                <div class="skill-progress-fill" style="width: 82%;"></div>
-                            </div>
-                        </div>
-
-                        <!-- SQL -->
-                        <div class="skill-verify-item">
-                            <div class="skill-verify-info">
-                                <span class="skill-name">SQL</span>
-                                <span class="skill-level">Intermediate</span>
-                            </div>
-                            <div class="skill-progress-bar">
-                                <div class="skill-progress-fill" style="width: 60%;"></div>
-                            </div>
-                        </div>
-
-                        <!-- JavaScript -->
-                        <div class="skill-verify-item">
-                            <div class="skill-verify-info">
-                                <span class="skill-name">JavaScript</span>
-                                <span class="skill-level">Intermediate</span>
-                            </div>
-                            <div class="skill-progress-bar">
-                                <div class="skill-progress-fill" style="width: 55%;"></div>
-                            </div>
-                        </div>
-
-                        <!-- Flutter -->
-                        <div class="skill-verify-item">
-                            <div class="skill-verify-info">
-                                <span class="skill-name">Flutter</span>
-                                <span class="skill-level">Beginner</span>
-                            </div>
-                            <div class="skill-progress-bar">
-                                <div class="skill-progress-fill" style="width: 30%;"></div>
-                            </div>
-                        </div>
+                        <% } %>
                     </div>
                 </div>
 
@@ -315,38 +242,35 @@
                         <i class="fa-regular fa-lightbulb insight-bulb-icon"></i>
                     </div>
                     <p class="insight-desc">
-                        Improve your SQL skills to increase your match with 12 recommended opportunities.
+                        Explore relevant opportunities and tailor your applications to stand out to verified employers.
                     </p>
-                    <a href="#" class="btn-take-assessment">Take SQL Assessment</a>
+                    <a href='<%= ResolveUrl("~/User/Jobs.aspx") %>' class="btn-take-assessment">Find Matching Opportunities</a>
                 </div>
 
                 <!-- Suggested Connections Card -->
                 <div class="widget-white-card">
                     <h3 class="widget-card-title">Suggested Connections</h3>
                     <div class="connections-list">
-                        <!-- Connection 1: Mahek Godvani -->
-                        <div class="connection-item">
-                            <div class="connection-left">
-                                <img src='<%= ResolveUrl("~/assets/images/user-female-logo.png") %>' alt="Mahek Godvani" class="connection-avatar" />
-                                <div class="connection-details">
-                                    <div class="connection-name">Mahek Godvani</div>
-                                    <div class="connection-role">SDE at Google</div>
+                        <asp:Repeater ID="rptSuggestedConnections" runat="server">
+                            <ItemTemplate>
+                                <div class="connection-item">
+                                    <div class="connection-left">
+                                        <div style="width:36px; height:36px; border-radius:50%; background:#0040A2; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; margin-right:10px;">
+                                            <%# Eval("Initial") %>
+                                        </div>
+                                        <div class="connection-details">
+                                            <div class="connection-name"><%# Eval("FullName") %></div>
+                                            <div class="connection-role"><%# Eval("Subtitle") %></div>
+                                        </div>
+                                    </div>
+                                    <a href='<%= ResolveUrl("~/User/Networking.aspx") %>' class="btn-connect-action" title="Connect">
+                                        <i class="fa-solid fa-user-plus"></i>
+                                    </a>
                                 </div>
-                            </div>
-                            <button type="button" class="btn-connect-action" aria-label="Connect">
-                                <i class="fa-solid fa-user-plus"></i>
-                            </button>
-                        </div>
-
-                        <!-- Connection 2: Ananya Sharma -->
-                        <div class="connection-item">
-                            <div class="connection-left">
-                                <div class="connection-avatar-initials"><i class="fa-solid fa-a"></i></div>
-                                <div class="connection-details">
-                                    <div class="connection-name">Ananya Sharma</div>
-                                    <div class="connection-role">Senior Recruiter</div>
-                                </div>
-                            </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
+                    </div>
+                </div>
                             <button type="button" class="btn-connect-action" aria-label="Connect">
                                 <i class="fa-solid fa-user-plus"></i>
                             </button>
