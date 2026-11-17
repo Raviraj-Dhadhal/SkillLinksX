@@ -7,17 +7,19 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <div class="interviews-page-container">
 
-        <!-- Top Metrics Cards Row (5 Tiles) -->
+        <!-- =========================================================================
+             [DYNAMIC METRIC TILES]: Aggregated interview stats from SQL Server
+             ========================================================================= -->
         <div class="interviews-metrics-5col">
             <!-- TODAY -->
             <div class="interview-metric-card">
                 <div class="int-metric-top">
-                    <span class="int-metric-label">TODAY</span>
+                    <span class="int-metric-label">TOTAL</span>
                     <div class="int-metric-icon-circle c-blue">
                         <i class="fa-regular fa-calendar"></i>
                     </div>
                 </div>
-                <div class="int-metric-number">4</div>
+                <div class="int-metric-number"><%= TotalInterviewsCount %></div>
             </div>
 
             <!-- UPCOMING -->
@@ -28,7 +30,7 @@
                         <i class="fa-regular fa-clock"></i>
                     </div>
                 </div>
-                <div class="int-metric-number">12</div>
+                <div class="int-metric-number"><%= UpcomingCount %></div>
             </div>
 
             <!-- COMPLETED -->
@@ -39,29 +41,29 @@
                         <i class="fa-solid fa-check"></i>
                     </div>
                 </div>
-                <div class="int-metric-number">28</div>
+                <div class="int-metric-number"><%= CompletedCount %></div>
             </div>
 
             <!-- PENDING -->
             <div class="interview-metric-card">
                 <div class="int-metric-top">
-                    <span class="int-metric-label">PENDING</span>
+                    <span class="int-metric-label">ACTIVE JOBS</span>
                     <div class="int-metric-icon-circle c-gray">
                         <i class="fa-regular fa-hourglass-half"></i>
                     </div>
                 </div>
-                <div class="int-metric-number">5</div>
+                <div class="int-metric-number"><%= TotalInterviewsCount > 0 ? 1 : 0 %></div>
             </div>
 
-            <!-- CANCELLED -->
+            <!-- VIRTUAL CALLS -->
             <div class="interview-metric-card">
                 <div class="int-metric-top">
-                    <span class="int-metric-label">CANCELLED</span>
+                    <span class="int-metric-label">GOOGLE MEET</span>
                     <div class="int-metric-icon-circle c-red">
-                        <i class="fa-regular fa-circle-xmark"></i>
+                        <i class="fa-solid fa-video"></i>
                     </div>
                 </div>
-                <div class="int-metric-number">2</div>
+                <div class="int-metric-number"><%= UpcomingCount %></div>
             </div>
         </div>
 
@@ -111,12 +113,10 @@
                         <div class="cal-day-cell">3</div>
                         <div class="cal-day-cell">
                             <span class="day-num">4</span>
-                            <div class="cal-event-pill">10:00 Technical</div>
                         </div>
                         <div class="cal-day-cell">5</div>
                         <div class="cal-day-cell">
                             <span class="day-num">6</span>
-                            <div class="cal-event-pill">14:00 HR: Priya</div>
                         </div>
                         <div class="cal-day-cell weekend-day">7</div>
                         <div class="cal-day-cell weekend-day">8</div>
@@ -125,8 +125,9 @@
                         <div class="cal-day-cell">9</div>
                         <div class="cal-day-cell active-today-cell">
                             <span class="day-num today-circle">10</span>
-                            <div class="cal-event-pill today-event">11:30 Tech: Sarah</div>
-                            <div class="cal-event-pill today-event-green">15:00 Final: Rahul</div>
+                            <% if (UpcomingCount > 0) { %>
+                                <div class="cal-event-pill today-event"><%= UpcomingCount %> Scheduled</div>
+                            <% } %>
                         </div>
                         <div class="cal-day-cell">11</div>
                         <div class="cal-day-cell">12</div>
@@ -174,82 +175,38 @@
                     </button>
                 </div>
 
+                <!-- =================================================================
+                     [DYNAMIC UPCOMING INTERVIEWS STACK]: Binds from database
+                     ================================================================= -->
                 <div class="upcoming-cards-stack">
-                    <!-- Item 1: Mahek Godvani (Confirmed) -->
-                    <div class="upcoming-item-box">
-                        <div class="upcoming-item-top">
-                            <div class="upcoming-avatar-info">
-                                <img src="<%= ResolveUrl("~/assets/images/user-female-logo.png") %>" alt="Mahek Godvani" class="upcoming-avatar-img" style="object-position: 50% 12%;" />
-                                <div>
-                                    <h4 class="upcoming-cand-name">Mahek Godvani</h4>
-                                    <div class="upcoming-cand-role">Senior Frontend Developer</div>
+                    <asp:Repeater ID="rptUpcomingInterviews" runat="server">
+                        <ItemTemplate>
+                            <div class="upcoming-item-box">
+                                <div class="upcoming-item-top">
+                                    <div class="upcoming-avatar-info">
+                                        <img src='<%# ResolveUrl("~/assets/images/user-male-logo.png") %>' alt="Candidate" class="upcoming-avatar-img" />
+                                        <div>
+                                            <h4 class="upcoming-cand-name"><%# Eval("StudentName") %></h4>
+                                            <div class="upcoming-cand-role"><%# Eval("JobTitle") %></div>
+                                        </div>
+                                    </div>
+                                    <span class='int-status-badge status-<%# Eval("StatusClass") %>'><%# Eval("Status") %></span>
+                                </div>
+                                <div class="upcoming-details-list">
+                                    <div class="upcoming-meta-row">
+                                        <i class="fa-regular fa-calendar"></i>
+                                        <span><%# Eval("InterviewDateFormatted") %></span>
+                                    </div>
+                                    <div class="upcoming-meta-row">
+                                        <i class="fa-solid fa-video"></i>
+                                        <a href='<%# Eval("MeetingLink") %>' target="_blank" rel="noopener noreferrer" style="color:#2563eb; font-weight:600; text-decoration:none;">
+                                            Join Google Meet
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
-                            <span class="int-status-badge status-confirmed">Confirmed</span>
-                        </div>
-                        <div class="upcoming-details-list">
-                            <div class="upcoming-meta-row">
-                                <i class="fa-regular fa-calendar"></i>
-                                <span>Today, 11:30 AM - 12:30 PM</span>
-                            </div>
-                            <div class="upcoming-meta-row">
-                                <i class="fa-solid fa-code"></i>
-                                <span>Technical Interview</span>
-                            </div>
-                            <div class="upcoming-meta-row">
-                                <i class="fa-solid fa-video"></i>
-                                <span>Google Meet</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Item 2: Rahul Mehta (Pending) -->
-                    <div class="upcoming-item-box">
-                        <div class="upcoming-item-top">
-                            <div class="upcoming-avatar-info">
-                                <div class="upcoming-initials-avatar">RM</div>
-                                <div>
-                                    <h4 class="upcoming-cand-name">Rahul Mehta</h4>
-                                    <div class="upcoming-cand-role">Product Manager</div>
-                                </div>
-                            </div>
-                            <span class="int-status-badge status-pending">Pending</span>
-                        </div>
-                        <div class="upcoming-details-list">
-                            <div class="upcoming-meta-row">
-                                <i class="fa-regular fa-calendar"></i>
-                                <span>Today, 3:00 PM - 4:00 PM</span>
-                            </div>
-                            <div class="upcoming-meta-row">
-                                <i class="fa-solid fa-user-group"></i>
-                                <span>Final Culture Fit</span>
-                            </div>
-                            <div class="upcoming-meta-row">
-                                <i class="fa-solid fa-location-dot"></i>
-                                <span>Bengaluru Office</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Item 3: Raviraj Dhadhal (Completed) -->
-                    <div class="upcoming-item-box">
-                        <div class="upcoming-item-top">
-                            <div class="upcoming-avatar-info">
-                                <img src="<%= ResolveUrl("~/assets/images/user-male-logo.png") %>" alt="Raviraj Dhadhal" class="upcoming-avatar-img" />
-                                <div>
-                                    <h4 class="upcoming-cand-name">Raviraj Dhadhal</h4>
-                                    <div class="upcoming-cand-role">HR Business Partner</div>
-                                </div>
-                            </div>
-                            <span class="int-status-badge status-completed">Completed</span>
-                        </div>
-                        <div class="upcoming-details-bottom-row">
-                            <div class="upcoming-score-row">
-                                <i class="fa-regular fa-star"></i> Score: 92/100
-                            </div>
-                            <a href="#" class="view-feedback-link">View Feedback</a>
-                        </div>
-                    </div>
+                        </ItemTemplate>
+                    </asp:Repeater>
                 </div>
 
                 <!-- Footer CTA -->

@@ -8,5 +8,6 @@ namespace SkillLinksX.Company
 {
     public partial class Interviews
     {
+        protected global::System.Web.UI.WebControls.Repeater rptUpcomingInterviews;
     }
 }
