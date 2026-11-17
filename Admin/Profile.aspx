@@ -19,11 +19,13 @@
             
             <div class="admin-profile-header-meta">
                 <div class="admin-name-badge-row">
-                    <h1 class="admin-profile-name">Mahek Godvani</h1>
+                    <h1 class="admin-profile-name">
+                        <asp:Literal ID="litAdminName" runat="server">Mahek Godvani</asp:Literal>
+                    </h1>
                     <span class="badge-active-pill"><i class="fa-solid fa-circle"></i> Active</span>
                 </div>
                 <div class="admin-profile-subtitle">
-                    Platform Administrator &bull; admin@skilllinkx.com
+                    Platform Administrator &bull; <asp:Literal ID="litAdminEmail" runat="server">admin@skilllinkx.com</asp:Literal>
                 </div>
             </div>
 
