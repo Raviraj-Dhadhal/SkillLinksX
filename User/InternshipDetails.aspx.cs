@@ -91,7 +91,7 @@ namespace SkillLinksX.User
         {
             int studentId = Convert.ToInt32(Session["UserId"]);
             object existing = DBHelper.ExecuteScalar(
-                "SELECT COUNT(*) FROM applications WHERE user_id = @sid AND job_id = @jid",
+                "SELECT COUNT(*) FROM applications WHERE user_id = @sid AND (job_id = @jid OR internship_id = @jid)",
                 new SqlParameter("@sid", studentId),
                 new SqlParameter("@jid", InternshipId)
             );
@@ -99,9 +99,9 @@ namespace SkillLinksX.User
             if (existing != null && Convert.ToInt32(existing) > 0)
             {
                 btnApplyInternship.Enabled = false;
-                btnApplyInternship.Text = "Already Applied";
+                btnApplyInternship.Text = "Applied Already";
                 btnApplyInternship.CssClass += " btn-disabled";
-                lblApplyFeedback.ForeColor = System.Drawing.Color.Blue;
+                lblApplyFeedback.ForeColor = System.Drawing.Color.Green;
                 lblApplyFeedback.Text = "You have already applied for this internship position.";
             }
         }
@@ -136,6 +136,38 @@ namespace SkillLinksX.User
                     btnApplyInternship.Text = "Applied Successfully";
                     lblApplyFeedback.ForeColor = System.Drawing.Color.Green;
                     lblApplyFeedback.Text = "Internship application submitted! Track progress in Applications.";
+
+                    // Send notification to Candidate
+                    try
+                    {
+                        string candNotifSql = @"
+                            INSERT INTO notifications (user_id, title, message, category, link_url, is_read, created_at)
+                            VALUES (@uid, 'Internship Application Submitted', @msg, 'Applications', '~/User/Applications.aspx', 0, GETDATE())";
+                        string candMsg = $"You successfully applied for {InternshipTitle} at {CompanyName}.";
+                        DBHelper.ExecuteNonQuery(candNotifSql,
+                            new SqlParameter("@uid", studentId),
+                            new SqlParameter("@msg", candMsg));
+                    }
+                    catch { }
+
+                    // Send notification to Company
+                    try
+                    {
+                        object sNameObj = DBHelper.ExecuteScalar("SELECT full_name FROM member_master_table WHERE id = @id", new SqlParameter("@id", studentId));
+                        string sName = (sNameObj != null && sNameObj != DBNull.Value) ? sNameObj.ToString() : "A candidate";
+
+                        string compNotifSql = @"
+                            INSERT INTO notifications (user_id, title, message, category, link_url, is_read, created_at)
+                            SELECT user_id, 'New Internship Applicant: ' + @sname, @sname + ' applied for ' + @ititle + '.', 'Applications', '~/Company/Applicants.aspx', 0, GETDATE()
+                            FROM company_table 
+                            WHERE company_id = @cid AND user_id IS NOT NULL";
+
+                        DBHelper.ExecuteNonQuery(compNotifSql,
+                            new SqlParameter("@sname", sName),
+                            new SqlParameter("@ititle", InternshipTitle),
+                            new SqlParameter("@cid", companyId));
+                    }
+                    catch { }
                 }
             }
             catch (Exception ex)

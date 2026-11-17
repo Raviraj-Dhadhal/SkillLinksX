@@ -41,9 +41,9 @@
                         </div>
                     </div>
 
-                    <div class="opp-details-stipend-row flex-between">
-                        <div class="opp-stipend-amount">
-                            <%= SalaryRange %>
+                    <div class="opp-details-stipend-row flex-between" style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; padding-top:14px; border-top:1px solid #f1f5f9;">
+                        <div class="opp-stipend-amount" style="font-size:16px; font-weight:700; color:#0f172a; display:inline-flex; align-items:center; gap:8px;">
+                            <span style="font-size:12px; font-weight:600; color:#64748b; text-transform:uppercase;">Stipend:</span> <%= SalaryRange %>
                         </div>
                         <div class="opp-header-action-btns">
                             <button type="button" class="btn-opp-action-pill" onclick="alert('Internship link copied!');">

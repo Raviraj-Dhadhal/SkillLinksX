@@ -8,6 +8,19 @@ using SkillLinksX.Helpers;
 
 namespace SkillLinksX.User
 {
+    public class InternshipDisplayItem
+    {
+        public int JobId { get; set; }
+        public string Title { get; set; }
+        public string CompanyName { get; set; }
+        public string Location { get; set; }
+        public string JobType { get; set; }
+        public string SalaryRange { get; set; }
+        public string RequiredSkills { get; set; }
+        public int AiMatchScore { get; set; }
+        public bool HasApplied { get; set; }
+    }
+
     public partial class Internships : Page
     {
         protected void Page_Load(object sender, EventArgs e)
@@ -60,7 +73,7 @@ namespace SkillLinksX.User
             DataTable dt = DBHelper.ExecuteQuery(sql);
 
             // If no explicit internship is found, fallback to jobs table
-            if (dt.Rows.Count == 0)
+            if (dt == null || dt.Rows.Count == 0)
             {
                 sql = @"
                     SELECT j.job_id, j.job_title AS title, j.location, j.job_type, 
@@ -74,27 +87,49 @@ namespace SkillLinksX.User
                 dt = DBHelper.ExecuteQuery(sql);
             }
 
-            var rankedList = new List<dynamic>();
-
-            foreach (DataRow r in dt.Rows)
+            // Fetch already applied jobs / internships for this student
+            var appliedIds = new HashSet<int>();
+            try
             {
-                string req = r["required_skills"] != DBNull.Value ? r["required_skills"].ToString() : "";
-                int match = AIService.CalculateMatchScore(studentSkills, req);
-
-                rankedList.Add(new
+                string appSql = "SELECT job_id, internship_id FROM applications WHERE user_id = @uid";
+                DataTable dtApp = DBHelper.ExecuteQuery(appSql, new SqlParameter("@uid", studentId));
+                foreach (DataRow appRow in dtApp.Rows)
                 {
-                    JobId = Convert.ToInt32(r["job_id"]),
-                    Title = r["title"].ToString(),
-                    CompanyName = r["company_name"].ToString(),
-                    Location = r["location"].ToString(),
-                    JobType = r["job_type"].ToString(),
-                    SalaryRange = r["salary_range"] != DBNull.Value ? r["salary_range"].ToString() : "Stipend Provided",
-                    RequiredSkills = req,
-                    AiMatchScore = match
-                });
+                    if (appRow["job_id"] != DBNull.Value) appliedIds.Add(Convert.ToInt32(appRow["job_id"]));
+                    if (appRow["internship_id"] != DBNull.Value) appliedIds.Add(Convert.ToInt32(appRow["internship_id"]));
+                }
+            }
+            catch { }
+
+            var rankedList = new List<InternshipDisplayItem>();
+
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                foreach (DataRow r in dt.Rows)
+                {
+                    int jobId = Convert.ToInt32(r["job_id"]);
+                    string req = r["required_skills"] != DBNull.Value ? r["required_skills"].ToString() : "";
+                    int match = AIService.CalculateMatchScore(studentSkills, req);
+
+                    rankedList.Add(new InternshipDisplayItem
+                    {
+                        JobId = jobId,
+                        Title = r["title"].ToString(),
+                        CompanyName = r["company_name"].ToString(),
+                        Location = r["location"] != DBNull.Value ? r["location"].ToString() : "Remote",
+                        JobType = r["job_type"] != DBNull.Value ? r["job_type"].ToString() : "Internship",
+                        SalaryRange = r["salary_range"] != DBNull.Value ? r["salary_range"].ToString() : "Stipend Provided",
+                        RequiredSkills = req,
+                        AiMatchScore = match,
+                        HasApplied = appliedIds.Contains(jobId)
+                    });
+                }
             }
 
-            rptInternshipsList.DataSource = rankedList.OrderByDescending(x => x.AiMatchScore).ToList();
+            // Order by AI match score
+            var sortedList = rankedList.OrderByDescending(x => x.AiMatchScore).ToList();
+
+            rptInternshipsList.DataSource = sortedList;
             rptInternshipsList.DataBind();
         }
     }
