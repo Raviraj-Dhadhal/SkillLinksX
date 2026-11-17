@@ -11,5 +11,8 @@ namespace SkillLinksX.User
 {
     public partial class InternshipDetails
     {
+        protected global::System.Web.UI.WebControls.Button btnApplyInternship;
+        protected global::System.Web.UI.WebControls.Label lblApplyFeedback;
+        protected global::System.Web.UI.WebControls.Repeater rptRequiredSkills;
     }
 }

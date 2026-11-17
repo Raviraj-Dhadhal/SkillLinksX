@@ -30,12 +30,12 @@
                                 <img src="<%= ResolveUrl("~/assets/images/razorpay-logo.svg") %>" alt="Razorpay" class="opp-details-brand-img" />
                             </div>
                             <div class="opp-details-title-wrap">
-                                <h1 class="opp-details-role-title">Frontend Developer Intern</h1>
-                                <div class="opp-details-company-name">Razorpay</div>
+                                <h1 class="opp-details-role-title"><%= InternshipTitle %></h1>
+                                <div class="opp-details-company-name"><%= CompanyName %></div>
                                 <div class="opp-details-sub-meta">
-                                    <span><i class="fa-solid fa-location-dot"></i> Bengaluru</span>
-                                    <span><i class="fa-solid fa-laptop-code"></i> Hybrid</span>
-                                    <span><i class="fa-regular fa-clock"></i> 6 Months</span>
+                                    <span><i class="fa-solid fa-location-dot"></i> <%= Location %></span>
+                                    <span><i class="fa-solid fa-laptop-code"></i> <%= JobType %></span>
+                                    <span><i class="fa-regular fa-clock"></i> Active Opening</span>
                                 </div>
                             </div>
                         </div>
@@ -43,21 +43,18 @@
 
                     <div class="opp-details-stipend-row flex-between">
                         <div class="opp-stipend-amount">
-                            &#8377;15,000 &ndash; &#8377;25,000 <span class="opp-stipend-unit">/ month</span>
+                            <%= SalaryRange %>
                         </div>
                         <div class="opp-header-action-btns">
-                            <button type="button" class="btn-opp-action-pill">
+                            <button type="button" class="btn-opp-action-pill" onclick="alert('Internship link copied!');">
                                 <i class="fa-solid fa-share-nodes"></i> Share
                             </button>
-                            <button type="button" class="btn-opp-action-pill">
-                                <i class="fa-regular fa-bookmark"></i> Save
-                            </button>
-                            <button type="button" class="btn-opp-apply-primary" onclick="alert('Application submitted successfully!');">
-                                Apply Now
-                            </button>
+                            <asp:Button ID="btnApplyInternship" runat="server" Text="Apply Now" CssClass="btn-opp-apply-primary" OnClick="btnApplyInternship_Click" />
                         </div>
                     </div>
                 </div>
+
+                <asp:Label ID="lblApplyFeedback" runat="server" style="display:block; margin: 10px 0; font-size:13.5px; font-weight:600;" EnableViewState="false" />
 
                 <!-- 2. About the Internship Card -->
                 <div class="opp-details-section-card">
@@ -96,16 +93,18 @@
                             <i class="fa-solid fa-sparkles ai-stars-icon"></i>
                             <span class="ai-match-card-label">AI Match Score</span>
                         </div>
-                        <div class="ai-match-percentage">94%</div>
+                        <div class="ai-match-percentage"><%= AiMatchScore %>%</div>
                     </div>
                     <p class="ai-match-description">
-                        Excellent fit! Your strong background in React and frontend technologies aligns perfectly with their tech stack.
+                        Calculated by comparing your profile skills with this internship's requirements.
                     </p>
-                    <div class="ai-matching-skills-title">MATCHING SKILLS</div>
+                    <div class="ai-matching-skills-title">REQUIRED SKILLS</div>
                     <div class="ai-skills-tags-row">
-                        <span class="ai-skill-tag">React</span>
-                        <span class="ai-skill-tag">JavaScript</span>
-                        <span class="ai-skill-tag">Tailwind CSS</span>
+                        <asp:Repeater ID="rptRequiredSkills" runat="server">
+                            <ItemTemplate>
+                                <span class="ai-skill-tag"><%# Container.DataItem %></span>
+                            </ItemTemplate>
+                        </asp:Repeater>
                     </div>
                 </div>
 
