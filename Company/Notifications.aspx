@@ -14,85 +14,41 @@
                 <p class="notifications-sub">Stay updated with applications, interviews, jobs and important company activity.</p>
             </div>
             <div>
-                <button type="button" class="btn-mark-all-read">
+                <asp:LinkButton ID="btnMarkAllRead" runat="server" CssClass="btn-mark-all-read" OnClick="btnMarkAllRead_Click">
                     <i class="fa-solid fa-check-double"></i> Mark All as Read
-                </button>
+                </asp:LinkButton>
             </div>
         </div>
 
         <!-- Notifications Card Container -->
         <div class="notifications-list-card">
-            
-            <!-- Notification Item 1: New Application -->
-            <div class="notif-item unread">
-                <div class="notif-icon-box bg-blue-soft">
-                    <i class="fa-solid fa-user-plus text-blue"></i>
-                </div>
-                <div class="notif-content-wrap">
-                    <div class="notif-title-row">
-                        <span class="notif-main-text"><strong>Vivek Gupta</strong> submitted an application for <strong>Software Developer</strong>.</span>
-                        <span class="notif-time-ago">10 mins ago</span>
+            <asp:Repeater ID="rptCompanyNotifications" runat="server">
+                <ItemTemplate>
+                    <div class='notif-item <%# Convert.ToBoolean(Eval("is_read")) ? "" : "unread" %>'>
+                        <div class='notif-icon-box <%# Eval("category").ToString() == "Interviews" ? "bg-green-soft" : "bg-blue-soft" %>'>
+                            <i class='<%# Eval("category").ToString() == "Interviews" ? "fa-regular fa-calendar-check text-green" : "fa-solid fa-user-plus text-blue" %>'></i>
+                        </div>
+                        <div class="notif-content-wrap">
+                            <div class="notif-title-row">
+                                <span class="notif-main-text"><strong><%# Eval("title") %>:</strong> <%# Eval("message") %></span>
+                                <span class="notif-time-ago"><%# Convert.ToDateTime(Eval("created_at")).ToString("dd MMM, hh:mm tt") %></span>
+                            </div>
+                            <div class="notif-quick-actions" style="margin-top: 8px;">
+                                <a href='<%# ResolveUrl(Eval("link_url") != DBNull.Value && !string.IsNullOrEmpty(Eval("link_url").ToString()) ? "~/Company/" + Eval("link_url") : "~/Company/Applicants.aspx") %>' class="notif-action-link">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                        <%# Convert.ToBoolean(Eval("is_read")) ? "" : "<div class=\"notif-dot\"></div>" %>
                     </div>
-                    <p class="notif-snippet">AI Match Score: 94%. Strong overlap in React &amp; Node.js enterprise requirements.</p>
-                    <div class="notif-quick-actions">
-                        <a href="<%= ResolveUrl("~/Company/Applicants.aspx") %>" class="notif-action-link">Review Application</a>
-                    </div>
-                </div>
-                <div class="notif-dot"></div>
-            </div>
-
-            <!-- Notification Item 2: Interview Scheduled -->
-            <div class="notif-item unread">
-                <div class="notif-icon-box bg-green-soft">
-                    <i class="fa-regular fa-calendar-check text-green"></i>
-                </div>
-                <div class="notif-content-wrap">
-                    <div class="notif-title-row">
-                        <span class="notif-main-text">Technical Interview scheduled with <strong>Mahek Godvani</strong>.</span>
-                        <span class="notif-time-ago">1 hour ago</span>
-                    </div>
-                    <p class="notif-snippet">Confirmed for Today at 11:30 AM - 12:30 PM via Google Meet.</p>
-                    <div class="notif-quick-actions">
-                        <a href="<%= ResolveUrl("~/Company/Interviews.aspx") %>" class="notif-action-link">Open Calendar</a>
-                    </div>
-                </div>
-                <div class="notif-dot"></div>
-            </div>
-
-            <!-- Notification Item 3: Job Expiring Alert -->
-            <div class="notif-item">
-                <div class="notif-icon-box bg-red-soft">
-                    <i class="fa-solid fa-triangle-exclamation text-red"></i>
-                </div>
-                <div class="notif-content-wrap">
-                    <div class="notif-title-row">
-                        <span class="notif-main-text">Listing <strong>Senior Backend Engineer</strong> is expiring in 2 days.</span>
-                        <span class="notif-time-ago">Yesterday</span>
-                    </div>
-                    <p class="notif-snippet">You have 42 pending applications to review before this job opportunity closes.</p>
-                    <div class="notif-quick-actions">
-                        <a href="<%= ResolveUrl("~/Company/ManageJobs.aspx") %>" class="notif-action-link">Manage Job</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Notification Item 4: Assessment Completed -->
-            <div class="notif-item">
-                <div class="notif-icon-box bg-purple-soft">
-                    <i class="fa-solid fa-code text-purple"></i>
-                </div>
-                <div class="notif-content-wrap">
-                    <div class="notif-title-row">
-                        <span class="notif-main-text"><strong>Raviraj Dhadhal</strong> completed the online technical assessment.</span>
-                        <span class="notif-time-ago">2 days ago</span>
-                    </div>
-                    <p class="notif-snippet">Score: 92/100 (Expert level in C#, ASP.NET &amp; SQL Server).</p>
-                    <div class="notif-quick-actions">
-                        <a href="<%= ResolveUrl("~/Company/CandidateProfile.aspx") %>" class="notif-action-link">View Candidate Profile</a>
-                    </div>
-                </div>
-            </div>
-
+                </ItemTemplate>
+                <FooterTemplate>
+                    <asp:Panel ID="pnlNoCompanyNotifs" runat="server" Visible='<%# rptCompanyNotifications.Items.Count == 0 %>' CssClass="text-center" style="padding: 30px; color: #64748b;">
+                        <i class="fa-regular fa-bell-slash" style="font-size: 28px; margin-bottom: 8px;"></i>
+                        <p>No new company notifications.</p>
+                    </asp:Panel>
+                </FooterTemplate>
+            </asp:Repeater>
         </div>
 
     </div>
