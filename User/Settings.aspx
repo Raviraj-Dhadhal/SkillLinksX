@@ -20,6 +20,7 @@
             <div class="settings-card-head">
                 <h2 class="settings-card-heading">Account Information</h2>
                 <p class="settings-card-description">Update your basic account details.</p>
+                <asp:Label ID="lblSettingsFeedback" runat="server" style="margin-top:6px; display:block; font-size:13px; font-weight:600;" EnableViewState="false" />
             </div>
 
             <!-- Form Content Body -->
