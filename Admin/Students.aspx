@@ -18,14 +18,16 @@
             </button>
         </div>
 
-        <!-- 5 Summary Metrics Cards -->
+        <!-- =========================================================================
+             [DYNAMIC METRIC TILES]: Real-time Student counts from database
+             ========================================================================= -->
         <div class="admin-metrics-5grid">
             <div class="admin-stat-card">
                 <div class="stat-top-row">
                     <span class="stat-label">Total Students</span>
                     <span class="stat-icon-wrap bg-blue-subtle"><i class="fa-solid fa-user-group"></i></span>
                 </div>
-                <div class="stat-num-val">45,231 <span class="stat-trend-green"><i class="fa-solid fa-arrow-up"></i> 12.5%</span></div>
+                <div class="stat-num-val"><%= TotalStudents %></div>
             </div>
 
             <div class="admin-stat-card">
@@ -33,15 +35,15 @@
                     <span class="stat-label">Active Students</span>
                     <span class="stat-icon-wrap bg-green-subtle"><i class="fa-regular fa-circle-check"></i></span>
                 </div>
-                <div class="stat-num-val">38,102</div>
+                <div class="stat-num-val"><%= ActiveStudents %></div>
             </div>
 
             <div class="admin-stat-card">
                 <div class="stat-top-row">
-                    <span class="stat-label">New This Month</span>
-                    <span class="stat-icon-wrap bg-purple-subtle"><i class="fa-solid fa-user-plus"></i></span>
+                    <span class="stat-label">Pending Approval</span>
+                    <span class="stat-icon-wrap bg-purple-subtle"><i class="fa-solid fa-user-clock"></i></span>
                 </div>
-                <div class="stat-num-val">2,450</div>
+                <div class="stat-num-val"><%= PendingStudents %></div>
             </div>
 
             <div class="admin-stat-card">
@@ -49,15 +51,15 @@
                     <span class="stat-label">Verified Profiles</span>
                     <span class="stat-icon-wrap bg-blue-subtle"><i class="fa-regular fa-circle-check"></i></span>
                 </div>
-                <div class="stat-num-val">42,100</div>
+                <div class="stat-num-val"><%= ActiveStudents %></div>
             </div>
 
             <div class="admin-stat-card">
                 <div class="stat-top-row">
-                    <span class="stat-label">Inactive Students</span>
+                    <span class="stat-label">Suspended</span>
                     <span class="stat-icon-wrap bg-red-subtle"><i class="fa-solid fa-user-xmark"></i></span>
                 </div>
-                <div class="stat-num-val">681</div>
+                <div class="stat-num-val"><%= SuspendedStudents %></div>
             </div>
         </div>
 
@@ -65,28 +67,76 @@
         <div class="admin-filter-bar-card">
             <div class="admin-search-input-wrap">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchStudentInput" placeholder="Search student..." />
+                <asp:TextBox ID="txtSearchStudent" runat="server" placeholder="Search student name or skill..." AutoPostBack="true" OnTextChanged="txtSearchStudent_TextChanged" />
             </div>
 
             <div class="admin-dropdown-wrap">
-                <select id="filterCollege">
-                    <option value="">College</option>
-                    <option value="IIT Bombay">IIT Bombay</option>
-                    <option value="NIT Trichy">NIT Trichy</option>
-                    <option value="BITS Pilani">BITS Pilani</option>
-                    <option value="Delhi University">Delhi University</option>
-                </select>
+                <asp:DropDownList ID="ddlStatusFilter" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlStatusFilter_SelectedIndexChanged">
+                    <asp:ListItem Text="All Statuses" Value="" />
+                    <asp:ListItem Text="Active" Value="Active" />
+                    <asp:ListItem Text="Pending" Value="Pending" />
+                    <asp:ListItem Text="Suspended" Value="Suspended" />
+                </asp:DropDownList>
             </div>
+        </div>
 
-            <div class="admin-dropdown-wrap">
-                <select id="filterLocation">
-                    <option value="">Location</option>
-                    <option value="Mumbai">Mumbai</option>
-                    <option value="Bengaluru">Bengaluru</option>
-                    <option value="Pune">Pune</option>
-                    <option value="New Delhi">New Delhi</option>
-                </select>
-            </div>
+        <asp:Label ID="lblAdminMessage" runat="server" ForeColor="Green" style="margin: 8px 12px; display:block; font-size:13px;" EnableViewState="false" />
+
+        <!-- Split Layout: Table (Left 2.2fr) + Detail Panel (Right 1fr) -->
+        <div class="admin-workspace-split">
+
+            <!-- Left Main: Students Table Card -->
+            <div class="admin-table-card">
+                <div class="admin-table-responsive">
+                    <table class="admin-data-table" id="studentsTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">#</th>
+                                <th>Student</th>
+                                <th>Skills &amp; Profile</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- =========================================================
+                                 [STUDENTS REPEATER]: Binds registered students from DB
+                                 ========================================================= -->
+                            <asp:Repeater ID="rptStudents" runat="server" OnItemCommand="rptStudents_ItemCommand">
+                                <ItemTemplate>
+                                    <tr class="student-row">
+                                        <td><%# Container.ItemIndex + 1 %></td>
+                                        <td>
+                                            <div class="student-cell-flex">
+                                                <div class="student-avatar-wrap">
+                                                    <img src='<%# ResolveUrl("~/assets/images/user-male-logo.png") %>' alt="Avatar" class="student-avatar-img" />
+                                                </div>
+                                                <div>
+                                                    <div class="student-name-text"><%# Eval("FullName") %></div>
+                                                    <div class="student-sub-email"><%# Eval("Email") %></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="student-college-name"><%# Eval("Skills") %></div>
+                                            <div class="student-sub-loc"><i class="fa-regular fa-clock"></i> Joined <%# Eval("JoinedDate") %></div>
+                                        </td>
+                                        <td>
+                                            <span class='badge-status-pill <%# Eval("StatusBadgeClass") %>' style="padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600;">
+                                                <%# Eval("AccountStatus") %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <asp:LinkButton ID="btnToggleStatus" runat="server" CommandName="ToggleStatus" CommandArgument='<%# Eval("MemberId") + "|" + Eval("AccountStatus") %>' CssClass="btn btn-sm btn-outline-primary" style="font-size:11px; padding:3px 8px; text-decoration:none; border:1px solid #2563eb; color:#2563eb; border-radius:4px;">
+                                                <%# Eval("AccountStatus").ToString() == "Active" ? "Suspend" : "Activate" %>
+                                            </asp:LinkButton>
+                                        </td>
+                                    </tr>
+                                </ItemTemplate>
+                            </asp:Repeater>
+                        </tbody>
+                    </table>
+                </div>
 
             <div class="admin-dropdown-wrap">
                 <select id="filterGradYear">
