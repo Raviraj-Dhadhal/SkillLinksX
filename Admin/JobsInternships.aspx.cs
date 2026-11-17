@@ -32,7 +32,7 @@ namespace SkillLinksX.Admin
         private void LoadAllOpportunities()
         {
             string sql = @"
-                SELECT j.job_id, j.title, j.location, j.job_type, j.status,
+                SELECT j.job_id, j.job_title AS title, j.location, j.job_type, j.status,
                        c.comp_name AS company_name
                 FROM jobs j
                 INNER JOIN company_table c ON j.company_id = c.company_id

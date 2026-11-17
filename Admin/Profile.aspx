@@ -11,21 +11,20 @@
         <!-- Top Profile Header Card -->
         <div class="admin-profile-header-card">
             <div class="admin-profile-avatar-wrapper">
-                <img src="<%= ResolveUrl("~/assets/images/user-female-logo.png") %>" alt="Mahek Godvani" class="admin-profile-lg-avatar" />
-                <button type="button" class="btn-avatar-camera" title="Change Avatar" aria-label="Change Avatar">
-                    <i class="fa-solid fa-camera"></i>
-                </button>
+                <div style="width:72px; height:72px; border-radius:50%; background:#0040A2; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:26px;">
+                    <%= AdminInitials %>
+                </div>
             </div>
             
             <div class="admin-profile-header-meta">
                 <div class="admin-name-badge-row">
                     <h1 class="admin-profile-name">
-                        <asp:Literal ID="litAdminName" runat="server">Mahek Godvani</asp:Literal>
+                        <asp:Literal ID="litAdminName" runat="server"></asp:Literal>
                     </h1>
                     <span class="badge-active-pill"><i class="fa-solid fa-circle"></i> Active</span>
                 </div>
                 <div class="admin-profile-subtitle">
-                    Platform Administrator &bull; <asp:Literal ID="litAdminEmail" runat="server">admin@skilllinkx.com</asp:Literal>
+                    Platform Administrator &bull; <asp:Literal ID="litAdminEmail" runat="server"></asp:Literal>
                 </div>
             </div>
 
@@ -61,22 +60,22 @@
 
                         <div class="admin-form-group">
                             <label class="admin-input-label">Full Name</label>
-                            <input type="text" class="admin-profile-input" value="Mahek Godvani" />
+                            <input type="text" class="admin-profile-input" value="<%= AdminFullName %>" readonly="readonly" />
                         </div>
 
                         <div class="admin-form-group">
                             <label class="admin-input-label">Email Address</label>
-                            <input type="email" class="admin-profile-input" value="admin@skilllinkx.com" />
+                            <input type="email" class="admin-profile-input" value="<%= AdminEmail %>" readonly="readonly" />
                         </div>
 
                         <div class="admin-form-group">
                             <label class="admin-input-label">Phone Number</label>
-                            <input type="tel" class="admin-profile-input" value="+91 98765 43210" />
+                            <input type="tel" class="admin-profile-input" value="<%= AdminPhone %>" readonly="readonly" />
                         </div>
 
                         <div class="admin-form-group">
                             <label class="admin-input-label">Location</label>
-                            <input type="text" class="admin-profile-input" value="Ahmedabad, Gujarat, India" />
+                            <input type="text" class="admin-profile-input" value="<%= AdminLocation %>" readonly="readonly" />
                         </div>
                     </div>
 

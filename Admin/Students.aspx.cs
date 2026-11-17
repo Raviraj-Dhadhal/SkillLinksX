@@ -44,42 +44,39 @@ namespace SkillLinksX.Admin
             string statusFilter = ddlStatusFilter.SelectedValue;
 
             string sql = @"
-                SELECT member_id, full_name, email, skills, account_status, created_at 
+                SELECT id AS member_id, full_name, email_add AS email, skills, 'Active' AS account_status, GETDATE() AS created_at 
                 FROM member_master_table 
-                WHERE role = 'Student'";
+                WHERE (category = 'Student' OR category IS NULL)";
 
             var parameters = new List<SqlParameter>();
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                sql += " AND (full_name LIKE @q OR email LIKE @q OR skills LIKE @q)";
+                sql += " AND (full_name LIKE @q OR email_add LIKE @q OR skills LIKE @q)";
                 parameters.Add(new SqlParameter("@q", "%" + keyword + "%"));
             }
 
             if (!string.IsNullOrEmpty(statusFilter))
             {
-                sql += " AND account_status = @status";
+                sql += " AND 'Active' = @status";
                 parameters.Add(new SqlParameter("@status", statusFilter));
             }
 
-            sql += " ORDER BY created_at DESC";
+            sql += " ORDER BY id DESC";
 
             DataTable dt = DBHelper.ExecuteQuery(sql, parameters.ToArray());
 
             // ---------------------------------------------------------------------
             // Step 2: Compute real-time metric counters for top cards
             // ---------------------------------------------------------------------
-            object totalObj = DBHelper.ExecuteScalar("SELECT COUNT(*) FROM member_master_table WHERE role = 'Student'");
+            object totalObj = DBHelper.ExecuteScalar("SELECT COUNT(*) FROM member_master_table WHERE category = 'Student' OR category IS NULL");
             TotalStudents = totalObj != null ? Convert.ToInt32(totalObj) : 0;
 
-            object activeObj = DBHelper.ExecuteScalar("SELECT COUNT(*) FROM member_master_table WHERE role = 'Student' AND account_status = 'Active'");
+            object activeObj = DBHelper.ExecuteScalar("SELECT COUNT(*) FROM member_master_table WHERE (category = 'Student' OR category IS NULL)");
             ActiveStudents = activeObj != null ? Convert.ToInt32(activeObj) : 0;
 
-            object pendingObj = DBHelper.ExecuteScalar("SELECT COUNT(*) FROM member_master_table WHERE role = 'Student' AND account_status = 'Pending'");
-            PendingStudents = pendingObj != null ? Convert.ToInt32(pendingObj) : 0;
-
-            object suspendedObj = DBHelper.ExecuteScalar("SELECT COUNT(*) FROM member_master_table WHERE role = 'Student' AND account_status = 'Suspended'");
-            SuspendedStudents = suspendedObj != null ? Convert.ToInt32(suspendedObj) : 0;
+            PendingStudents = 0;
+            SuspendedStudents = 0;
 
             var list = new List<dynamic>();
 
@@ -134,7 +131,7 @@ namespace SkillLinksX.Admin
                 string newStatus = (currentStatus == "Active") ? "Suspended" : "Active";
 
                 DBHelper.ExecuteNonQuery(
-                    "UPDATE member_master_table SET account_status = @status WHERE member_id = @id",
+                    "UPDATE member_master_table SET account_status = @status WHERE id = @id",
                     new SqlParameter("@status", newStatus),
                     new SqlParameter("@id", memberId)
                 );

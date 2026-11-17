@@ -136,7 +136,9 @@
                     <div class="topbar-actions">
                         <a href="<%= ResolveUrl("~/Company/Notifications.aspx") %>" class="topbar-icon-btn topbar-notif-btn" title="Notifications">
                             <i class="fa-regular fa-bell"></i>
-                            <span class="badge-dot"></span>
+                            <% if (UnreadNotificationCount > 0) { %>
+                                <span class="badge-dot"></span>
+                            <% } %>
                         </a>
                         <a href="<%= ResolveUrl("~/Company/Messages.aspx") %>" class="topbar-icon-btn" title="Messages">
                             <i class="fa-regular fa-message"></i>
@@ -146,9 +148,11 @@
                                 <span class="user-name"><%= Session["UserName"] ?? "Company" %></span>
                                 <span class="user-role">Recruiting Team</span>
                             </div>
-                            <!-- TechNova SVG Avatar Logo -->
+                            <!-- Dynamic Company Initial Monogram -->
                             <div class="user-avatar-chip">
-                                <img src='<%= ResolveUrl("~/assets/images/technova-avatar.svg") %>' alt='<%= Session["UserName"] ?? "Company" %>' class="company-avatar-svg-img" />
+                                <span style="width:36px; height:36px; border-radius:50%; background:#eff6ff; display:inline-flex; align-items:center; justify-content:center; color:#2563eb; font-weight:700; font-size:16px; border:1px solid #bfdbfe;">
+                                    <%= (Session["UserName"] != null && Session["UserName"].ToString().Length > 0) ? Session["UserName"].ToString().Substring(0, 1).ToUpper() : "C" %>
+                                </span>
                             </div>
                         </a>
                     </div>

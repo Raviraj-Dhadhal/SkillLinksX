@@ -182,227 +182,67 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- App 1: Raviraj Dhadhal (Selected by default) -->
-                            <tr class="app-row selected"
-                                data-student-name="Raviraj Dhadhal"
-                                data-applied-for="Frontend Developer at TechCorp India"
-                                data-avatar='<%= ResolveUrl("~/assets/images/user-male-logo.png") %>'
-                                data-match="94%"
-                                data-skills-match="98%"
-                                data-exp-match="85%"
-                                data-education="B.Tech Computer Science"
-                                data-college="IIT Bombay &bull; 2019 - 2023"
-                                data-skills="React,TypeScript,Tailwind CSS,Redux"
-                                data-status="Under Review"
-                                data-date="Oct 12, 2026">
-                                <td>
-                                    <div class="student-cell-flex">
-                                        <div class="student-avatar-wrap">
-                                            <img src="<%= ResolveUrl("~/assets/images/user-male-logo.png") %>" alt="Raviraj" class="student-avatar-img" />
-                                        </div>
-                                        <div>
-                                            <div class="student-name-text">Raviraj Dhadhal</div>
-                                            <div class="student-sub-email">Applied Oct 12</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="opp-title-bold">Frontend Developer</div>
-                                    <div class="opp-sub-meta">TechCorp India</div>
-                                </td>
-                                <td>
-                                    <div class="opp-sub-meta">Job</div>
-                                    <div class="opp-sub-meta">Bengaluru</div>
-                                </td>
-                                <td><span class="match-score-pill">94%</span></td>
-                                <td>
-                                    <div class="action-dropdown-wrap">
-                                        <button type="button" class="btn-more-dots" onclick="event.stopPropagation(); this.nextElementSibling.classList.toggle('show');">
-                                            <i class="fa-solid fa-ellipsis-vertical"></i>
-                                        </button>
-                                        <div class="action-menu-dropdown">
-                                            <a href="<%= ResolveUrl("~/User/Messages.aspx") %>" class="action-menu-item" onclick="event.stopPropagation();">
-                                                <i class="fa-regular fa-message"></i> Message
-                                            </a>
-                                            <a href="<%= ResolveUrl("~/User/Profile.aspx") %>" class="action-menu-item" onclick="event.stopPropagation();">
-                                                <i class="fa-regular fa-user"></i> View Profile
-                                            </a>
-                                            <a href="javascript:void(0);" class="action-menu-item" onclick="event.stopPropagation(); alert('Downloading application PDF...');">
-                                                <i class="fa-solid fa-download"></i> Download PDF
-                                            </a>
-                                            <a href="javascript:void(0);" class="action-menu-item danger" onclick="event.stopPropagation(); confirm('Reject candidate?');">
-                                                <i class="fa-solid fa-ban"></i> Reject
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- App 2: Priya Sharma -->
-                            <tr class="app-row"
-                                data-student-name="Priya Sharma"
-                                data-applied-for="Data Science Intern at Global Analytics"
-                                data-avatar='<%= ResolveUrl("~/assets/images/user-female-logo.png") %>'
-                                data-match="88%"
-                                data-skills-match="90%"
-                                data-exp-match="80%"
-                                data-education="MCA"
-                                data-college="NIT Trichy &bull; 2021 - 2024"
-                                data-skills="Python,SQL,Pandas,Scikit-Learn"
-                                data-status="Shortlisted"
-                                data-date="Oct 10, 2026">
-                                <td>
-                                    <div class="student-cell-flex">
-                                        <div class="student-avatar-init">PS</div>
-                                        <div>
-                                            <div class="student-name-text">Priya Sharma</div>
-                                            <div class="student-sub-email">Applied Oct 10</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="opp-title-bold">Data Science Intern</div>
-                                    <div class="opp-sub-meta">Global Analytics</div>
-                                </td>
-                                <td>
-                                    <div class="opp-sub-meta">Internship</div>
-                                    <div class="opp-sub-meta">Pune</div>
-                                </td>
-                                <td><span class="match-score-pill">88%</span></td>
-                                <td>
-                                    <div class="action-dropdown-wrap">
-                                        <button type="button" class="btn-more-dots" onclick="event.stopPropagation(); this.nextElementSibling.classList.toggle('show');">
-                                            <i class="fa-solid fa-ellipsis-vertical"></i>
-                                        </button>
-                                        <div class="action-menu-dropdown">
-                                            <a href="<%= ResolveUrl("~/User/Messages.aspx") %>" class="action-menu-item" onclick="event.stopPropagation();">
-                                                <i class="fa-regular fa-message"></i> Message
-                                            </a>
-                                            <a href="<%= ResolveUrl("~/User/Profile.aspx") %>" class="action-menu-item" onclick="event.stopPropagation();">
-                                                <i class="fa-regular fa-user"></i> View Profile
-                                            </a>
-                                            <a href="javascript:void(0);" class="action-menu-item" onclick="event.stopPropagation(); alert('Downloading application PDF...');">
-                                                <i class="fa-solid fa-download"></i> Download PDF
-                                            </a>
-                                            <a href="javascript:void(0);" class="action-menu-item danger" onclick="event.stopPropagation(); confirm('Reject candidate?');">
-                                                <i class="fa-solid fa-ban"></i> Reject
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- App 3: Neha Gupta -->
-                            <tr class="app-row"
-                                data-student-name="Neha Gupta"
-                                data-applied-for="UX Designer at CreativeMinds"
-                                data-avatar='<%= ResolveUrl("~/assets/images/user-female-logo.png") %>'
-                                data-match="65%"
-                                data-skills-match="70%"
-                                data-exp-match="60%"
-                                data-education="B.Des Interaction Design"
-                                data-college="NID Ahmedabad &bull; 2020 - 2024"
-                                data-skills="Figma,Wireframing,User Research"
-                                data-status="Rejected"
-                                data-date="Oct 05, 2026">
-                                <td>
-                                    <div class="student-cell-flex">
-                                        <div class="student-avatar-wrap">
-                                            <img src="<%= ResolveUrl("~/assets/images/user-female-logo.png") %>" alt="Neha" class="student-avatar-img" />
-                                        </div>
-                                        <div>
-                                            <div class="student-name-text">Neha Gupta</div>
-                                            <div class="student-sub-email">Applied Oct 05</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="opp-title-bold">UX Designer</div>
-                                    <div class="opp-sub-meta">CreativeMinds</div>
-                                </td>
-                                <td>
-                                    <div class="opp-sub-meta">Job</div>
-                                    <div class="opp-sub-meta">New Delhi</div>
-                                </td>
-                                <td><span class="match-score-pill score-red">65%</span></td>
-                                <td><span class="badge-status-rejected">Rejected</span></td>
-                                <td>
-                                    <div class="action-dropdown-wrap">
-                                        <button type="button" class="btn-more-dots" onclick="event.stopPropagation(); this.nextElementSibling.classList.toggle('show');">
-                                            <i class="fa-solid fa-ellipsis-vertical"></i>
-                                        </button>
-                                        <div class="action-menu-dropdown">
-                                            <a href="<%= ResolveUrl("~/User/Messages.aspx") %>" class="action-menu-item" onclick="event.stopPropagation();">
-                                                <i class="fa-regular fa-message"></i> Message
-                                            </a>
-                                            <a href="<%= ResolveUrl("~/User/Profile.aspx") %>" class="action-menu-item" onclick="event.stopPropagation();">
-                                                <i class="fa-regular fa-user"></i> View Profile
-                                            </a>
-                                            <a href="javascript:void(0);" class="action-menu-item" onclick="event.stopPropagation(); alert('Downloading application PDF...');">
-                                                <i class="fa-solid fa-download"></i> Download PDF
-                                            </a>
-                                            <a href="javascript:void(0);" class="action-menu-item danger" onclick="event.stopPropagation(); confirm('Reject candidate?');">
-                                                <i class="fa-solid fa-ban"></i> Reject
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- App 4: Rohan Kumar -->
-                            <tr class="app-row"
-                                data-student-name="Rohan Kumar"
-                                data-applied-for="Backend Engineer at TechCorp India"
-                                data-avatar='<%= ResolveUrl("~/assets/images/user-male-logo.png") %>'
-                                data-match="98%"
-                                data-skills-match="99%"
-                                data-exp-match="95%"
-                                data-education="B.Tech Computer Science"
-                                data-college="IIT Delhi &bull; 2018 - 2022"
-                                data-skills="Go,Kubernetes,Docker,gRPC"
-                                data-status="Selected"
-                                data-date="Sep 28, 2026">
-                                <td>
-                                    <div class="student-cell-flex">
-                                        <div class="student-avatar-init bg-navy">RK</div>
-                                        <div>
-                                            <div class="student-name-text">Rohan Kumar</div>
-                                            <div class="student-sub-email">Applied Sep 28</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="opp-title-bold">Backend Engineer</div>
-                                    <div class="opp-sub-meta">TechCorp India</div>
-                                </td>
-                                <td>
-                                    <div class="opp-sub-meta">Job</div>
-                                    <div class="opp-sub-meta">Bengaluru</div>
-                                </td>
-                                <td><span class="match-score-pill">98%</span></td>
-                                <td><span class="badge-status-selected">Selected</span></td>
-                                <td>
-                                    <div class="action-dropdown-wrap">
-                                        <button type="button" class="btn-more-dots" onclick="event.stopPropagation(); this.nextElementSibling.classList.toggle('show');">
-                                            <i class="fa-solid fa-ellipsis-vertical"></i>
-                                        </button>
-                                        <div class="action-menu-dropdown">
-                                            <a href="<%= ResolveUrl("~/User/Messages.aspx") %>" class="action-menu-item" onclick="event.stopPropagation();">
-                                                <i class="fa-regular fa-message"></i> Message
-                                            </a>
-                                            <a href="<%= ResolveUrl("~/User/Profile.aspx") %>" class="action-menu-item" onclick="event.stopPropagation();">
-                                                <i class="fa-regular fa-user"></i> View Profile
-                                            </a>
-                                            <a href="javascript:void(0);" class="action-menu-item" onclick="event.stopPropagation(); alert('Downloading application PDF...');">
-                                                <i class="fa-solid fa-download"></i> Download PDF
-                                            </a>
-                                            <a href="javascript:void(0);" class="action-menu-item danger" onclick="event.stopPropagation(); confirm('Reject candidate?');">
-                                                <i class="fa-solid fa-ban"></i> Reject
-                                            </a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
+                            <asp:Repeater ID="rptAdminApplications" runat="server">
+                                <ItemTemplate>
+                                    <tr class="app-row"
+                                        data-student-name='<%# Eval("StudentName") %>'
+                                        data-applied-for='<%# Eval("OpportunityTitle") + " at " + Eval("CompanyName") %>'
+                                        data-match='<%# Eval("MatchScore") + "%" %>'
+                                        data-skills-match='<%# Eval("MatchScore") + "%" %>'
+                                        data-exp-match="85%"
+                                        data-education='<%# Eval("Degree") %>'
+                                        data-college='<%# Eval("College") %>'
+                                        data-skills='<%# Eval("Skills") %>'
+                                        data-status='<%# Eval("Status") %>'
+                                        data-date='<%# Eval("AppliedDateFormatted") %>'>
+                                        <td>
+                                            <div class="student-cell-flex">
+                                                <div class="student-avatar-wrap">
+                                                    <div style="width:36px; height:36px; border-radius:50%; background:#0040A2; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">
+                                                        <%# Eval("StudentName").ToString().Length > 0 ? Eval("StudentName").ToString().Substring(0, 1).ToUpper() : "S" %>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="student-name-text"><%# Eval("StudentName") %></div>
+                                                    <div class="student-sub-email">Applied <%# Eval("AppliedDateFormatted") %></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="opp-title-bold"><%# Eval("OpportunityTitle") %></div>
+                                            <div class="opp-sub-meta"><%# Eval("CompanyName") %></div>
+                                        </td>
+                                        <td>
+                                            <div class="opp-sub-meta"><%# Eval("OppType") %></div>
+                                            <div class="opp-sub-meta"><%# Eval("Location") %></div>
+                                        </td>
+                                        <td><span class="match-score-pill"><%# Eval("MatchScore") %>%</span></td>
+                                        <td>
+                                            <span class='badge-status-<%# Eval("Status").ToString().ToLower().Replace(" ", "-") %>'>
+                                                <%# Eval("Status") %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="action-dropdown-wrap">
+                                                <button type="button" class="btn-more-dots" onclick="event.stopPropagation(); this.nextElementSibling.classList.toggle('show');">
+                                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                </button>
+                                                <div class="action-menu-dropdown">
+                                                    <a href='<%= ResolveUrl("~/User/Messages.aspx") %>' class="action-menu-item" onclick="event.stopPropagation();">
+                                                        <i class="fa-regular fa-message"></i> Message
+                                                    </a>
+                                                    <a href='<%= ResolveUrl("~/User/Profile.aspx") %>' class="action-menu-item" onclick="event.stopPropagation();">
+                                                        <i class="fa-regular fa-user"></i> View Profile
+                                                    </a>
+                                                    <a href="javascript:void(0);" class="action-menu-item danger" onclick="event.stopPropagation(); confirm('Reject candidate?');">
+                                                        <i class="fa-solid fa-ban"></i> Reject
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </ItemTemplate>
+                            </asp:Repeater>
                         </tbody>
                     </table>
                 </div>
@@ -410,6 +250,7 @@
 
             <!-- Right Sidebar Column: Candidate Detail Profile & Timeline Card -->
             <div class="admin-details-sidebar-card" id="appDetailsCard">
+                <% if (HasSelectedApp) { %>
                 <div class="details-card-header flex-between" style="border:none; padding-bottom:0;">
                     <div></div>
                     <button type="button" class="btn-close-details" id="btnCloseAppDetails" title="Close"><i class="fa-solid fa-xmark"></i></button>
@@ -417,13 +258,15 @@
 
                 <div class="student-profile-center-block" style="padding-top:0;">
                     <div class="student-large-avatar-box">
-                        <img src="<%= ResolveUrl("~/assets/images/user-male-logo.png") %>" alt="Candidate" id="adAvatar" class="student-large-avatar-img" />
+                        <div style="width:72px; height:72px; border-radius:50%; background:#0040A2; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:26px; margin:0 auto;">
+                            <%= !string.IsNullOrEmpty(SelectedStudentName) ? SelectedStudentName.Substring(0, 1).ToUpper() : "S" %>
+                        </div>
                     </div>
-                    <h4 class="sd-student-name" id="adName">Raviraj Dhadhal</h4>
-                    <div class="sd-student-email" id="adAppliedFor">Applying for Frontend Developer at TechCorp India</div>
+                    <h4 class="sd-student-name" id="adName"><%= SelectedStudentName %></h4>
+                    <div class="sd-student-email" id="adAppliedFor">Applying for <%= SelectedAppliedRole %> at <%= SelectedCompanyName %></div>
                     <div class="ad-resume-portfolio-row">
                         <a href="javascript:void(0);" class="btn-ad-pill-outline"><i class="fa-regular fa-file-lines"></i> Resume</a>
-                        <a href="javascript:void(0);" class="btn-ad-pill-outline"><i class="fa-solid fa-globe"></i> Portfolio</a>
+                        <a href='<%= ResolveUrl("~/User/Portfolio.aspx") %>' class="btn-ad-pill-outline"><i class="fa-solid fa-globe"></i> Portfolio</a>
                     </div>
                 </div>
 
@@ -431,14 +274,14 @@
                 <div class="ad-ai-match-box">
                     <div class="ad-ai-header flex-between">
                         <span class="ad-ai-title"><i class="fa-solid fa-sparkles"></i> AI Match Analysis</span>
-                        <span class="ad-ai-pct" id="adMatchPct">94%</span>
+                        <span class="ad-ai-pct" id="adMatchPct"><%= SelectedMatchPct %>%</span>
                     </div>
                     <div class="ad-match-bar-group">
                         <div class="ad-match-bar-label flex-between">
                             <span>Skills Match</span>
-                            <span id="adSkillsMatchPct">98%</span>
+                            <span id="adSkillsMatchPct"><%= SelectedMatchPct %>%</span>
                         </div>
-                        <div class="ad-bar-track"><div class="ad-bar-fill fill-green" id="adSkillsBar" style="width: 98%;"></div></div>
+                        <div class="ad-bar-track"><div class="ad-bar-fill fill-green" id="adSkillsBar" style="width: <%= SelectedMatchPct %>%;"></div></div>
                     </div>
                     <div class="ad-match-bar-group" style="margin-top:8px;">
                         <div class="ad-match-bar-label flex-between">
@@ -455,15 +298,18 @@
                     <div class="ad-edu-icon-row">
                         <i class="fa-solid fa-graduation-cap"></i>
                         <div>
-                            <div class="sd-bold-txt" id="adDegree">B.Tech Computer Science</div>
-                            <div class="sd-sub-txt" id="adCollege">IIT Bombay &bull; 2019 - 2023</div>
+                            <div class="sd-bold-txt" id="adDegree"><%= SelectedEducation %></div>
+                            <div class="sd-sub-txt" id="adCollege"><%= SelectedCollege %></div>
                         </div>
                     </div>
                     <div class="sd-skills-chips-row" style="margin-top:10px;" id="adSkills">
-                        <span class="sd-skill-pill">React</span>
-                        <span class="sd-skill-pill">TypeScript</span>
-                        <span class="sd-skill-pill">Tailwind CSS</span>
-                        <span class="sd-skill-pill">Redux</span>
+                        <% if (SelectedSkills != null && SelectedSkills.Count > 0) { 
+                               foreach (var sk in SelectedSkills) { %>
+                                   <span class="sd-skill-pill"><%= sk %></span>
+                        <%     } 
+                           } else { %>
+                               <span class="sd-skill-pill" style="color:#64748B;">No skills specified</span>
+                        <% } %>
                     </div>
                 </div>
 
@@ -474,41 +320,29 @@
                         <div class="timeline-step active">
                             <div class="step-dot" style="background:#0040A2;"></div>
                             <div class="step-info">
-                                <div class="step-title" id="adTimelineStatus">Under Review</div>
-                                <div class="step-date">Oct 12, 2026 &bull; Moved by System</div>
-                            </div>
-                        </div>
-                        <div class="timeline-step done">
-                            <div class="step-dot" style="background:#CBD5E1;"></div>
-                            <div class="step-info">
-                                <div class="step-title">Applied</div>
-                                <div class="step-date">Oct 10, 2026 &bull; Submitted via Portal</div>
+                                <div class="step-title" id="adTimelineStatus"><%= SelectedTimelineStatus %></div>
+                                <div class="step-date">Current Status &bull; Updated in Database</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Update Status Dropdown -->
-                <div class="ad-status-dropdown-wrap">
-                    <label class="sd-section-lbl">Update Status</label>
-                    <select class="form-control-select" id="ddlUpdateAppStatus">
-                        <option value="Under Review" selected="selected">Under Review</option>
-                        <option value="Shortlisted">Shortlisted</option>
-                        <option value="Interview">Interview</option>
-                        <option value="Selected">Selected</option>
-                        <option value="Rejected">Rejected</option>
-                    </select>
-                </div>
-
                 <!-- Actions Stack -->
                 <div class="ad-actions-2btn-row">
-                    <a href="<%= ResolveUrl("~/User/Messages.aspx") %>" class="btn-ad-message" style="text-align:center; text-decoration:none;">
+                    <a href='<%= ResolveUrl("~/User/Messages.aspx") %>' class="btn-ad-message" style="text-align:center; text-decoration:none;">
                         Message Student
                     </a>
-                    <a href="<%= ResolveUrl("~/User/Profile.aspx") %>" class="btn-ad-fullprofile" style="text-align:center; text-decoration:none;">
+                    <a href='<%= ResolveUrl("~/User/Profile.aspx") %>' class="btn-ad-fullprofile" style="text-align:center; text-decoration:none;">
                         Full Profile
                     </a>
                 </div>
+                <% } else { %>
+                <div style="padding: 40px 20px; text-align: center; color: #64748B;">
+                    <i class="fa-regular fa-folder-open" style="font-size: 40px; margin-bottom: 12px; color: #CBD5E1;"></i>
+                    <h4 style="font-size: 16px; font-weight: 700; color: #1E293B; margin-bottom: 6px;">No Applications Yet</h4>
+                    <p style="font-size: 13px; color: #64748B; margin: 0;">When candidates apply to jobs or internships, their application details and AI match score will appear here.</p>
+                </div>
+                <% } %>
             </div>
 
         </div>
