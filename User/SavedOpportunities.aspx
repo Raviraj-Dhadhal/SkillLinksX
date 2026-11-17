@@ -13,14 +13,16 @@
             <p class="saved-page-sub">Keep track of jobs and internships you want to apply for.</p>
         </div>
 
-        <!-- 4 Metric Tiles Row -->
+        <!-- =========================================================================
+             [DYNAMIC METRIC TILES]: Calculated via OOP Collection in code-behind
+             ========================================================================= -->
         <div class="saved-metrics-grid">
             <div class="saved-metric-tile">
                 <div class="saved-metric-top">
                     <span class="saved-metric-label">Total Saved</span>
                     <i class="fa-regular fa-bookmark saved-metric-icon"></i>
                 </div>
-                <span class="saved-metric-val">12</span>
+                <span class="saved-metric-val"><%= TotalSavedCount %></span>
             </div>
 
             <div class="saved-metric-tile">
@@ -28,7 +30,7 @@
                     <span class="saved-metric-label">Saved Jobs</span>
                     <i class="fa-solid fa-briefcase saved-metric-icon"></i>
                 </div>
-                <span class="saved-metric-val">5</span>
+                <span class="saved-metric-val"><%= SavedJobsCount %></span>
             </div>
 
             <div class="saved-metric-tile">
@@ -36,15 +38,15 @@
                     <span class="saved-metric-label">Saved Internships</span>
                     <i class="fa-solid fa-graduation-cap saved-metric-icon"></i>
                 </div>
-                <span class="saved-metric-val">7</span>
+                <span class="saved-metric-val"><%= SavedInternshipsCount %></span>
             </div>
 
             <div class="saved-metric-tile danger-tile">
                 <div class="saved-metric-top">
-                    <span class="saved-metric-label color-red" style="color: #DC2626 !important;">Closing Soon</span>
-                    <i class="fa-solid fa-triangle-exclamation saved-metric-icon color-red" style="color: #DC2626 !important;"></i>
+                    <span class="saved-metric-label color-red" style="color: #DC2626 !important;">Active</span>
+                    <i class="fa-solid fa-check-circle saved-metric-icon color-green" style="color: #059669 !important;"></i>
                 </div>
-                <span class="saved-metric-val color-red" style="color: #DC2626 !important;">2</span>
+                <span class="saved-metric-val" style="color: #059669 !important;"><%= TotalSavedCount %></span>
             </div>
         </div>
 
@@ -61,31 +63,42 @@
                     <button type="button" class="saved-tab-btn">Internships</button>
                 </div>
 
-                <!-- Saved Cards List -->
+                <!-- =================================================================
+                     [OOP COLLECTION REPEATER]: Binds List<BaseOpportunity>
+                     ================================================================= -->
                 <div class="saved-cards-stack">
-
-                    <!-- Saved Item 1: Backend Developer (Java/Spring) at Swiggy -->
-                    <div class="saved-opp-card" data-category="job">
-                        <div class="saved-card-top flex-between">
-                            <div class="saved-brand-info-flex">
-                                <div class="saved-company-avatar">
-                                    <img src="<%= ResolveUrl("~/assets/images/swiggy-logo.svg") %>" alt="Swiggy" class="saved-logo-img" />
+                    <asp:Repeater ID="rptSavedList" runat="server" OnItemCommand="rptSavedList_ItemCommand">
+                        <ItemTemplate>
+                            <div class="saved-opp-card" data-category='<%# Eval("Category") %>'>
+                                <div class="saved-card-top flex-between">
+                                    <div class="saved-brand-info-flex">
+                                        <div class="saved-company-avatar">
+                                            <i class="fa-solid fa-building" style="font-size:22px; color:#2563eb;"></i>
+                                        </div>
+                                        <div class="saved-role-meta">
+                                            <h3 class="saved-role-title"><%# Eval("Title") %></h3>
+                                            <div class="saved-company-name"><%# Eval("CompanyName") %></div>
+                                        </div>
+                                    </div>
+                                    <asp:LinkButton ID="btnRemove" runat="server" CommandName="Remove" CommandArgument='<%# Eval("SavedId") %>' CssClass="btn-saved-bookmark active" ToolTip="Remove from Saved">
+                                        <i class="fa-solid fa-bookmark"></i>
+                                    </asp:LinkButton>
                                 </div>
-                                <div class="saved-role-meta">
-                                    <h3 class="saved-role-title">Backend Developer (Java/Spring)</h3>
-                                    <div class="saved-company-name">Swiggy</div>
+
+                                <div class="saved-meta-specs-row">
+                                    <span><i class="fa-solid fa-location-dot"></i> <%# Eval("Location") %></span>
+                                    <span><i class="fa-solid fa-laptop-code"></i> <%# Eval("JobType") %></span>
+                                    <span><i class="fa-solid fa-indian-rupee-sign"></i> <%# Eval("CompensationDisplay") %></span>
+                                </div>
+
+                                <div class="saved-bottom-actions flex-between" style="margin-top: 14px;">
+                                    <span style="font-size:12px; color:#64748b;">Saved <%# Eval("SavedTime") %></span>
+                                    <a href='<%# ResolveUrl("~/User/JobDetails.aspx?id=" + Eval("JobId")) %>' class="btn-saved-apply">Apply Now</a>
                                 </div>
                             </div>
-                            <button type="button" class="btn-saved-bookmark active" title="Remove from Saved">
-                                <i class="fa-solid fa-bookmark"></i>
-                            </button>
-                        </div>
-
-                        <div class="saved-meta-specs-row">
-                            <span><i class="fa-solid fa-location-dot"></i> Bengaluru</span>
-                            <span><i class="fa-solid fa-laptop-code"></i> Hybrid</span>
-                            <span><i class="fa-solid fa-indian-rupee-sign"></i> &#8377;15L - &#8377;25L</span>
-                        </div>
+                        </ItemTemplate>
+                    </asp:Repeater>
+                </div>
 
                         <div class="saved-tags-row">
                             <span class="saved-tag-pill">Java</span>
