@@ -11,5 +11,6 @@ namespace SkillLinksX.User
 {
     public partial class Internships
     {
+        protected global::System.Web.UI.WebControls.Repeater rptInternshipsList;
     }
 }

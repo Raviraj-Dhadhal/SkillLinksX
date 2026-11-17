@@ -165,39 +165,54 @@
                     </div>
                 </div>
 
-                <!-- Section: Recent Postings (with clear separation) -->
-                <div class="opps-section-group opps-recent-postings-section" style="margin-top: 36px;">
+                <!-- =================================================================
+                     [DYNAMIC INTERNSHIPS FEED]: Binds from 'jobs' where type='Internship'
+                     ================================================================= -->
+                <div class="opps-section-group opps-recent-postings-section" style="margin-top: 24px;">
                     <div class="opps-group-header flex-between">
-                        <h2 class="opps-group-title">Recent Postings</h2>
-                        <span class="opps-total-results">Showing 124 results</span>
+                        <h2 class="opps-group-title">Available Internships</h2>
+                        <span class="opps-total-results">Live Opportunities</span>
                     </div>
 
                     <div class="opps-listings-stack">
-
-                        <!-- Item 1: Product Management Intern at Flipkart -->
-                        <div class="opp-listing-card">
-                            <div class="opp-listing-top">
-                                <div class="opp-listing-brand-wrap">
-                                    <div class="opp-company-avatar">
-                                        <img src="<%= ResolveUrl("~/assets/images/technova-avatar.svg") %>" alt="Flipkart" class="opp-brand-logo-img" />
+                        <asp:Repeater ID="rptInternshipsList" runat="server">
+                            <ItemTemplate>
+                                <div class="opp-listing-card">
+                                    <div class="opp-listing-top">
+                                        <div class="opp-listing-brand-wrap">
+                                            <div class="opp-company-avatar">
+                                                <i class="fa-solid fa-graduation-cap" style="font-size:20px; color:#2563eb;"></i>
+                                            </div>
+                                            <div class="opp-listing-info">
+                                                <h3 class="opp-card-heading">
+                                                    <a href='<%# ResolveUrl("~/User/JobDetails.aspx?id=" + Eval("JobId")) %>'>
+                                                        <%# Eval("Title") %>
+                                                    </a>
+                                                </h3>
+                                                <div class="opp-card-sub"><%# Eval("CompanyName") %> &bull; <%# Eval("Location") %></div>
+                                            </div>
+                                        </div>
+                                        <span class="opp-match-pill" style="font-size:11px; padding:3px 8px; border-radius:6px; background:#eff6ff; color:#2563eb; font-weight:600;">
+                                            <%# Eval("AiMatchScore") %>% Match
+                                        </span>
                                     </div>
-                                    <div class="opp-listing-info">
-                                        <h3 class="opp-card-heading">
-                                            <a href="<%= ResolveUrl("~/User/InternshipDetails.aspx") %>">Product Management Intern</a>
-                                        </h3>
-                                        <div class="opp-card-sub">Flipkart &bull; Bengaluru, KA</div>
+
+                                    <div class="opp-listing-meta-row">
+                                        <span class="opp-meta-item"><i class="fa-solid fa-briefcase"></i> <%# Eval("JobType") %></span>
+                                        <span class="opp-meta-item"><i class="fa-solid fa-wallet"></i> <%# Eval("SalaryRange") %></span>
+                                    </div>
+
+                                    <div class="opp-listing-footer flex-between" style="margin-top: 10px;">
+                                        <span style="font-size:12px; color:#64748b;"><strong>Skills:</strong> <%# Eval("RequiredSkills") %></span>
+                                        <a href='<%# ResolveUrl("~/User/JobDetails.aspx?id=" + Eval("JobId")) %>' class="btn-rec-apply" style="padding:4px 12px; font-size:12px; text-decoration:none;">
+                                            Apply Now
+                                        </a>
                                     </div>
                                 </div>
-                                <button type="button" class="btn-opp-bookmark" title="Save Opportunity" aria-label="Save Opportunity">
-                                    <i class="fa-regular fa-bookmark"></i>
-                                </button>
-                            </div>
-
-                            <div class="opp-listing-meta-row">
-                                <span class="opp-meta-item"><i class="fa-solid fa-briefcase"></i> On-site</span>
-                                <span class="opp-meta-item"><i class="fa-regular fa-clock"></i> 3 Months</span>
-                                <span class="opp-meta-item"><i class="fa-solid fa-wallet"></i> &#8377;30,000 / mo</span>
-                            </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
+                    </div>
+                </div>
 
                             <div class="opp-tags-flex">
                                 <span class="opp-tag-pill">Agile</span>
