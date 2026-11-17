@@ -11,5 +11,14 @@ namespace SkillLinksX.Company
 {
     public partial class Settings
     {
+        protected global::System.Web.UI.WebControls.Label lblSettingsStatus;
+        protected global::System.Web.UI.WebControls.TextBox txtCompanyName;
+        protected global::System.Web.UI.WebControls.DropDownList ddlIndustry;
+        protected global::System.Web.UI.WebControls.DropDownList ddlCompanySize;
+        protected global::System.Web.UI.WebControls.TextBox txtWebsite;
+        protected global::System.Web.UI.WebControls.TextBox txtLocation;
+        protected global::System.Web.UI.WebControls.TextBox txtContactEmail;
+        protected global::System.Web.UI.WebControls.TextBox txtCompanyDesc;
+        protected global::System.Web.UI.WebControls.Button btnSaveSettings;
     }
 }

@@ -52,36 +52,29 @@
                         <h2 class="settings-card-title">Company Profile</h2>
                     </div>
                     <div class="settings-card-body">
-                        <!-- Logo Upload Row (Technova Logo Box) -->
-                        <div class="company-logo-uploader-row">
-                            <div class="company-avatar-box">
-                                <img src="<%= ResolveUrl("~/assets/images/technova-logo.svg") %>" alt="Company Logo" class="settings-company-logo-img" />
-                            </div>
-                            <div class="logo-uploader-meta">
-                                <button type="button" class="btn-change-logo">Change Logo</button>
-                                <span class="upload-hint-text">JPG, GIF or PNG. Max size of 800K</span>
-                            </div>
-                        </div>
+                        <asp:Label ID="lblSettingsStatus" runat="server" style="display:block; margin-bottom:12px; font-size:14px; font-weight:600;" EnableViewState="false" />
 
                         <!-- Form 2x2 fields -->
                         <div class="settings-form-grid">
                             <!-- Company Name -->
                             <div class="settings-form-group">
                                 <label class="settings-label">Company Name</label>
-                                <input type="text" class="settings-input" value="TechNova Solutions" />
+                                <asp:TextBox ID="txtCompanyName" runat="server" CssClass="settings-input" />
                             </div>
 
                             <!-- Industry -->
                             <div class="settings-form-group">
                                 <label class="settings-label">Industry</label>
                                 <div class="settings-select-wrapper">
-                                    <select class="settings-select">
-                                        <option selected="selected">Information Technology</option>
-                                        <option>Software Development</option>
-                                        <option>Finance &amp; Banking</option>
-                                        <option>Healthcare &amp; Biotech</option>
-                                        <option>E-Commerce</option>
-                                    </select>
+                                    <asp:DropDownList ID="ddlIndustry" runat="server" CssClass="settings-select">
+                                        <asp:ListItem Text="Information Technology" Value="Information Technology" />
+                                        <asp:ListItem Text="Software Development" Value="Software Development" />
+                                        <asp:ListItem Text="Finance & Banking" Value="Finance & Banking" />
+                                        <asp:ListItem Text="Healthcare & Biotech" Value="Healthcare & Biotech" />
+                                        <asp:ListItem Text="E-Commerce" Value="E-Commerce" />
+                                        <asp:ListItem Text="Manufacturing" Value="Manufacturing" />
+                                        <asp:ListItem Text="Consulting & Services" Value="Consulting & Services" />
+                                    </asp:DropDownList>
                                     <i class="fa-solid fa-chevron-down select-chevron"></i>
                                 </div>
                             </div>
@@ -90,45 +83,45 @@
                             <div class="settings-form-group">
                                 <label class="settings-label">Company Size</label>
                                 <div class="settings-select-wrapper">
-                                    <select class="settings-select">
-                                        <option selected="selected">201-500 employees</option>
-                                        <option>1-10 employees</option>
-                                        <option>11-50 employees</option>
-                                        <option>51-200 employees</option>
-                                        <option>500+ employees</option>
-                                    </select>
+                                    <asp:DropDownList ID="ddlCompanySize" runat="server" CssClass="settings-select">
+                                        <asp:ListItem Text="1-10 employees" Value="1-10 employees" />
+                                        <asp:ListItem Text="11-50 employees" Value="11-50 employees" />
+                                        <asp:ListItem Text="51-200 employees" Value="51-200 employees" />
+                                        <asp:ListItem Text="201-500 employees" Value="201-500 employees" />
+                                        <asp:ListItem Text="500+ employees" Value="500+ employees" />
+                                    </asp:DropDownList>
                                     <i class="fa-solid fa-chevron-down select-chevron"></i>
                                 </div>
-                            </div>
-
-                            <!-- Founded Year -->
-                            <div class="settings-form-group">
-                                <label class="settings-label">Founded Year</label>
-                                <input type="text" class="settings-input" value="2012" />
                             </div>
 
                             <!-- Website -->
                             <div class="settings-form-group">
                                 <label class="settings-label">Website</label>
-                                <input type="text" class="settings-input" value="https://technovasolutions.in" />
+                                <asp:TextBox ID="txtWebsite" runat="server" CssClass="settings-input" />
                             </div>
 
-                            <!-- Location (Moved below Website field as requested) -->
+                            <!-- Location -->
                             <div class="settings-form-group">
-                                <label class="settings-label">Location</label>
-                                <input type="text" class="settings-input" value="Titanium Business Park, SG Highway, Ahmedabad, Gujarat 380015, India" />
+                                <label class="settings-label">Location / Address</label>
+                                <asp:TextBox ID="txtLocation" runat="server" CssClass="settings-input" />
                             </div>
 
                             <!-- Contact Email -->
                             <div class="settings-form-group">
                                 <label class="settings-label">Contact Email</label>
-                                <input type="email" class="settings-input" value="careers@technovasolutions.in" />
+                                <asp:TextBox ID="txtContactEmail" runat="server" CssClass="settings-input" TextMode="Email" />
+                            </div>
+
+                            <!-- Company Description -->
+                            <div class="settings-form-group" style="grid-column: 1 / -1;">
+                                <label class="settings-label">About Company</label>
+                                <asp:TextBox ID="txtCompanyDesc" runat="server" CssClass="settings-input" TextMode="MultiLine" Rows="3" style="resize:vertical;" />
                             </div>
                         </div>
 
                         <!-- Save Changes Button Row -->
                         <div class="settings-actions-row">
-                            <button type="button" class="btn-save-settings">Save Changes</button>
+                            <asp:Button ID="btnSaveSettings" runat="server" Text="Save Changes" CssClass="btn-save-settings" OnClick="btnSaveSettings_Click" />
                         </div>
                     </div>
                 </div>
@@ -137,72 +130,55 @@
                 <div class="settings-section-card" id="sectionTeamMembers">
                     <div class="settings-card-header flex-between">
                         <h2 class="settings-card-title">Team Members</h2>
-                        <a href="<%= ResolveUrl("~/Company/Applicants.aspx") %>" class="btn-add-member" style="text-decoration: none;">
-                            <i class="fa-solid fa-user-plus"></i> Add Member
-                        </a>
                     </div>
                     <div class="settings-card-body p-0">
-                        <div class="team-table-scroll-wrapper">
-                            <table class="team-members-table">
-                                <thead>
-                                    <tr>
-                                        <th>USER</th>
-                                        <th>ROLE</th>
-                                        <th>STATUS</th>
-                                        <th class="text-right">ACTION</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Member 1: Arjun Kapoor -->
-                                    <tr>
-                                        <td>
-                                            <div class="team-user-cell">
-                                                <div class="member-avatar bg-blue-dark">AK</div>
-                                                <div class="member-info">
-                                                    <div class="member-name">Arjun Kapoor</div>
-                                                    <div class="member-email">arjun@technova.in</div>
+                        <% if (IsTechNova) { %>
+                            <div class="team-table-scroll-wrapper">
+                                <table class="team-members-table">
+                                    <thead>
+                                        <tr>
+                                            <th>USER</th>
+                                            <th>ROLE</th>
+                                            <th>STATUS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="team-user-cell">
+                                                    <div class="member-avatar bg-blue-dark">AK</div>
+                                                    <div class="member-info">
+                                                        <div class="member-name">Arjun Kapoor</div>
+                                                        <div class="member-email">arjun@technova.in</div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="member-role-text">Company Admin</span>
-                                        </td>
-                                        <td>
-                                            <span class="badge-status-active">Active</span>
-                                        </td>
-                                        <td class="text-right">
-                                            <button type="button" class="btn-member-action" aria-label="Action Menu">
-                                                <i class="fa-solid fa-ellipsis-vertical"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-
-                                    <!-- Member 2: Priya Sharma -->
-                                    <tr>
-                                        <td>
-                                            <div class="team-user-cell">
-                                                <div class="member-avatar bg-blue-light">P</div>
-                                                <div class="member-info">
-                                                    <div class="member-name">Priya Sharma</div>
-                                                    <div class="member-email">priya@technova.in</div>
+                                            </td>
+                                            <td><span class="member-role-text">Company Admin</span></td>
+                                            <td><span class="badge-status-active">Active</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="team-user-cell">
+                                                    <div class="member-avatar bg-blue-light">P</div>
+                                                    <div class="member-info">
+                                                        <div class="member-name">Priya Sharma</div>
+                                                        <div class="member-email">priya@technova.in</div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="member-role-text">Senior Recruiter</span>
-                                        </td>
-                                        <td>
-                                            <span class="badge-status-active">Active</span>
-                                        </td>
-                                        <td class="text-right">
-                                            <button type="button" class="btn-member-action" aria-label="Action Menu">
-                                                <i class="fa-solid fa-ellipsis-vertical"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                            </td>
+                                            <td><span class="member-role-text">Senior Recruiter</span></td>
+                                            <td><span class="badge-status-active">Active</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <% } else { %>
+                            <div style="padding:28px 16px; text-align:center; color:#64748b; background:#f8fafc;">
+                                <i class="fa-solid fa-users" style="font-size:28px; color:#94a3b8; margin-bottom:8px; display:block;"></i>
+                                <h4 style="font-size:14px; font-weight:600; color:#334155; margin-bottom:4px;">No Additional Members</h4>
+                                <p style="font-size:13px; margin:0;">You are currently the primary administrator for this company workspace.</p>
+                            </div>
+                        <% } %>
                     </div>
                 </div>
 
