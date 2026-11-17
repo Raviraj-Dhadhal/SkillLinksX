@@ -24,40 +24,36 @@
                     <span class="cand-open-badge"><i class="fa-solid fa-circle"></i> Open to Work</span>
                 </div>
                 <div class="cand-hero-info">
-                    <h1 class="cand-hero-name">Raviraj Dhadhal</h1>
-                    <div class="cand-hero-title">Senior Software Developer | Full-Stack</div>
+                    <h1 class="cand-hero-name"><%= CandidateName %></h1>
+                    <div class="cand-hero-title"><%= CandidateTitle %></div>
                     <div class="cand-hero-meta-row">
-                        <span><i class="fa-solid fa-location-dot"></i> Bengaluru, India (Hybrid preferred)</span>
-                        <span><i class="fa-solid fa-briefcase"></i> 5+ Years Experience</span>
-                        <span><i class="fa-solid fa-graduation-cap"></i> IIT Bombay</span>
+                        <span><i class="fa-solid fa-location-dot"></i> <%= CandidateCity %></span>
+                        <span><i class="fa-solid fa-envelope"></i> <%= CandidateEmail %></span>
+                        <span><i class="fa-solid fa-graduation-cap"></i> <%= CandidateCollege %></span>
                     </div>
                     <div class="cand-hero-cta-buttons">
-                        <a href="<%= ResolveUrl("~/Company/Messages.aspx") %>" class="btn-cand-msg" style="text-decoration: none;">
-                            <i class="fa-regular fa-message"></i> Message Candidate
+                        <a href="<%= ResolveUrl("~/Company/Applicants.aspx") %>" class="btn-cand-msg" style="text-decoration: none;">
+                            <i class="fa-solid fa-list-check"></i> Manage Application
                         </a>
-                        <button type="button" class="btn-cand-schedule" id="btnOpenScheduleModal">
-                            <i class="fa-regular fa-calendar"></i> Schedule Interview
-                        </button>
-                        <button type="button" class="btn-cand-shortlist">
-                            <i class="fa-regular fa-bookmark"></i> Shortlist
-                        </button>
+                        <asp:Button ID="btnShortlistCandidate" runat="server" Text="Shortlist Candidate" CssClass="btn-cand-schedule" OnClick="btnShortlistCandidate_Click" />
                     </div>
+                    <asp:Label ID="lblActionStatus" runat="server" ForeColor="Green" style="margin-top: 6px; display:block; font-size:12.5px;" EnableViewState="false" />
                 </div>
             </div>
 
             <div class="cand-hero-right">
                 <div class="cand-ai-match-hero-chip">
                     <div class="ai-circle-score-wrap">
-                        <div class="ai-circle-score-val">94%</div>
+                        <div class="ai-circle-score-val"><%= CandidateMatchScore %>%</div>
                     </div>
                     <div class="ai-circle-score-text">
                         <div class="ai-score-top-label">AI Match Score</div>
-                        <div class="ai-score-for-role">For Senior .NET Role</div>
+                        <div class="ai-score-for-role">Job Overlap</div>
                     </div>
                 </div>
                 <div style="text-align: right; margin-top: 14px;">
-                    <a href="#" class="cand-download-resume-link">
-                        <i class="fa-solid fa-download"></i> Download Resume
+                    <a href="javascript:alert('Resume preview mode active.');" class="cand-download-resume-link">
+                        <i class="fa-solid fa-file-pdf"></i> View Resume
                     </a>
                 </div>
             </div>

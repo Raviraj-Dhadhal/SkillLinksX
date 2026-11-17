@@ -8,5 +8,7 @@ namespace SkillLinksX.Company
 {
     public partial class CandidateProfile
     {
+        protected global::System.Web.UI.WebControls.Button btnShortlistCandidate;
+        protected global::System.Web.UI.WebControls.Label lblActionStatus;
     }
 }
