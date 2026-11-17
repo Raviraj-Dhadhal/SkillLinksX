@@ -55,19 +55,19 @@
                     <div class="settings-form-grid">
                         <div class="admin-form-group">
                             <label class="admin-input-label">Platform Name</label>
-                            <input type="text" class="admin-profile-input" value="SkillLinkX" />
+                            <asp:TextBox ID="txtPlatformName" runat="server" CssClass="admin-profile-input" Text="SkillLinkX" />
                         </div>
                         <div class="admin-form-group">
                             <label class="admin-input-label">Platform Email</label>
-                            <input type="email" class="admin-profile-input" value="admin@skilllinkx.com" />
+                            <asp:TextBox ID="txtPlatformEmail" runat="server" CssClass="admin-profile-input" Text="admin@skilllinkx.com" />
                         </div>
                         <div class="admin-form-group">
                             <label class="admin-input-label">Support Email</label>
-                            <input type="email" class="admin-profile-input" value="support@skilllinkx.com" />
+                            <asp:TextBox ID="txtSupportEmail" runat="server" CssClass="admin-profile-input" Text="support@skilllinkx.com" />
                         </div>
                         <div class="admin-form-group">
                             <label class="admin-input-label">Support Phone</label>
-                            <input type="tel" class="admin-profile-input" value="+91 98765 43210" />
+                            <asp:TextBox ID="txtSupportPhone" runat="server" CssClass="admin-profile-input" Text="+91 98765 43210" />
                         </div>
                     </div>
 
@@ -76,40 +76,39 @@
                     <div class="settings-form-grid">
                         <div class="admin-form-group">
                             <label class="admin-input-label">Default Country</label>
-                            <select class="admin-filter-select">
-                                <option value="India" selected="selected">India</option>
-                                <option value="United States">United States</option>
-                                <option value="United Kingdom">United Kingdom</option>
-                                <option value="Canada">Canada</option>
-                            </select>
+                            <asp:DropDownList ID="ddlCountry" runat="server" CssClass="admin-filter-select">
+                                <asp:ListItem Text="India" Value="India" Selected="True"></asp:ListItem>
+                                <asp:ListItem Text="United States" Value="United States"></asp:ListItem>
+                                <asp:ListItem Text="United Kingdom" Value="United Kingdom"></asp:ListItem>
+                                <asp:ListItem Text="Canada" Value="Canada"></asp:ListItem>
+                            </asp:DropDownList>
                         </div>
                         <div class="admin-form-group">
                             <label class="admin-input-label">Default City</label>
-                            <input type="text" class="admin-profile-input" value="Ahmedabad" />
+                            <asp:TextBox ID="txtDefaultCity" runat="server" CssClass="admin-profile-input" Text="Ahmedabad" />
                         </div>
                         <div class="admin-form-group">
                             <label class="admin-input-label">Time Zone</label>
-                            <select class="admin-filter-select">
-                                <option value="IST" selected="selected">IST (UTC +5:30)</option>
-                                <option value="EST">EST (UTC -5:00)</option>
-                                <option value="PST">PST (UTC -8:00)</option>
-                                <option value="GMT">GMT (UTC +0:00)</option>
-                            </select>
+                            <asp:DropDownList ID="ddlTimeZone" runat="server" CssClass="admin-filter-select">
+                                <asp:ListItem Text="IST (UTC +5:30)" Value="IST" Selected="True"></asp:ListItem>
+                                <asp:ListItem Text="EST (UTC -5:00)" Value="EST"></asp:ListItem>
+                                <asp:ListItem Text="PST (UTC -8:00)" Value="PST"></asp:ListItem>
+                                <asp:ListItem Text="GMT (UTC +0:00)" Value="GMT"></asp:ListItem>
+                            </asp:DropDownList>
                         </div>
                         <div class="admin-form-group">
                             <label class="admin-input-label">Date Format</label>
-                            <select class="admin-filter-select">
-                                <option value="DD/MM/YYYY" selected="selected">DD/MM/YYYY</option>
-                                <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                                <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-                            </select>
+                            <asp:DropDownList ID="ddlDateFormat" runat="server" CssClass="admin-filter-select">
+                                <asp:ListItem Text="DD/MM/YYYY" Value="DD/MM/YYYY" Selected="True"></asp:ListItem>
+                                <asp:ListItem Text="MM/DD/YYYY" Value="MM/DD/YYYY"></asp:ListItem>
+                                <asp:ListItem Text="YYYY-MM-DD" Value="YYYY-MM-DD"></asp:ListItem>
+                            </asp:DropDownList>
                         </div>
                     </div>
 
-                    <div class="settings-card-footer">
-                        <button type="button" class="btn-save-settings" onclick="alert('Settings saved successfully!');">
-                            Save Changes
-                        </button>
+                    <div class="settings-card-footer" style="display:flex; justify-content:space-between; align-items:center;">
+                        <asp:Label ID="lblGeneralFeedback" runat="server" Font-Bold="true" Font-Size="Small"></asp:Label>
+                        <asp:Button ID="btnSaveGeneral" runat="server" CssClass="btn-save-settings" Text="Save Changes" OnClick="btnSaveGeneral_Click" />
                     </div>
                 </div>
 
@@ -133,7 +132,7 @@
                                 <div class="toggle-row-desc">Allow new accounts to be created on the platform</div>
                             </div>
                             <label class="switch-toggle">
-                                <input type="checkbox" checked="checked" />
+                                <asp:CheckBox ID="chkAllowRegistration" runat="server" Checked="true" />
                                 <span class="switch-slider"></span>
                             </label>
                         </div>
@@ -145,7 +144,7 @@
                                 <div class="toggle-row-desc">Require email verification before account activation</div>
                             </div>
                             <label class="switch-toggle">
-                                <input type="checkbox" checked="checked" />
+                                <asp:CheckBox ID="chkRequireVerification" runat="server" Checked="true" />
                                 <span class="switch-slider"></span>
                             </label>
                         </div>
@@ -157,7 +156,7 @@
                                 <div class="toggle-row-desc">Allow verified companies to post new listings</div>
                             </div>
                             <label class="switch-toggle">
-                                <input type="checkbox" checked="checked" />
+                                <asp:CheckBox ID="chkAllowJobPosting" runat="server" Checked="true" />
                                 <span class="switch-slider"></span>
                             </label>
                         </div>
@@ -169,7 +168,7 @@
                                 <div class="toggle-row-desc">Enable AI-driven candidate recommendations</div>
                             </div>
                             <label class="switch-toggle">
-                                <input type="checkbox" checked="checked" />
+                                <asp:CheckBox ID="chkAIMatching" runat="server" Checked="true" />
                                 <span class="switch-slider"></span>
                             </label>
                         </div>
@@ -181,10 +180,15 @@
                                 <div class="toggle-row-desc">Enable generative AI chat for candidates</div>
                             </div>
                             <label class="switch-toggle">
-                                <input type="checkbox" checked="checked" />
+                                <asp:CheckBox ID="chkAIAssistant" runat="server" Checked="true" />
                                 <span class="switch-slider"></span>
                             </label>
                         </div>
+                    </div>
+
+                    <div class="settings-card-footer" style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
+                        <asp:Label ID="lblPlatformFeedback" runat="server" Font-Bold="true" Font-Size="Small"></asp:Label>
+                        <asp:Button ID="btnSavePlatformSettings" runat="server" CssClass="btn-save-settings" Text="Save Toggles" OnClick="btnSavePlatformSettings_Click" />
                     </div>
                 </div>
 
