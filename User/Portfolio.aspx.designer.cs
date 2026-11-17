@@ -11,5 +11,28 @@ namespace SkillLinksX.User
 {
     public partial class Portfolio
     {
+        protected global::System.Web.UI.WebControls.LinkButton btnDownloadPortfolioResume;
+        protected global::System.Web.UI.WebControls.Label lblProjectStatus;
+        protected global::System.Web.UI.WebControls.Label lblProjectModalMsg;
+        protected global::System.Web.UI.WebControls.TextBox txtProjectTitle;
+        protected global::System.Web.UI.WebControls.TextBox txtProjectDesc;
+        protected global::System.Web.UI.WebControls.TextBox txtProjectStack;
+        protected global::System.Web.UI.WebControls.TextBox txtProjectGithub;
+        protected global::System.Web.UI.WebControls.TextBox txtProjectDemo;
+        protected global::System.Web.UI.WebControls.Button btnSaveProject;
+        protected global::System.Web.UI.WebControls.Label lblEditPortfolioMsg;
+        protected global::System.Web.UI.WebControls.TextBox txtEditAboutMe;
+        protected global::System.Web.UI.WebControls.TextBox txtEditSkills;
+        protected global::System.Web.UI.WebControls.TextBox txtEditCollege;
+        protected global::System.Web.UI.WebControls.TextBox txtEditDegree;
+        protected global::System.Web.UI.WebControls.TextBox txtEditGradYear;
+        protected global::System.Web.UI.WebControls.TextBox txtEditCgpa;
+        protected global::System.Web.UI.WebControls.Button btnSavePortfolioEdit;
+        protected global::System.Web.UI.WebControls.Label lblCertStatus;
+        protected global::System.Web.UI.WebControls.Label lblCertModalMsg;
+        protected global::System.Web.UI.WebControls.TextBox txtCertName;
+        protected global::System.Web.UI.WebControls.TextBox txtCertOrg;
+        protected global::System.Web.UI.WebControls.TextBox txtCertDate;
+        protected global::System.Web.UI.WebControls.Button btnSaveCert;
     }
 }
