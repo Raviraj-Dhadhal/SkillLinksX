@@ -11,5 +11,8 @@ namespace SkillLinksX.User
 {
     public partial class JobDetails
     {
+        protected global::System.Web.UI.WebControls.Button btnApplyNow;
+        protected global::System.Web.UI.WebControls.Button btnSaveJob;
+        protected global::System.Web.UI.WebControls.Label lblFeedback;
     }
 }

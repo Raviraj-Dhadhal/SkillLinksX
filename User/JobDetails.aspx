@@ -13,7 +13,7 @@
                 <i class="fa-solid fa-arrow-left"></i> Back to Jobs
             </a>
             <span class="breadcrumb-separator">/</span>
-            <span class="breadcrumb-current">Software Developer</span>
+            <span class="breadcrumb-current"><%= JobTitle %></span>
         </div>
 
         <!-- Header Card -->
@@ -21,40 +21,42 @@
             <div class="job-header-top-flex flex-between">
                 <div class="job-header-left-brand">
                     <div class="job-header-avatar">
-                        <img src="<%= ResolveUrl("~/assets/images/techflow-logo.svg") %>" alt="TechFlow" class="job-brand-logo-img" />
+                        <span style="width:52px; height:52px; border-radius:10px; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#2563eb; font-size:24px; font-weight:700;">
+                            <%= !string.IsNullOrEmpty(CompanyName) ? CompanyName.Substring(0, 1).ToUpper() : "C" %>
+                        </span>
                     </div>
                     <div class="job-header-titles">
                         <div class="job-title-badge-row">
-                            <h1 class="job-main-title">.Net Developer</h1>
+                            <h1 class="job-main-title"><%= JobTitle %></h1>
                             <span class="badge-actively-hiring">ACTIVELY HIRING</span>
                         </div>
                         <div class="job-header-subline">
-                            <span class="job-company-name">TechFlow Mumbai</span> &bull; 
-                            <span class="job-location-name">Ahmedabad, Gujarat</span>
+                            <span class="job-company-name"><%= CompanyName %></span> &bull; 
+                            <span class="job-location-name"><%= CompanyLocation %></span>
                         </div>
                         <div class="job-meta-chips-row">
-                            <span><i class="fa-solid fa-briefcase"></i> 0&ndash;2 Yrs</span>
-                            <span><i class="fa-solid fa-indian-rupee-sign"></i> &#8377;4.5L &ndash; &#8377;7L / yr</span>
-                            <span><i class="fa-solid fa-location-dot"></i> Mumbai</span>
-                            <span><i class="fa-regular fa-clock"></i> Posted 2 days ago</span>
+                            <span><i class="fa-solid fa-briefcase"></i> <%= ExperienceRequired %></span>
+                            <span><i class="fa-solid fa-indian-rupee-sign"></i> <%= SalaryRange %></span>
+                            <span><i class="fa-solid fa-location-dot"></i> <%= CompanyLocation %></span>
+                            <span><i class="fa-regular fa-clock"></i> Active Opening</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Action Buttons: Apply Now, Save, Share -->
                 <div class="job-header-actions-group">
-                    <button type="button" class="btn-job-apply-primary" onclick="alert('Application submitted successfully!');">
-                        Apply Now <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                    <button type="button" class="btn-job-action-box" title="Save Job">
-                        <i class="fa-regular fa-bookmark"></i> Save
-                    </button>
-                    <button type="button" class="btn-job-action-box" title="Share Job">
-                        <i class="fa-solid fa-share-nodes"></i>
-                    </button>
+                    <!-- =========================================================
+                         [APPLY ACTION BUTTON]: Wired to server-side btnApply_Click
+                         Inserts student application into 'applications' table
+                         ========================================================= -->
+                    <asp:Button ID="btnApplyNow" runat="server" CssClass="btn-job-apply-primary" Text="Apply Now" OnClick="btnApplyNow_Click" />
+                    <asp:Button ID="btnSaveJob" runat="server" CssClass="btn-job-action-box" Text="Save" OnClick="btnSaveJob_Click" />
                 </div>
             </div>
         </div>
+
+        <!-- Feedback Alert Message -->
+        <asp:Label ID="lblFeedback" runat="server" style="display:block; margin: 12px 0; font-size: 14px; font-weight: 500;" EnableViewState="false"></asp:Label>
 
         <!-- 2-Column Grid: Left Content + Right Company & Application Cards -->
         <div class="job-body-grid">
@@ -66,7 +68,7 @@
                 <div class="job-ai-match-card">
                     <div class="ai-match-score-left">
                         <div class="ai-circle-score">
-                            <span class="ai-score-txt">92%</span>
+                            <span class="ai-score-txt"><%= AiMatchScore %>%</span>
                         </div>
                     </div>
                     <div class="ai-match-content-right">
@@ -74,15 +76,17 @@
                             <i class="fa-solid fa-sparkles"></i> Your AI Career Match
                         </div>
                         <p class="ai-match-blurb">
-                            Your strong foundation in the .NET ecosystem and SQL makes you a top candidate for this role.
+                            <%= AiMatchBlurb %>
                         </p>
                         <div class="ai-match-skill-chips">
-                            <span class="ai-chip-pill chip-green"><i class="fa-solid fa-check"></i> C#</span>
-                            <span class="ai-chip-pill chip-green"><i class="fa-solid fa-check"></i> ASP.NET</span>
-                            <span class="ai-chip-pill chip-green"><i class="fa-solid fa-check"></i> SQL</span>
-                            <span class="ai-chip-pill chip-red"><i class="fa-solid fa-xmark"></i> Docker</span>
+                            <% foreach(var ms in MatchingSkills) { %>
+                                <span class="ai-chip-pill chip-green"><i class="fa-solid fa-check"></i> <%= ms %></span>
+                            <% } %>
+                            <% foreach(var miss in MissingSkills) { %>
+                                <span class="ai-chip-pill chip-red"><i class="fa-solid fa-xmark"></i> <%= miss %></span>
+                            <% } %>
                         </div>
-                        <a href="javascript:void(0);" class="ai-match-improve-link">Improve My Match &rarr;</a>
+                        <a href="<%= ResolveUrl("~/User/CareerAssistant.aspx") %>" class="ai-match-improve-link">Improve My Match &rarr;</a>
                     </div>
                 </div>
 
@@ -91,35 +95,22 @@
                     <div class="job-card-section-block">
                         <h2 class="job-section-heading">About the Job</h2>
                         <p class="job-desc-paragraph">
-                            TechFlow is seeking a highly motivated Software Developer to join our core product team in Ahmedabad. In this role, you will be instrumental in designing, building, and maintaining high-performance, reusable, and reliable code for our enterprise SaaS platforms.
+                            <%= !string.IsNullOrEmpty(JobDescription) ? JobDescription : "We are seeking a talented candidate to join our team in this role. You will work on impactful projects, collaborate with cross-functional teams, and contribute to innovative software solutions." %>
                         </p>
-                        <p class="job-desc-paragraph">
-                            We are looking for someone who is passionate about clean code, enjoys solving complex problems, and thrives in a collaborative, agile environment. You will work closely with product managers and other engineers to deliver features that directly impact our growing client base.
-                        </p>
-                    </div>
-
-                    <!-- Responsibilities -->
-                    <div class="job-card-section-block">
-                        <h3 class="job-sub-heading">Responsibilities</h3>
-                        <ul class="job-arrow-bullets">
-                            <li>Develop and maintain scalable web applications using C# and .NET Core.</li>
-                            <li>Collaborate with cross-functional teams to define, design, and ship new features.</li>
-                            <li>Identify bottlenecks and bugs, and devise solutions to mitigate and address these issues.</li>
-                            <li>Participate in code reviews to ensure code quality and adherence to best practices.</li>
-                            <li>Write unit and integration tests to ensure robustness and reliability.</li>
-                        </ul>
                     </div>
 
                     <!-- Requirements -->
                     <div class="job-card-section-block">
-                        <h3 class="job-sub-heading">Requirements</h3>
-                        <div class="req-tech-skills-title">Technical Skills</div>
+                        <h3 class="job-sub-heading">Requirements &amp; Skills</h3>
+                        <div class="req-tech-skills-title">Required Competencies</div>
                         <div class="req-skills-tags-row">
-                            <span class="req-skill-pill">C#</span>
-                            <span class="req-skill-pill">.NET Core</span>
-                            <span class="req-skill-pill">SQL Server</span>
-                            <span class="req-skill-pill">JavaScript</span>
-                            <span class="req-skill-pill">RESTful APIs</span>
+                            <% if (RequiredSkillsList != null && RequiredSkillsList.Count > 0) { 
+                                   foreach(var req in RequiredSkillsList) { %>
+                                       <span class="req-skill-pill"><%= req %></span>
+                            <%     } 
+                               } else { %>
+                                   <span class="req-skill-pill">General Engineering</span>
+                            <% } %>
                         </div>
 
                         <!-- 2 Sub Cards: Education + Experience -->
@@ -128,14 +119,14 @@
                                 <i class="fa-solid fa-graduation-cap req-card-icon"></i>
                                 <div class="req-card-info">
                                     <span class="req-card-label">Education</span>
-                                    <p class="req-card-desc">B.Tech / B.E. in Computer Science, IT, or related field.</p>
+                                    <p class="req-card-desc">B.Tech / B.E. / BCA / MCA in Computer Science, IT, or related degree.</p>
                                 </div>
                             </div>
                             <div class="req-sub-card">
                                 <i class="fa-solid fa-briefcase req-card-icon"></i>
                                 <div class="req-card-info">
-                                    <span class="req-card-label">Experience</span>
-                                    <p class="req-card-desc">0 - 2 years of professional software development experience.</p>
+                                    <span class="req-card-label">Experience Required</span>
+                                    <p class="req-card-desc"><%= ExperienceRequired %></p>
                                 </div>
                             </div>
                         </div>
@@ -147,19 +138,19 @@
                         <div class="perks-4grid">
                             <div class="perk-tile">
                                 <div class="perk-icon-wrap"><i class="fa-solid fa-briefcase-medical"></i></div>
-                                <span class="perk-tile-title">Health Insurance</span>
+                                <span class="perk-tile-title"><%= !string.IsNullOrEmpty(JobBenefits) ? JobBenefits : "Health & Wellness" %></span>
                             </div>
                             <div class="perk-tile">
                                 <div class="perk-icon-wrap"><i class="fa-solid fa-laptop-house"></i></div>
-                                <span class="perk-tile-title">Flexible Work</span>
+                                <span class="perk-tile-title">Flexible Hours</span>
                             </div>
                             <div class="perk-tile">
                                 <div class="perk-icon-wrap"><i class="fa-solid fa-award"></i></div>
-                                <span class="perk-tile-title">L&amp;D Budget</span>
+                                <span class="perk-tile-title">Mentorship &amp; Growth</span>
                             </div>
                             <div class="perk-tile">
                                 <div class="perk-icon-wrap"><i class="fa-solid fa-plane-departure"></i></div>
-                                <span class="perk-tile-title">Paid Time Off</span>
+                                <span class="perk-tile-title">Competitive Compensation</span>
                             </div>
                         </div>
                     </div>
@@ -176,32 +167,34 @@
                     <h3 class="side-card-title">About the Company</h3>
                     <div class="company-brand-row">
                         <div class="side-company-avatar">
-                            <img src="<%= ResolveUrl("~/assets/images/techflow-logo.svg") %>" alt="TechFlow" class="side-company-img" />
+                            <span style="width:40px; height:40px; border-radius:8px; background:#eff6ff; display:inline-flex; align-items:center; justify-content:center; color:#2563eb; font-weight:700; font-size:18px;">
+                                <%= !string.IsNullOrEmpty(CompanyName) ? CompanyName.Substring(0, 1).ToUpper() : "C" %>
+                            </span>
                         </div>
                         <div class="side-company-meta">
-                            <h4 class="side-company-name">TechFlow Mumbai</h4>
-                            <a href="javascript:void(0);" class="side-company-link">View Profile</a>
+                            <h4 class="side-company-name"><%= CompanyName %></h4>
+                            <a href="<%= CompanyWebsite %>" target="_blank" rel="noopener noreferrer" class="side-company-link">Visit Website</a>
                         </div>
                     </div>
                     <p class="side-company-desc">
-                        TechFlow is a leading provider of innovative software solutions for the financial sector, empowering businesses with robust and scalable tools.
+                        <%= CompanyDescription %>
                     </p>
                     <div class="side-meta-list">
                         <div class="side-meta-row">
                             <span class="side-meta-label"><i class="fa-solid fa-building"></i> Industry</span>
-                            <span class="side-meta-val">Software &amp; IT</span>
+                            <span class="side-meta-val"><%= CompanyIndustry %></span>
                         </div>
                         <div class="side-meta-row">
                             <span class="side-meta-label"><i class="fa-solid fa-users"></i> Company Size</span>
-                            <span class="side-meta-val">50-200</span>
+                            <span class="side-meta-val"><%= CompanySize %></span>
                         </div>
                         <div class="side-meta-row">
-                            <span class="side-meta-label"><i class="fa-regular fa-calendar"></i> Founded</span>
-                            <span class="side-meta-val">2015</span>
+                            <span class="side-meta-label"><i class="fa-solid fa-location-dot"></i> Location</span>
+                            <span class="side-meta-val"><%= CompanyLocation %></span>
                         </div>
                         <div class="side-meta-row">
                             <span class="side-meta-label"><i class="fa-solid fa-globe"></i> Website</span>
-                            <a href="https://techflow.in" target="_blank" rel="noopener noreferrer" class="side-meta-link">techflow.in</a>
+                            <a href="<%= CompanyWebsite %>" target="_blank" rel="noopener noreferrer" class="side-meta-link"><%= CompanyWebsite.Replace("https://", "").Replace("http://", "").TrimEnd('/') %></a>
                         </div>
                     </div>
                 </div>
@@ -214,21 +207,14 @@
                             <div class="app-detail-icon"><i class="fa-regular fa-calendar"></i></div>
                             <div class="app-detail-content">
                                 <span class="app-detail-label">Deadline</span>
-                                <span class="app-detail-val">October 30, 2023</span>
+                                <span class="app-detail-val"><%= Deadline %></span>
                             </div>
                         </div>
                         <div class="app-detail-item">
                             <div class="app-detail-icon"><i class="fa-solid fa-user-group"></i></div>
                             <div class="app-detail-content">
-                                <span class="app-detail-label">Applicants</span>
-                                <span class="app-detail-val">124 people applied</span>
-                            </div>
-                        </div>
-                        <div class="app-detail-item">
-                            <div class="app-detail-icon"><i class="fa-solid fa-layer-group"></i></div>
-                            <div class="app-detail-content">
-                                <span class="app-detail-label">Hiring Process</span>
-                                <span class="app-detail-val">3 Stages (Resume, Tech Assessment, Interview)</span>
+                                <span class="app-detail-label">Status</span>
+                                <span class="app-detail-val">Actively Reviewing</span>
                             </div>
                         </div>
                     </div>
