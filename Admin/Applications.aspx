@@ -21,42 +21,55 @@
                 <div class="stat-top-row">
                     <span class="stat-label">Total Applications</span>
                 </div>
-                <div class="stat-num-val">12,450 <span class="stat-trend-green"><i class="fa-solid fa-arrow-up"></i> 15%</span></div>
+                <div class="stat-num-val">
+                    <asp:Literal ID="litTotalApps" runat="server">12,450</asp:Literal> 
+                    <span class="stat-trend-green"><i class="fa-solid fa-arrow-up"></i> 15%</span>
+                </div>
             </div>
 
             <div class="admin-stat-card">
                 <div class="stat-top-row">
                     <span class="stat-label">New Applications</span>
                 </div>
-                <div class="stat-num-val color-blue">842</div>
+                <div class="stat-num-val color-blue">
+                    <asp:Literal ID="litNewApps" runat="server">842</asp:Literal>
+                </div>
             </div>
 
             <div class="admin-stat-card">
                 <div class="stat-top-row">
                     <span class="stat-label">Under Review</span>
                 </div>
-                <div class="stat-num-val">2,130</div>
+                <div class="stat-num-val">
+                    <asp:Literal ID="litUnderReview" runat="server">2,130</asp:Literal>
+                </div>
             </div>
 
             <div class="admin-stat-card">
                 <div class="stat-top-row">
                     <span class="stat-label">Shortlisted</span>
                 </div>
-                <div class="stat-num-val color-green">1,450</div>
+                <div class="stat-num-val color-green">
+                    <asp:Literal ID="litShortlisted" runat="server">1,450</asp:Literal>
+                </div>
             </div>
 
             <div class="admin-stat-card">
                 <div class="stat-top-row">
                     <span class="stat-label">Interviews</span>
                 </div>
-                <div class="stat-num-val color-orange">420</div>
+                <div class="stat-num-val color-orange">
+                    <asp:Literal ID="litInterviews" runat="server">420</asp:Literal>
+                </div>
             </div>
 
             <div class="admin-stat-card">
                 <div class="stat-top-row">
                     <span class="stat-label">Hired</span>
                 </div>
-                <div class="stat-num-val color-teal">156</div>
+                <div class="stat-num-val color-teal">
+                    <asp:Literal ID="litHired" runat="server">156</asp:Literal>
+                </div>
             </div>
         </div>
 
