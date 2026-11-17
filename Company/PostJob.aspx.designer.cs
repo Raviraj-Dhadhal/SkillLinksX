@@ -11,6 +11,7 @@ namespace SkillLinksX.Company
 {
     public partial class PostJob
     {
+        protected global::System.Web.UI.WebControls.Label lblPostStatus;
         protected global::System.Web.UI.WebControls.HiddenField hfOpportunityType;
         protected global::System.Web.UI.WebControls.HiddenField hfWorkType;
         protected global::System.Web.UI.WebControls.TextBox txtJobTitle;
@@ -30,6 +31,7 @@ namespace SkillLinksX.Company
         protected global::System.Web.UI.WebControls.TextBox txtSalaryMax;
         protected global::System.Web.UI.WebControls.DropDownList ddlSalaryPeriod;
         protected global::System.Web.UI.WebControls.TextBox txtJobDescription;
+        protected global::System.Web.UI.WebControls.TextBox txtRequiredSkills;
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvJobDescription;
         protected global::System.Web.UI.WebControls.Button btnPublishOpportunity;
     }

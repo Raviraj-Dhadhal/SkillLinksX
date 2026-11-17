@@ -13,6 +13,11 @@
             <p class="post-opp-sub">Post a job or internship and connect with the right talent.</p>
         </div>
 
+        <!-- =====================================================================
+             [STATUS & FEEDBACK ALERT]: Displays success or error messages
+             ===================================================================== -->
+        <asp:Label ID="lblPostStatus" runat="server" style="display:block; margin: 10px 0; font-size:14px; font-weight:600;" EnableViewState="false" />
+
         <!-- Hidden field to hold selected Opportunity Type and Work Type -->
         <asp:HiddenField ID="hfOpportunityType" runat="server" Value="Job" />
         <asp:HiddenField ID="hfWorkType" runat="server" Value="Hybrid" />
@@ -196,18 +201,11 @@
             </div>
 
             <div class="form-group-item">
-                <label class="form-label">Required Skills</label>
-                <div class="skills-input-wrapper">
-                    <div class="skills-tags-list" id="skillsTagList">
-                        <span class="skill-tag-pill">React <i class="fa-solid fa-xmark" onclick="this.parentElement.remove()"></i></span>
-                        <span class="skill-tag-pill">TypeScript <i class="fa-solid fa-xmark" onclick="this.parentElement.remove()"></i></span>
-                        <span class="skill-tag-pill">Tailwind CSS <i class="fa-solid fa-xmark" onclick="this.parentElement.remove()"></i></span>
-                    </div>
-                    <div class="skills-input-bottom-row">
-                        <input type="text" id="inputNewSkill" class="skills-add-input" placeholder="Type a skill and press Enter" />
-                        <button type="button" id="btnAddSkill" class="btn-add-skill-tag">Add Skill</button>
-                    </div>
-                </div>
+                <label class="form-label">Required Skills (Comma-separated)</label>
+                <!-- =============================================================
+                     [DYNAMIC SKILLS INPUT]: Direct server control for job skills
+                     ============================================================= -->
+                <asp:TextBox ID="txtRequiredSkills" runat="server" CssClass="form-control-input" placeholder="e.g. C#, ASP.NET, SQL Server, React"></asp:TextBox>
             </div>
         </div>
 
