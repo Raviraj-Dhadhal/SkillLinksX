@@ -32,6 +32,8 @@ namespace SkillLinksX.User
 
         private void LoadNetworkingData(int currentUserId)
         {
+            DBHelper.EnsureProfilePhotoColumns();
+
             try
             {
                 // 1. Metric Counts from 'connections' table
@@ -55,6 +57,7 @@ namespace SkillLinksX.User
                            COALESCE(m.tagline, m.degree, 'Student') AS Subtitle,
                            COALESCE(m.clg_name, m.city, 'India') AS Institute,
                            m.skills AS Skills,
+                           m.profile_photo AS ProfilePhoto,
                            c.status AS ConnectionStatus,
                            c.sender_id AS ConnectionSenderId
                     FROM member_master_table m
@@ -95,6 +98,8 @@ namespace SkillLinksX.User
                                              .Take(3)
                                              .ToList();
 
+                    string photo = r["ProfilePhoto"] != DBNull.Value ? r["ProfilePhoto"].ToString().Trim() : "";
+
                     discoverList.Add(new
                     {
                         UserId = r["UserId"],
@@ -102,6 +107,7 @@ namespace SkillLinksX.User
                         Subtitle = r["Subtitle"].ToString(),
                         Institute = r["Institute"].ToString(),
                         Skills = skillsList,
+                        ProfilePhoto = photo,
                         ButtonState = buttonState,
                         ButtonCss = buttonCss,
                         IsConnected = isConnected,
@@ -117,7 +123,8 @@ namespace SkillLinksX.User
                     SELECT m.id AS UserId, m.full_name AS Name, 
                            COALESCE(m.tagline, m.degree, 'Connected Member') AS Subtitle,
                            COALESCE(m.clg_name, m.city, 'India') AS Institute,
-                           m.skills AS Skills
+                           m.skills AS Skills,
+                           m.profile_photo AS ProfilePhoto
                     FROM connections c
                     INNER JOIN member_master_table m ON 
                         (CASE WHEN c.sender_id = @uid THEN c.receiver_id ELSE c.sender_id END) = m.id
@@ -135,12 +142,15 @@ namespace SkillLinksX.User
                                              .Take(3)
                                              .ToList();
 
+                    string photo = r["ProfilePhoto"] != DBNull.Value ? r["ProfilePhoto"].ToString().Trim() : "";
+
                     connectionsList.Add(new
                     {
                         UserId = r["UserId"],
                         Name = r["Name"].ToString(),
                         Subtitle = r["Subtitle"].ToString(),
                         Institute = r["Institute"].ToString(),
+                        ProfilePhoto = photo,
                         Skills = skillsList
                     });
                 }
@@ -153,7 +163,8 @@ namespace SkillLinksX.User
                     SELECT c.connection_id AS ConnectionId, m.id AS UserId, m.full_name AS Name,
                            COALESCE(m.tagline, m.degree, 'SkillLinksX Member') AS Subtitle,
                            c.created_at AS CreatedAt,
-                           m.skills AS Skills
+                           m.skills AS Skills,
+                           m.profile_photo AS ProfilePhoto
                     FROM connections c
                     INNER JOIN member_master_table m ON c.sender_id = m.id
                     WHERE c.receiver_id = @uid AND c.status = 'Pending'";
@@ -169,12 +180,15 @@ namespace SkillLinksX.User
                                              .Take(3)
                                              .ToList();
 
+                    string photo = r["ProfilePhoto"] != DBNull.Value ? r["ProfilePhoto"].ToString().Trim() : "";
+
                     pendingList.Add(new
                     {
                         ConnectionId = r["ConnectionId"],
                         UserId = r["UserId"],
                         Name = r["Name"].ToString(),
                         Subtitle = r["Subtitle"].ToString(),
+                        ProfilePhoto = photo,
                         Skills = skillsList
                     });
                 }
@@ -183,7 +197,7 @@ namespace SkillLinksX.User
                 rptPendingRequests.DataBind();
 
                 // 5. Load Verified Companies / Recruiters dynamically from company_table
-                string sqlRecruiters = "SELECT TOP 4 company_id, comp_name AS CompanyName, COALESCE(city, 'India') AS Location FROM company_table ORDER BY company_id ASC";
+                string sqlRecruiters = "SELECT TOP 4 company_id, comp_name AS CompanyName, profile_photo AS LogoUrl, COALESCE(city, 'India') AS Location FROM company_table ORDER BY company_id ASC";
                 DataTable dtRecruiters = DBHelper.ExecuteQuery(sqlRecruiters);
                 rptVerifiedRecruiters.DataSource = dtRecruiters;
                 rptVerifiedRecruiters.DataBind();

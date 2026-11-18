@@ -17,6 +17,7 @@ namespace SkillLinksX.User
         public int TargetCompanyId { get; set; } = 1;
         public string JobTitle { get; set; } = ".Net Developer";
         public string CompanyName { get; set; } = "Tech Company";
+        public string CompanyLogoUrl { get; set; } = "";
         public string CompanyLocation { get; set; } = "Mumbai";
         public string CompanyIndustry { get; set; } = "Software & IT";
         public string CompanySize { get; set; } = "50-200";
@@ -57,6 +58,14 @@ namespace SkillLinksX.User
 
             if (!IsPostBack)
             {
+                if (DBHelper.ColumnExists("jobs", "views_count"))
+                {
+                    try
+                    {
+                        DBHelper.ExecuteNonQuery("UPDATE jobs SET views_count = ISNULL(views_count, 0) + 1 WHERE job_id = @jid", new SqlParameter("@jid", JobId));
+                    }
+                    catch { }
+                }
                 CheckExistingApplication();
             }
         }
@@ -69,7 +78,7 @@ namespace SkillLinksX.User
                     SELECT j.job_id, j.company_id, j.job_title, j.job_type, j.category, j.experience_required,
                            j.salary_min, j.salary_max, j.location, j.city, j.state, j.job_description,
                            j.requirements, j.benefits, j.deadline,
-                           c.comp_name, c.industry, c.description AS comp_desc, c.website, c.employee_count
+                           c.comp_name, c.industry, c.description AS comp_desc, c.website, c.employee_count, c.profile_photo AS CompanyLogoUrl
                     FROM jobs j
                     LEFT JOIN company_table c ON j.company_id = c.company_id
                     WHERE j.job_id = @id";
@@ -81,6 +90,7 @@ namespace SkillLinksX.User
                     TargetCompanyId = (r["company_id"] != DBNull.Value) ? Convert.ToInt32(r["company_id"]) : 1;
                     JobTitle = r["job_title"] != DBNull.Value ? r["job_title"].ToString() : ".Net Developer";
                     CompanyName = r["comp_name"] != DBNull.Value ? r["comp_name"].ToString() : "Hiring Company";
+                    CompanyLogoUrl = r["CompanyLogoUrl"] != DBNull.Value ? r["CompanyLogoUrl"].ToString().Trim() : "";
                     
                     string city = r["city"] != DBNull.Value ? r["city"].ToString().Trim() : "";
                     string state = r["state"] != DBNull.Value ? r["state"].ToString().Trim() : "";
@@ -189,9 +199,9 @@ namespace SkillLinksX.User
 
             // Check if candidate is currently hired / an active team member at any company
             object hiredObj = DBHelper.ExecuteScalar(@"
-                SELECT TOP 1 c.comp_name 
+                SELECT TOP 1 COALESCE(c.comp_name, 'another company')
                 FROM applications a 
-                INNER JOIN company_table c ON a.company_id = c.company_id 
+                LEFT JOIN company_table c ON a.company_id = c.company_id 
                 WHERE a.user_id = @sid AND a.status = 'Selected'",
                 new SqlParameter("@sid", studentId));
 
@@ -231,9 +241,9 @@ namespace SkillLinksX.User
 
             // Guard: active employment check
             object hiredObj = DBHelper.ExecuteScalar(@"
-                SELECT TOP 1 c.comp_name 
+                SELECT TOP 1 COALESCE(c.comp_name, 'another company')
                 FROM applications a 
-                INNER JOIN company_table c ON a.company_id = c.company_id 
+                LEFT JOIN company_table c ON a.company_id = c.company_id 
                 WHERE a.user_id = @sid AND a.status = 'Selected'",
                 new SqlParameter("@sid", studentId));
 

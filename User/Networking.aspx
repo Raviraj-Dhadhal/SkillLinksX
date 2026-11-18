@@ -77,10 +77,10 @@
                     <asp:Repeater ID="rptDiscoverPeople" runat="server" OnItemCommand="rptDiscoverPeople_ItemCommand">
                         <ItemTemplate>
                             <div class="net-person-card">
-                                <div class="person-card-avatar-wrap">
-                                    <span style="width:56px; height:56px; border-radius:50%; background:#eff6ff; display:inline-flex; align-items:center; justify-content:center; color:#2563eb; font-weight:700; font-size:20px; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,0.06);">
-                                        <%# Eval("Name").ToString().Length > 0 ? Eval("Name").ToString().Substring(0, 1).ToUpper() : "U" %>
-                                    </span>
+                                <div class="person-card-avatar-wrap" style="width:72px; height:72px; border-radius:50%; background:#f1f5f9; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:28px; border:2px solid #e2e8f0; overflow:hidden; margin:0 auto 12px;">
+                                    <%# (!string.IsNullOrEmpty(Eval("ProfilePhoto") as string)) 
+                                        ? "<img src='" + ResolveUrl(Eval("ProfilePhoto").ToString()) + "' alt='Avatar' style='width:100%; height:100%; object-fit:cover;' />"
+                                        : "<i class=\"fa-regular fa-user\"></i>" %>
                                 </div>
                                 <h3 class="person-name"><%# Eval("Name") %></h3>
                                 <div class="person-sub-title"><%# Eval("Subtitle") %></div>
@@ -113,10 +113,10 @@
                     <asp:Repeater ID="rptMyConnections" runat="server">
                         <ItemTemplate>
                             <div class="net-person-card">
-                                <div class="person-card-avatar-wrap">
-                                    <span style="width:56px; height:56px; border-radius:50%; background:#eff6ff; display:inline-flex; align-items:center; justify-content:center; color:#2563eb; font-weight:700; font-size:20px; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,0.06);">
-                                        <%# Eval("Name").ToString().Length > 0 ? Eval("Name").ToString().Substring(0, 1).ToUpper() : "U" %>
-                                    </span>
+                                <div class="person-card-avatar-wrap" style="width:72px; height:72px; border-radius:50%; background:#f1f5f9; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:28px; border:2px solid #e2e8f0; overflow:hidden; margin:0 auto 12px;">
+                                    <%# (!string.IsNullOrEmpty(Eval("ProfilePhoto") as string)) 
+                                        ? "<img src='" + ResolveUrl(Eval("ProfilePhoto").ToString()) + "' alt='Avatar' style='width:100%; height:100%; object-fit:cover;' />"
+                                        : "<i class=\"fa-regular fa-user\"></i>" %>
                                 </div>
                                 <h3 class="person-name"><%# Eval("Name") %></h3>
                                 <div class="person-sub-title"><%# Eval("Subtitle") %></div>
@@ -126,7 +126,7 @@
                                 <div class="person-skills-chips">
                                     <%# Eval("Skills") != null ? string.Join("", ((System.Collections.Generic.List<string>)Eval("Skills")).Select(s => "<span class='person-skill-pill'>" + s + "</span>")) : "" %>
                                 </div>
-                                <a href="<%= ResolveUrl("~/User/Messages.aspx") %>" class="btn-net-connect" style="text-decoration:none; display:flex; justify-content:center; align-items:center; gap:6px;">
+                                <a href='<%# ResolveUrl("~/User/Messages.aspx?to=" + Eval("UserId")) %>' class="btn-net-connect" style="text-decoration:none; display:flex; justify-content:center; align-items:center; gap:6px;">
                                     <i class="fa-regular fa-message"></i> Message
                                 </a>
                             </div>
@@ -141,10 +141,10 @@
                     <asp:Repeater ID="rptPendingRequests" runat="server" OnItemCommand="rptPendingRequests_ItemCommand">
                         <ItemTemplate>
                             <div class="net-person-card">
-                                <div class="person-card-avatar-wrap">
-                                    <span style="width:56px; height:56px; border-radius:50%; background:#eff6ff; display:inline-flex; align-items:center; justify-content:center; color:#2563eb; font-weight:700; font-size:20px; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,0.06);">
-                                        <%# Eval("Name").ToString().Length > 0 ? Eval("Name").ToString().Substring(0, 1).ToUpper() : "U" %>
-                                    </span>
+                                <div class="person-card-avatar-wrap" style="width:72px; height:72px; border-radius:50%; background:#f1f5f9; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:28px; border:2px solid #e2e8f0; overflow:hidden; margin:0 auto 12px;">
+                                    <%# (!string.IsNullOrEmpty(Eval("ProfilePhoto") as string)) 
+                                        ? "<img src='" + ResolveUrl(Eval("ProfilePhoto").ToString()) + "' alt='Avatar' style='width:100%; height:100%; object-fit:cover;' />"
+                                        : "<i class=\"fa-regular fa-user\"></i>" %>
                                 </div>
                                 <h3 class="person-name"><%# Eval("Name") %></h3>
                                 <div class="person-sub-title"><%# Eval("Subtitle") %></div>
@@ -183,16 +183,18 @@
                             <ItemTemplate>
                                 <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
                                     <div style="display:flex; align-items:center; gap:10px;">
-                                        <div style="width:38px; height:38px; border-radius:8px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:16px;">
-                                            <i class="fa-solid fa-building"></i>
+                                        <div style="width:38px; height:38px; border-radius:8px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:16px; overflow:hidden;">
+                                            <%# (Eval("LogoUrl") != DBNull.Value && !string.IsNullOrEmpty(Eval("LogoUrl").ToString())) 
+                                                ? "<img src='" + ResolveUrl(Eval("LogoUrl").ToString()) + "' alt='Logo' style='width:100%; height:100%; object-fit:cover;' />"
+                                                : "<i class=\"fa-solid fa-building\"></i>" %>
                                         </div>
                                         <div>
                                             <h4 style="font-size:13.5px; font-weight:600; color:#1e293b; margin:0;"><%# Eval("CompanyName") %></h4>
                                             <span style="font-size:12px; color:#64748b;"><%# Eval("Location") %></span>
                                         </div>
                                     </div>
-                                    <a href='<%= ResolveUrl("~/User/Messages.aspx") %>' style="padding:5px 12px; font-size:12px; font-weight:600; color:#2563eb; border:1px solid #bfdbfe; border-radius:6px; text-decoration:none; background:#f8fafc;">
-                                        Connect
+                                    <a href='<%= ResolveUrl("~/User/Jobs.aspx") %>' style="padding:5px 12px; font-size:12px; font-weight:600; color:#2563eb; border:1px solid #bfdbfe; border-radius:6px; text-decoration:none; background:#f8fafc;">
+                                        View Jobs
                                     </a>
                                 </div>
                             </ItemTemplate>

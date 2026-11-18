@@ -21,8 +21,12 @@
             <div class="job-header-top-flex flex-between">
                 <div class="job-header-left-brand">
                     <div class="job-header-avatar">
-                        <span style="width:52px; height:52px; border-radius:10px; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#2563eb; font-size:24px; font-weight:700;">
-                            <%= !string.IsNullOrEmpty(CompanyName) ? CompanyName.Substring(0, 1).ToUpper() : "C" %>
+                        <span style="width:52px; height:52px; border-radius:10px; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#64748b; font-size:24px; overflow:hidden; border:1px solid #cbd5e1;">
+                            <% if (!string.IsNullOrEmpty(CompanyLogoUrl)) { %>
+                                <img src='<%= ResolveUrl(CompanyLogoUrl) %>' alt='<%= CompanyName %>' style='width:100%; height:100%; object-fit:cover;' />
+                            <% } else { %>
+                                <i class="fa-solid fa-building"></i>
+                            <% } %>
                         </span>
                     </div>
                     <div class="job-header-titles">
@@ -167,8 +171,12 @@
                     <h3 class="side-card-title">About the Company</h3>
                     <div class="company-brand-row">
                         <div class="side-company-avatar">
-                            <span style="width:40px; height:40px; border-radius:8px; background:#eff6ff; display:inline-flex; align-items:center; justify-content:center; color:#2563eb; font-weight:700; font-size:18px;">
-                                <%= !string.IsNullOrEmpty(CompanyName) ? CompanyName.Substring(0, 1).ToUpper() : "C" %>
+                            <span style="width:40px; height:40px; border-radius:8px; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#64748b; font-size:18px; overflow:hidden; border:1px solid #cbd5e1;">
+                                <% if (!string.IsNullOrEmpty(CompanyLogoUrl)) { %>
+                                    <img src='<%= ResolveUrl(CompanyLogoUrl) %>' alt='<%= CompanyName %>' style='width:100%; height:100%; object-fit:cover;' />
+                                <% } else { %>
+                                    <i class="fa-solid fa-building"></i>
+                                <% } %>
                             </span>
                         </div>
                         <div class="side-company-meta">
@@ -205,8 +213,12 @@
                         <button type="button" onclick="closeCompanyModal();" style="position:absolute; right:18px; top:18px; background:none; border:none; font-size:18px; color:#94a3b8; cursor:pointer;" aria-label="Close Modal">&times;</button>
                         
                         <div style="display:flex; align-items:center; gap:16px; margin-bottom:18px;">
-                            <span style="width:56px; height:56px; border-radius:12px; background:#eff6ff; display:inline-flex; align-items:center; justify-content:center; color:#2563eb; font-weight:700; font-size:24px;">
-                                <%= !string.IsNullOrEmpty(CompanyName) ? CompanyName.Substring(0, 1).ToUpper() : "C" %>
+                            <span style="width:56px; height:56px; border-radius:12px; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#64748b; font-size:24px; overflow:hidden; border:1px solid #cbd5e1;">
+                                <% if (!string.IsNullOrEmpty(CompanyLogoUrl)) { %>
+                                    <img src='<%= ResolveUrl(CompanyLogoUrl) %>' alt='<%= CompanyName %>' style='width:100%; height:100%; object-fit:cover;' />
+                                <% } else { %>
+                                    <i class="fa-solid fa-building"></i>
+                                <% } %>
                             </span>
                             <div>
                                 <h3 style="margin:0 0 4px; font-size:18px; font-weight:700; color:#0f172a;"><%= CompanyName %></h3>

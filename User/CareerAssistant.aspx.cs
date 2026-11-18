@@ -26,6 +26,9 @@ namespace SkillLinksX.User
         public int OverallMatchPct { get; set; } = 0;
         public int ProfileStrengthPct { get; set; } = 50;
         public int ResumeScorePct { get; set; } = 0;
+        public string UserPhotoUrl { get; set; } = "";
+        public string UserName { get; set; } = "You";
+        public string UserInitials { get; set; } = "U";
 
         // =====================================================================
         // [FILE RESTRICTION]: Only these 4 file formats are permitted
@@ -49,6 +52,14 @@ namespace SkillLinksX.User
             }
         }
 
+        public string GetInitials(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return "U";
+            var parts = name.Trim().Split(new[] { ' ', '.', '_' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 1) return parts[0].Length >= 2 ? parts[0].Substring(0, 2).ToUpper() : parts[0].Substring(0, 1).ToUpper();
+            return (parts[0].Substring(0, 1) + parts[parts.Length - 1].Substring(0, 1)).ToUpper();
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             // Session-based authentication check
@@ -59,6 +70,27 @@ namespace SkillLinksX.User
             }
 
             int studentId = Convert.ToInt32(Session["UserId"]);
+
+            // Load user profile photo & name
+            try
+            {
+                DataTable dtUser = DBHelper.ExecuteQuery("SELECT full_name, profile_photo FROM member_master_table WHERE id = @id", new SqlParameter("@id", studentId));
+                if (dtUser != null && dtUser.Rows.Count > 0)
+                {
+                    string name = dtUser.Rows[0]["full_name"] != DBNull.Value ? dtUser.Rows[0]["full_name"].ToString().Trim() : "";
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        UserName = name;
+                        UserInitials = GetInitials(name);
+                    }
+                    if (dtUser.Rows[0]["profile_photo"] != DBNull.Value)
+                    {
+                        string p = dtUser.Rows[0]["profile_photo"].ToString().Trim();
+                        if (!string.IsNullOrEmpty(p)) UserPhotoUrl = p;
+                    }
+                }
+            }
+            catch { }
 
             // Handle file upload immediately when paperclip input changes
             if (IsPostBack && fileResume.HasFile)

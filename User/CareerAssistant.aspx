@@ -59,7 +59,13 @@
                                     </div>
                                 </div>
                                 <asp:Panel runat="server" Visible='<%# Eval("Sender").ToString() == "user" %>' CssClass="ai-msg-avatar user-avatar">
-                                    <img src="<%= ResolveUrl("~/assets/images/user-male-logo.png") %>" alt="User" />
+                                    <% if (!string.IsNullOrEmpty(UserPhotoUrl)) { %>
+                                        <img src="<%= ResolveUrl(UserPhotoUrl) %>" alt="<%= UserName %>" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />
+                                    <% } else { %>
+                                        <span style="width:100%; height:100%; border-radius:50%; background:#f1f5f9; color:#64748b; display:inline-flex; align-items:center; justify-content:center; font-size:13px; border:1px solid #cbd5e1;">
+                                            <i class="fa-regular fa-user"></i>
+                                        </span>
+                                    <% } %>
                                 </asp:Panel>
                             </div>
                         </ItemTemplate>
