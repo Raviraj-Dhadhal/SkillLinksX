@@ -11,11 +11,6 @@ namespace SkillLinksX.User
 {
     public partial class Messages : Page
     {
-        // =========================================================================
-        // [PAGE PROPERTIES]:
-        // CurrentUserId: Retrieved from Session["UserId"] for security and state
-        // ActiveContactId: Stored in ViewState across postbacks to remember active chat
-        // =========================================================================
         public int CurrentUserId => Session["UserId"] != null ? Convert.ToInt32(Session["UserId"]) : 1;
 
         public int ActiveContactId
@@ -35,8 +30,22 @@ namespace SkillLinksX.User
 
             if (!IsPostBack)
             {
-                // First-time load: bind contacts list and open conversation for default contact
+                // Check if target contact was passed in query string
+                if (Request.QueryString["to"] != null && int.TryParse(Request.QueryString["to"], out int toId))
+                {
+                    ActiveContactId = toId;
+                }
+                else if (Request.QueryString["cid"] != null && int.TryParse(Request.QueryString["cid"], out int cid))
+                {
+                    ActiveContactId = cid;
+                }
+                else if (Request.QueryString["id"] != null && int.TryParse(Request.QueryString["id"], out int qid))
+                {
+                    ActiveContactId = qid;
+                }
+
                 LoadContactThreads();
+
                 if (ActiveContactId > 0)
                 {
                     LoadActiveConversation(ActiveContactId);
@@ -45,161 +54,186 @@ namespace SkillLinksX.User
         }
 
         // =========================================================================
-        // [DATABASE CONNECTIVITY & ADO.NET]: Load Contact List
-        // Queries 'member_master_table' to display available conversation partners
+        // [DATABASE ACCESS]: Load Contact List with latest messages and unread counts
         // =========================================================================
         private void LoadContactThreads()
         {
             try
             {
-                // Select contacts who are not the logged-in user
                 string sql = @"
-                    SELECT id AS member_id, full_name, email_add AS email 
-                    FROM member_master_table 
-                    WHERE id <> @uid 
-                    ORDER BY id DESC";
+                    SELECT 
+                        c.contact_id, 
+                        c.full_name, 
+                        c.email, 
+                        c.role_type,
+                        (SELECT TOP 1 message_text FROM messages 
+                         WHERE (sender_id = c.contact_id AND receiver_id = @uid) 
+                            OR (sender_id = @uid AND receiver_id = c.contact_id) 
+                         ORDER BY sent_at DESC) AS last_message,
+                        (SELECT MAX(sent_at) FROM messages 
+                         WHERE (sender_id = c.contact_id AND receiver_id = @uid) 
+                            OR (sender_id = @uid AND receiver_id = c.contact_id)) AS last_activity,
+                        (SELECT COUNT(*) FROM messages 
+                         WHERE sender_id = c.contact_id AND receiver_id = @uid AND is_read = 0) AS unread_count
+                    FROM (
+                        SELECT user_id AS contact_id, comp_name AS full_name, email_add AS email, 'Recruiter' AS role_type
+                        FROM company_table
+                        WHERE user_id IS NOT NULL AND user_id <> @uid
+
+                        UNION
+
+                        SELECT id AS contact_id, full_name, email_add AS email, 'Student' AS role_type
+                        FROM member_master_table
+                        WHERE id <> @uid
+                    ) c
+                    ORDER BY 
+                        CASE WHEN (SELECT MAX(sent_at) FROM messages WHERE (sender_id = c.contact_id AND receiver_id = @uid) OR (sender_id = @uid AND receiver_id = c.contact_id)) IS NOT NULL THEN 0 ELSE 1 END,
+                        last_activity DESC,
+                        c.full_name ASC";
+
                 DataTable dt = DBHelper.ExecuteQuery(sql, new SqlParameter("@uid", CurrentUserId));
 
-                if (dt.Rows.Count > 0)
+                if (dt != null && dt.Rows.Count > 0)
                 {
                     rptContactThreads.DataSource = dt;
                     rptContactThreads.DataBind();
 
-                    // If default contact is not yet set, use the first available contact
                     if (ActiveContactId == 0)
                     {
-                        ActiveContactId = Convert.ToInt32(dt.Rows[0]["member_id"]);
+                        ActiveContactId = Convert.ToInt32(dt.Rows[0]["contact_id"]);
                     }
                 }
+                else
+                {
+                    rptContactThreads.DataSource = null;
+                    rptContactThreads.DataBind();
+                }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // Graceful fallback if query fails
+                rptContactThreads.DataSource = null;
+                rptContactThreads.DataBind();
             }
         }
 
         // =========================================================================
-        // [DATABASE CONNECTIVITY & ADO.NET]: Load Conversation Messages
-        // Retrieves full chat log between CurrentUserId and ActiveContactId from SQL
+        // [DATABASE ACCESS]: Load Conversation Messages for Active Contact
         // =========================================================================
         private void LoadActiveConversation(int contactId)
         {
             try
             {
-                // 1. Fetch active contact's display information
-                string contactSql = "SELECT full_name, email_add AS email FROM member_master_table WHERE id = @cid";
-                DataTable dtContact = DBHelper.ExecuteQuery(contactSql, new SqlParameter("@cid", contactId));
-                if (dtContact.Rows.Count > 0)
+                if (contactId <= 0) return;
+
+                // 1. Fetch Contact Details
+                string infoSql = @"
+                    SELECT full_name, email FROM (
+                        SELECT user_id AS contact_id, comp_name AS full_name, email_add AS email FROM company_table
+                        UNION
+                        SELECT id AS contact_id, full_name, email_add AS email FROM member_master_table
+                    ) x WHERE contact_id = @cid";
+
+                DataTable dtInfo = DBHelper.ExecuteQuery(infoSql, new SqlParameter("@cid", contactId));
+                if (dtInfo != null && dtInfo.Rows.Count > 0)
                 {
-                    litActiveContactName.Text = dtContact.Rows[0]["full_name"].ToString();
-                    litActiveContactEmail.Text = dtContact.Rows[0]["email"].ToString();
+                    string name = dtInfo.Rows[0]["full_name"].ToString();
+                    litActiveContactName.Text = name;
+                    litActiveContactEmail.Text = dtInfo.Rows[0]["email"].ToString();
+                    litActiveContactInitial.Text = GetInitials(name);
+                }
+                else
+                {
+                    litActiveContactName.Text = "Contact #" + contactId;
+                    litActiveContactEmail.Text = "";
+                    litActiveContactInitial.Text = "C";
                 }
 
-                // 2. Fetch conversation history between current user and selected contact
-                string sql = @"
-                    SELECT message_id, sender_id, receiver_id, message_text, sent_at
+                // 2. Fetch Chat Messages strictly using messages schema:
+                // message_id, sender_id, receiver_id, subject, message_text, is_read, sent_at
+                string msgSql = @"
+                    SELECT message_id, sender_id, receiver_id, subject, message_text, is_read, sent_at
                     FROM messages
                     WHERE (sender_id = @uid AND receiver_id = @cid)
                        OR (sender_id = @cid AND receiver_id = @uid)
                     ORDER BY sent_at ASC";
 
-                DataTable dtMessages = DBHelper.ExecuteQuery(sql,
+                DataTable dtMsgs = DBHelper.ExecuteQuery(msgSql,
                     new SqlParameter("@uid", CurrentUserId),
-                    new SqlParameter("@cid", contactId)
-                );
+                    new SqlParameter("@cid", contactId));
 
-                rptChatMessages.DataSource = dtMessages;
+                rptChatMessages.DataSource = dtMsgs;
                 rptChatMessages.DataBind();
 
                 // 3. Mark incoming messages as read in SQL database
                 string readSql = "UPDATE messages SET is_read = 1 WHERE sender_id = @cid AND receiver_id = @uid AND is_read = 0";
                 DBHelper.ExecuteNonQuery(readSql,
                     new SqlParameter("@cid", contactId),
-                    new SqlParameter("@uid", CurrentUserId)
-                );
+                    new SqlParameter("@uid", CurrentUserId));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                // Graceful fallback
+                rptChatMessages.DataSource = null;
+                rptChatMessages.DataBind();
             }
         }
 
         // =========================================================================
-        // [EVENT HANDLER]: Contact Thread Selected
-        // Invoked when user clicks a contact card on the left sidebar
+        // [EVENT HANDLER]: Contact Selected
         // =========================================================================
         protected void btnSelectThread_Click(object sender, EventArgs e)
         {
             var btn = (LinkButton)sender;
-            int selectedId = Convert.ToInt32(btn.CommandArgument);
-            ActiveContactId = selectedId;
-
-            // Rebind conversation stream for the newly selected contact
-            LoadActiveConversation(selectedId);
-            LoadContactThreads(); // Rebinds sidebar to highlight active thread
+            if (int.TryParse(btn.CommandArgument, out int selectedId))
+            {
+                ActiveContactId = selectedId;
+                LoadActiveConversation(selectedId);
+                LoadContactThreads();
+            }
         }
 
         // =========================================================================
-        // [DATABASE INSERTION - FALLBACK POSTBACK]: Send Message Handler
-        // Executes if JavaScript fetch() is disabled or unavailable in the browser
+        // [EVENT HANDLER]: Send Message
         // =========================================================================
         protected void btnSend_Click(object sender, EventArgs e)
         {
             string text = txtMessageInput.Text.Trim();
-            if (string.IsNullOrEmpty(text)) return;
+            if (string.IsNullOrEmpty(text) || ActiveContactId <= 0) return;
 
             try
             {
-                string sql = @"
-                    INSERT INTO messages (sender_id, receiver_id, message_text, sent_at, is_read)
-                    VALUES (@sid, @rid, @msg, GETDATE(), 0)";
+                string senderName = Session["UserName"]?.ToString();
+                if (string.IsNullOrEmpty(senderName))
+                {
+                    object nameObj = DBHelper.ExecuteScalar("SELECT full_name FROM member_master_table WHERE id = @id", new SqlParameter("@id", CurrentUserId));
+                    if (nameObj != null && nameObj != DBNull.Value) senderName = nameObj.ToString();
+                    else senderName = "Student";
+                }
 
-                DBHelper.ExecuteNonQuery(sql,
-                    new SqlParameter("@sid", CurrentUserId),
-                    new SqlParameter("@rid", ActiveContactId),
-                    new SqlParameter("@msg", text)
-                );
+                // Send direct message with valid subject
+                DBHelper.SendDirectMessage(CurrentUserId, ActiveContactId, text, "Message from " + senderName);
 
                 txtMessageInput.Text = string.Empty;
-                LoadActiveConversation(ActiveContactId); // Refresh messages list
+                LoadActiveConversation(ActiveContactId);
+                LoadContactThreads();
             }
-            catch (Exception ex)
-            {
-                // Graceful catch
-            }
+            catch { }
         }
 
-        // =========================================================================
-        // [VIVA EVALUATION - WEBMETHOD / AJAX REPLACEMENT]:
-        // Static WebMethod invoked asynchronously via JavaScript fetch() without
-        // triggering a full-page postback, complying with teacher's AJAX restriction.
-        // =========================================================================
+        public string GetInitials(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return "U";
+            string[] parts = name.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 1) return parts[0].Substring(0, 1).ToUpper();
+            return (parts[0].Substring(0, 1) + parts[parts.Length - 1].Substring(0, 1)).ToUpper();
+        }
+
+        // Optional WebMethod for client calls
         [WebMethod]
         public static bool SendMessage(int receiverId, string messageText)
         {
-            if (HttpContext.Current.Session["UserId"] == null) return false;
+            if (HttpContext.Current?.Session?["UserId"] == null) return false;
             int senderId = Convert.ToInt32(HttpContext.Current.Session["UserId"]);
-
-            if (string.IsNullOrWhiteSpace(messageText)) return false;
-
-            try
-            {
-                string sql = @"
-                    INSERT INTO messages (sender_id, receiver_id, message_text, sent_at, is_read)
-                    VALUES (@sid, @rid, @msg, GETDATE(), 0)";
-
-                int rows = DBHelper.ExecuteNonQuery(sql,
-                    new SqlParameter("@sid", senderId),
-                    new SqlParameter("@rid", receiverId),
-                    new SqlParameter("@msg", messageText.Trim())
-                );
-
-                return rows > 0;
-            }
-            catch
-            {
-                return false;
-            }
+            return DBHelper.SendDirectMessage(senderId, receiverId, messageText);
         }
     }
 }

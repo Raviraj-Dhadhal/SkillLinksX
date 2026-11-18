@@ -3,48 +3,132 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <!-- User Messages Head -->
     <link href="<%= ResolveUrl("~/assets/CSS/user-pages.css") %>" rel="stylesheet" />
+    <style>
+        .chat-thread-item {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 18px;
+            border-bottom: 1px solid #F1F5F9;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            border-left: 3px solid transparent;
+            border-top: none;
+            border-right: none;
+        }
+        .chat-thread-item:hover {
+            background-color: #F8FAFC;
+        }
+        .chat-thread-item.active {
+            background-color: #EEF4FF;
+            border-left: 3px solid #0040A2;
+        }
+        .thread-badge-unread {
+            background-color: #0040A2;
+            color: #FFFFFF;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+        .message-bubble-row {
+            display: flex;
+            gap: 10px;
+            max-width: 80%;
+            margin-bottom: 12px;
+        }
+        .message-bubble-row.incoming {
+            align-self: flex-start;
+        }
+        .message-bubble-row.outgoing {
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        .msg-bubble-content {
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 13.5px;
+            line-height: 1.45;
+            word-break: break-word;
+        }
+        .incoming-bubble {
+            background-color: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            color: #0F172A;
+            border-top-left-radius: 2px;
+        }
+        .outgoing-bubble {
+            background-color: #0040A2;
+            color: #FFFFFF;
+            border-top-right-radius: 2px;
+        }
+        .outgoing-bubble p {
+            color: #FFFFFF;
+            margin: 0 0 4px 0;
+        }
+        .incoming-bubble p {
+            color: #0F172A;
+            margin: 0 0 4px 0;
+        }
+    </style>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <div class="user-messages-page">
 
         <!-- 2-Column Chat Layout Container -->
-        <div class="chat-workspace-grid">
+        <div class="chat-workspace-grid" style="min-height: calc(100vh - 120px);">
 
             <!-- Column 1: Conversations List -->
             <div class="chat-sidebar-column">
                 <div class="chat-sidebar-header">
                     <h2 class="chat-column-title">Messages</h2>
-                    <button type="button" class="btn-new-message-blue">
-                        <i class="fa-regular fa-pen-to-square"></i> New Message
-                    </button>
+                    <span style="font-size: 12px; color: #64748B; font-weight: 500;">
+                        Direct Chat
+                    </span>
                 </div>
 
                 <div class="chat-threads-list">
-                    <!-- Dynamic Contact Repeater: Loads available recruiter/peer threads from member_master_table -->
+                    <!-- Dynamic Contact Repeater -->
                     <asp:Repeater ID="rptContactThreads" runat="server">
                         <ItemTemplate>
-                            <!-- Clickable Contact Card: LinkButton raises btnSelectThread_Click to switch active chat conversation -->
                             <asp:LinkButton ID="btnSelectThread" runat="server"
-                                CssClass='<%# "chat-thread-item " + (Convert.ToInt32(Eval("member_id")) == ActiveContactId ? "active" : "") %>'
-                                CommandArgument='<%# Eval("member_id") %>' OnClick="btnSelectThread_Click">
+                                CssClass='<%# "chat-thread-item " + (Convert.ToInt32(Eval("contact_id")) == ActiveContactId ? "active" : "") %>'
+                                CommandArgument='<%# Eval("contact_id") %>' OnClick="btnSelectThread_Click">
                                 <div class="thread-avatar-wrapper">
-                                    <span class="thread-avatar-circle" style="width:36px; height:36px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#64748b; font-size:16px;">
-                                        <i class="fa-regular fa-user"></i>
+                                    <span class="thread-avatar-circle" style="width:40px; height:40px; border-radius:50%; background:#e0e7ff; display:inline-flex; align-items:center; justify-content:center; color:#3730a3; font-size:16px; font-weight:600;">
+                                        <%# GetInitials(Eval("full_name").ToString()) %>
                                     </span>
-                                    <span class="thread-online-dot"></span>
                                 </div>
-                                <div class="thread-info-content">
-                                    <div class="thread-meta-top">
-                                        <span class="thread-sender-name"><%# Eval("full_name") %></span>
+                                <div class="thread-info-content" style="flex:1; min-width:0; margin-left: 4px;">
+                                    <div class="thread-meta-top" style="display:flex; justify-content:space-between; align-items:baseline;">
+                                        <span class="thread-sender-name" style="font-weight:700; color:#0F172A; font-size:13.5px;"><%# Eval("full_name") %></span>
+                                        <%# Convert.ToInt32(Eval("unread_count")) > 0 ? "<span class='thread-badge-unread'>" + Eval("unread_count") + "</span>" : "" %>
                                     </div>
-                                    <div class="thread-role-sub"><%# Eval("email") %></div>
-                                    <div class="thread-preview-row">
-                                        <span class="thread-snippet-text font-semibold">Active Conversation</span>
+                                    <div class="thread-role-sub" style="font-size:11.5px; color:#64748B;">
+                                        <span class="badge" style="background:#f1f5f9; color:#475569; padding:1px 6px; border-radius:4px; font-size:10px;"><%# Eval("role_type") %></span>
+                                        <%# Eval("email") %>
+                                    </div>
+                                    <div class="thread-preview-row" style="margin-top:2px;">
+                                        <span class="thread-snippet-text" style="font-size:12px; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block;">
+                                            <%# Eval("last_message") != DBNull.Value && !string.IsNullOrEmpty(Eval("last_message").ToString()) ? Eval("last_message") : "Tap to open chat" %>
+                                        </span>
                                     </div>
                                 </div>
                             </asp:LinkButton>
                         </ItemTemplate>
+                        <FooterTemplate>
+                            <asp:Panel ID="pnlNoContacts" runat="server" Visible='<%# rptContactThreads.Items.Count == 0 %>' style="padding: 24px; text-align: center; color: #94a3b8;">
+                                <i class="fa-regular fa-address-book" style="font-size: 28px; margin-bottom: 8px;"></i>
+                                <p style="font-size: 13px; margin: 0;">No contacts available right now.</p>
+                            </asp:Panel>
+                        </FooterTemplate>
                     </asp:Repeater>
                 </div>
             </div>
@@ -55,66 +139,58 @@
                 <div class="chat-main-header">
                     <div class="chat-header-user">
                         <div class="thread-avatar-wrapper">
-                            <span class="thread-avatar-circle" style="width:40px; height:40px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#64748b; font-size:18px;">
-                                <i class="fa-regular fa-user"></i>
+                            <span class="thread-avatar-circle" style="width:40px; height:40px; border-radius:50%; background:#e0e7ff; display:inline-flex; align-items:center; justify-content:center; color:#3730a3; font-size:16px; font-weight:600;">
+                                <asp:Literal ID="litActiveContactInitial" runat="server">C</asp:Literal>
                             </span>
                         </div>
                         <div>
-                            <!-- Dynamic Contact Name & Status -->
                             <div class="chat-header-name">
-                                <asp:Literal ID="litActiveContactName" runat="server">Recruiter</asp:Literal>
+                                <asp:Literal ID="litActiveContactName" runat="server">Select a contact</asp:Literal>
                             </div>
                             <div class="chat-header-subtitle">
-                                <asp:Literal ID="litActiveContactEmail" runat="server">recruiter@skilllinkx.com</asp:Literal> &bull; <span class="text-online">Online</span>
+                                <asp:Literal ID="litActiveContactEmail" runat="server">Select a conversation from the left to start messaging</asp:Literal>
                             </div>
                         </div>
-                    </div>
-                    <div class="chat-header-actions">
-                        <a href="javascript:void(0);" class="btn-view-profile-outline">View Profile</a>
                     </div>
                 </div>
 
                 <!-- Messages Conversation Flow Area -->
-                <div class="chat-scroll-area" id="chatScrollArea">
-                    <div class="chat-date-pill">Today</div>
+                <div class="chat-scroll-area" id="chatScrollArea" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column;">
+                    <div class="chat-date-pill" style="align-self:center; background:#E2E8F0; color:#475569; font-size:11px; font-weight:600; padding:3px 12px; border-radius:9999px; margin-bottom:12px;">Conversation History</div>
 
-                    <!-- Conversation Repeater: Binds conversation history between student and selected recruiter -->
+                    <!-- Conversation Repeater -->
                     <asp:Repeater ID="rptChatMessages" runat="server">
                         <ItemTemplate>
-                            <!-- Evaluates whether current message is outgoing (sent by current student) or incoming (sent by recruiter) -->
                             <div class='<%# Convert.ToInt32(Eval("sender_id")) == CurrentUserId ? "message-bubble-row outgoing" : "message-bubble-row incoming" %>'>
-                                <%# Convert.ToInt32(Eval("sender_id")) == CurrentUserId ? "" : "<span class='msg-bubble-avatar' style='width:28px; height:28px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#64748b; font-size:13px; margin-right:8px;'><i class='fa-regular fa-user'></i></span>" %>
+                                <%# Convert.ToInt32(Eval("sender_id")) == CurrentUserId ? "" : "<span class='msg-bubble-avatar' style='width:30px; height:30px; border-radius:50%; background:#e2e8f0; display:inline-flex; align-items:center; justify-content:center; color:#475569; font-size:12px; font-weight:600; margin-right:6px; flex-shrink:0;'><i class=\"fa-regular fa-user\"></i></span>" %>
                                 <div class='<%# Convert.ToInt32(Eval("sender_id")) == CurrentUserId ? "msg-bubble-content outgoing-bubble" : "msg-bubble-content incoming-bubble" %>'>
                                     <p><%# Eval("message_text") %></p>
-                                    <span class='<%# "msg-time-stamp " + (Convert.ToInt32(Eval("sender_id")) == CurrentUserId ? "sent-stamp" : "") %>'>
+                                    <span class='<%# "msg-time-stamp " + (Convert.ToInt32(Eval("sender_id")) == CurrentUserId ? "sent-stamp" : "") %>' style="font-size:10px; opacity:0.8; display:block; text-align:right;">
                                         <%# Convert.ToDateTime(Eval("sent_at")).ToString("hh:mm tt") %>
                                     </span>
                                 </div>
                             </div>
                         </ItemTemplate>
                         <FooterTemplate>
-                            <asp:Panel ID="pnlNoMessages" runat="server" Visible='<%# rptChatMessages.Items.Count == 0 %>' CssClass="text-center" style="padding: 30px; color: #94a3b8;">
-                                <i class="fa-regular fa-comment-dots" style="font-size: 30px; margin-bottom: 8px;"></i>
-                                <p>No messages yet. Say hello to start the conversation!</p>
+                            <asp:Panel ID="pnlNoMessages" runat="server" Visible='<%# rptChatMessages.Items.Count == 0 %>' CssClass="text-center" style="padding: 40px; color: #94a3b8; text-align:center;">
+                                <i class="fa-regular fa-comment-dots" style="font-size: 36px; margin-bottom: 10px; display:block; color:#cbd5e1;"></i>
+                                <p style="font-size:14px; margin:0;">No messages in this conversation yet.</p>
+                                <p style="font-size:12px; color:#64748b; margin-top:4px;">Say hello and type a message below to start chatting!</p>
                             </asp:Panel>
                         </FooterTemplate>
                     </asp:Repeater>
                 </div>
 
                 <!-- Message Input Footer -->
-                <div class="chat-input-bar">
-                    <button type="button" class="btn-chat-tool" aria-label="Attach File">
-                        <i class="fa-solid fa-paperclip"></i>
-                    </button>
-                    <div class="chat-input-wrapper">
-                        <!-- Message Input TextBox: Accepts chat message text -->
-                        <asp:TextBox ID="txtMessageInput" runat="server" ClientIDMode="Static" CssClass="chat-input-field" placeholder="Write a message..." onkeydown="handleEnterKey(event)" />
-                        <button type="button" class="btn-emoji-picker" aria-label="Insert Emoji">
-                            <i class="fa-regular fa-face-smile"></i>
-                        </button>
+                <div class="chat-input-bar" style="padding: 14px 20px; background: #FFFFFF; border-top: 1px solid #E2E8F0; display: flex; align-items: center; gap: 10px;">
+                    <div class="chat-input-wrapper" style="flex: 1; display: flex; align-items: center; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 24px; padding: 6px 16px;">
+                        <asp:TextBox ID="txtMessageInput" runat="server" ClientIDMode="Static" 
+                            style="border:none; outline:none; background:transparent; width:100%; font-size:13.5px; padding:6px 0;"
+                            placeholder="Write a message..." onkeydown="handleEnterKey(event)" />
                     </div>
-                    <!-- Send Button: Performs standard ASP.NET server postback to insert message and refresh conversation -->
-                    <asp:LinkButton ID="btnSend" runat="server" ClientIDMode="Static" CssClass="btn-send-message" aria-label="Send Message" OnClick="btnSend_Click">
+                    <asp:LinkButton ID="btnSend" runat="server" ClientIDMode="Static" 
+                        style="width:42px; height:42px; border-radius:50%; background:#0040A2; color:#fff; display:inline-flex; align-items:center; justify-content:center; text-decoration:none; font-size:15px; border:none; cursor:pointer;"
+                        aria-label="Send Message" OnClick="btnSend_Click">
                         <i class="fa-solid fa-paper-plane"></i>
                     </asp:LinkButton>
                 </div>
@@ -125,24 +201,21 @@
     </div>
 
     <script type="text/javascript">
-        // Auto-scroll chat area to the bottom whenever page loads or postback finishes
         window.addEventListener('DOMContentLoaded', function () {
             scrollToChatBottom();
         });
 
-        // Auto-scrolls the conversation container to the latest message
         function scrollToChatBottom() {
-            const area = document.getElementById('chatScrollArea');
+            var area = document.getElementById('chatScrollArea');
             if (area) {
                 area.scrollTop = area.scrollHeight;
             }
         }
 
-        // Allows pressing Enter to send message
         function handleEnterKey(event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
-                const sendBtn = document.getElementById('btnSend');
+                var sendBtn = document.getElementById('btnSend');
                 if (sendBtn) {
                     sendBtn.click();
                 }
