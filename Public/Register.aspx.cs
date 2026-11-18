@@ -18,18 +18,16 @@ namespace SkillLinksX.Public
 
         protected void btnCreateAccount_Click(object sender, EventArgs e)
         {
-            // Determine selected role: Student vs Company
-            string selectedRole = Request.Form["hiddenSelectedRole"] ?? "Student";
-            bool isCompany = selectedRole.Equals("Company", StringComparison.OrdinalIgnoreCase);
+            if (!Page.IsValid) return;
 
-            // Common Credentials
+            // Student Credentials
             string email    = txtRegEmail.Text.Trim();
-            string phone    = txtRegPhone.Text.Trim();
+            string phone    = txtRegPhone.Text.Trim().Replace(" ", "");
             string password = txtRegPassword.Text.Trim();
             string city     = txtRegCity.Text.Trim();
             string state    = ddlRegState.SelectedValue;
 
-            // Student Fields
+            // Student Details
             string studentFullName = txtRegFullName.Text.Trim();
             string college         = txtRegCollege.Text.Trim();
             string skills          = txtRegSkills.Text.Trim();
@@ -37,79 +35,19 @@ namespace SkillLinksX.Public
             int.TryParse(ddlGradYear.SelectedValue, out gradYear);
             if (gradYear == 0) gradYear = DateTime.Now.Year;
 
-            // Company Fields
-            string compName      = txtRegCompName.Text.Trim();
-            string recruiterName = txtRegRecruiterName.Text.Trim();
-            string compAddress   = txtRegCompAddress.Text.Trim();
-            string industry      = ddlRegIndustry.SelectedValue;
-            string employeeCount = ddlRegEmployeeCount.SelectedValue;
-            string website       = txtRegWebsite.Text.Trim();
-
-            // =========================================================================
-            // Server-Side Field Validation based on active role
-            // =========================================================================
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(phone) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(city))
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(phone) || string.IsNullOrEmpty(password) ||
+                string.IsNullOrEmpty(city) || string.IsNullOrEmpty(studentFullName) || string.IsNullOrEmpty(college))
             {
-                ShowError("Please complete all required account credentials (Email, Phone, Password, City).");
+                ShowError("Please complete all required fields.");
                 return;
             }
 
-            if (isCompany)
-            {
-                if (string.IsNullOrEmpty(compName))
-                {
-                    ShowError("Company / Organization name is required.");
-                    return;
-                }
-                if (string.IsNullOrEmpty(compAddress))
-                {
-                    ShowError("Company office address is required.");
-                    return;
-                }
-                if (string.IsNullOrEmpty(recruiterName))
-                {
-                    recruiterName = compName + " HR";
-                }
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(studentFullName))
-                {
-                    ShowError("Student full name is required.");
-                    return;
-                }
-                if (string.IsNullOrEmpty(college))
-                {
-                    ShowError("College / University name is required.");
-                    return;
-                }
-                if (gradYear == 0)
-                {
-                    ShowError("Graduation year is required.");
-                    return;
-                }
-            }
-
-            // Ensure DB schema has all columns needed for company_table
-            DBHelper.EnsureCompanyColumns();
-            DBHelper.EnsureProfilePhotoColumns();
-            DBHelper.EnsureNotificationColumns();
-
-            // Determine role ID dynamically from the 'role' table
-            int roleId = isCompany ? 3 : 2;
+            // Student role_id is 2
+            int roleId = 2;
             try
             {
-                string targetRoleName = isCompany ? "Company" : "Student";
-                object rObj = DBHelper.ExecuteScalar("SELECT TOP 1 role_id FROM [dbo].[role] WHERE role_name = @rname", new SqlParameter("@rname", targetRoleName));
-                if (rObj != null && rObj != DBNull.Value)
-                {
-                    roleId = Convert.ToInt32(rObj);
-                }
-                else
-                {
-                    object altObj = DBHelper.ExecuteScalar("SELECT TOP 1 role_id FROM [dbo].[role] WHERE role_name LIKE @rname", new SqlParameter("@rname", isCompany ? "%Comp%" : "%Stud%"));
-                    if (altObj != null && altObj != DBNull.Value) roleId = Convert.ToInt32(altObj);
-                }
+                object rObj = DBHelper.ExecuteScalar("SELECT TOP 1 role_id FROM [dbo].[role] WHERE role_name = 'Student'");
+                if (rObj != null && rObj != DBNull.Value) roleId = Convert.ToInt32(rObj);
             }
             catch { }
 
@@ -119,7 +57,7 @@ namespace SkillLinksX.Public
                 {
                     conn.Open();
 
-                    // 1. Check if email is already registered
+                    // 1. Check if email already registered
                     string checkSql = "SELECT COUNT(1) FROM [dbo].[user_auth] WHERE [email] = @email";
                     using (SqlCommand checkCmd = new SqlCommand(checkSql, conn))
                     {
@@ -132,7 +70,7 @@ namespace SkillLinksX.Public
                         }
                     }
 
-                    // 2. Insert into user_auth and appropriate profile table using a Transaction
+                    // 2. Insert into user_auth and member_master_table using Transaction
                     using (SqlTransaction trans = conn.BeginTransaction())
                     {
                         try
@@ -153,89 +91,39 @@ namespace SkillLinksX.Public
                                 newUserId = Convert.ToInt32(result);
                             }
 
-                            int newCompanyId = 0;
+                            string insertMemberSql = @"INSERT INTO [dbo].[member_master_table] 
+                                ([id], [category], [full_name], [email_add], [ph_no], [city], [state], 
+                                 [clg_name], [grad_year], [skills], [degree], [profile_strength])
+                                VALUES (@id, 'Student', @fullName, @email, @phone, @city, @state, 
+                                        @college, @gradYear, @skills, @degree, 50)";
 
-                            // 3. Insert into the appropriate profile table
-                            if (isCompany)
+                            using (SqlCommand memCmd = new SqlCommand(insertMemberSql, conn, trans))
                             {
-                                // Company profile
-                                string insertCompSql = @"INSERT INTO [dbo].[company_table] 
-                                    ([user_id], [comp_name], [email_add], [ph_no], [city], [state], [address], [industry], [website], [employee_count], [is_verified], [profile_strength])
-                                    VALUES (@userId, @compName, @email, @phone, @city, @state, @address, @industry, @website, @empCount, 0, 50);
-                                    SELECT SCOPE_IDENTITY();";
+                                memCmd.Parameters.AddWithValue("@id", newUserId);
+                                memCmd.Parameters.AddWithValue("@fullName", studentFullName);
+                                memCmd.Parameters.AddWithValue("@email", email);
+                                memCmd.Parameters.AddWithValue("@phone", phone);
+                                memCmd.Parameters.AddWithValue("@city", city);
+                                memCmd.Parameters.AddWithValue("@state", state);
+                                memCmd.Parameters.AddWithValue("@college", college);
+                                memCmd.Parameters.AddWithValue("@gradYear", gradYear);
+                                memCmd.Parameters.AddWithValue("@skills", string.IsNullOrWhiteSpace(skills) ? "General" : skills);
+                                memCmd.Parameters.AddWithValue("@degree", "Bachelor's Degree");
 
-                                using (SqlCommand compCmd = new SqlCommand(insertCompSql, conn, trans))
-                                {
-                                    compCmd.Parameters.AddWithValue("@userId", newUserId);
-                                    compCmd.Parameters.AddWithValue("@compName", compName);
-                                    compCmd.Parameters.AddWithValue("@email", email);
-                                    compCmd.Parameters.AddWithValue("@phone", phone);
-                                    compCmd.Parameters.AddWithValue("@city", city);
-                                    compCmd.Parameters.AddWithValue("@state", state);
-                                    compCmd.Parameters.AddWithValue("@address", compAddress);
-                                    compCmd.Parameters.AddWithValue("@industry", string.IsNullOrEmpty(industry) ? "Information Technology" : industry);
-                                    compCmd.Parameters.AddWithValue("@website", string.IsNullOrEmpty(website) ? "" : website);
-                                    compCmd.Parameters.AddWithValue("@empCount", string.IsNullOrEmpty(employeeCount) ? "11-50" : employeeCount);
-
-                                    object cidResult = compCmd.ExecuteScalar();
-                                    if (cidResult != null && cidResult != DBNull.Value)
-                                    {
-                                        newCompanyId = Convert.ToInt32(cidResult);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                // Student / Member profile
-                                string insertMemberSql = @"INSERT INTO [dbo].[member_master_table] 
-                                    ([id], [category], [full_name], [email_add], [ph_no], [city], [state], 
-                                     [clg_name], [grad_year], [skills], [degree], [profile_strength])
-                                    VALUES (@id, 'Student', @fullName, @email, @phone, @city, @state, 
-                                            @college, @gradYear, @skills, @degree, 50)";
-
-                                using (SqlCommand memCmd = new SqlCommand(insertMemberSql, conn, trans))
-                                {
-                                    memCmd.Parameters.AddWithValue("@id", newUserId);
-                                    memCmd.Parameters.AddWithValue("@fullName", studentFullName);
-                                    memCmd.Parameters.AddWithValue("@email", email);
-                                    memCmd.Parameters.AddWithValue("@phone", phone);
-                                    memCmd.Parameters.AddWithValue("@city", city);
-                                    memCmd.Parameters.AddWithValue("@state", state);
-                                    memCmd.Parameters.AddWithValue("@college", college);
-                                    memCmd.Parameters.AddWithValue("@gradYear", gradYear);
-                                    memCmd.Parameters.AddWithValue("@skills", string.IsNullOrWhiteSpace(skills) ? "General" : skills);
-                                    memCmd.Parameters.AddWithValue("@degree", "Bachelor's Degree");
-
-                                    memCmd.ExecuteNonQuery();
-                                }
+                                memCmd.ExecuteNonQuery();
                             }
 
-                            // Commit transaction
                             trans.Commit();
 
-                            // 4. Set Session variables (State Management)
+                            // 3. Set Session State & Redirect to Student Dashboard
                             Session["UserId"]   = newUserId.ToString();
                             Session["Email"]    = email;
+                            Session["UserName"] = studentFullName;
+                            Session["Role"]     = "Student";
 
-                            if (isCompany)
-                            {
-                                Session["UserName"]  = compName;
-                                Session["Role"]      = "Company";
-                                Session["CompanyId"] = newCompanyId > 0 ? newCompanyId : DBHelper.GetCurrentCompanyId(newUserId, Session);
+                            DBHelper.SendNotification(newUserId, "Welcome to SkillLinksX!", "Your student account is active. Explore internships and jobs matching your skills.", "~/User/Dashboard.aspx");
 
-                                DBHelper.SendNotification(newUserId, "Welcome to SkillLinksX!", "Your company account is ready. Post jobs and internships, search candidate profiles, and schedule interviews.", "~/Company/Dashboard.aspx");
-
-                                Response.Redirect("~/Company/Dashboard.aspx", false);
-                            }
-                            else
-                            {
-                                Session["UserName"] = studentFullName;
-                                Session["Role"]     = "Student";
-
-                                DBHelper.SendNotification(newUserId, "Welcome to SkillLinksX!", "Your student account is active. Explore internships and jobs matching your skills.", "~/User/Dashboard.aspx");
-
-                                Response.Redirect("~/User/Dashboard.aspx", false);
-                            }
+                            Response.Redirect("~/User/Dashboard.aspx", false);
                             Context.ApplicationInstance.CompleteRequest();
                         }
                         catch (Exception ex)
