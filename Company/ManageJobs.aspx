@@ -77,26 +77,37 @@
             <div class="table-filter-bar">
                 <div class="table-search-input-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Search jobs, internships, people..." />
+                    <input type="text" id="txtJobSearch" placeholder="Search jobs, internships, people..." oninput="applyJobsFilter();" />
                 </div>
-                <select class="table-filter-select">
-                    <option>Status</option>
-                    <option>Active</option>
-                    <option>Draft</option>
-                    <option>Closed</option>
+                <select id="ddlJobStatusFilter" class="table-filter-select" onchange="applyJobsFilter();">
+                    <option value="">Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Draft">Draft</option>
+                    <option value="Closed">Closed</option>
                 </select>
-                <select class="table-filter-select">
-                    <option>Location</option>
-                    <option>Bengaluru</option>
-                    <option>Ahmedabad</option>
-                    <option>Remote</option>
+                <select id="ddlJobLocationFilter" class="table-filter-select" onchange="applyJobsFilter();">
+                    <option value="">Location</option>
+                    <option value="Ahmedabad">Ahmedabad</option>
+                    <option value="Bengaluru">Bengaluru</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Pune">Pune</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Remote">Remote</option>
                 </select>
-                <select class="table-filter-select">
-                    <option>Work Mode</option>
-                    <option>Hybrid</option>
-                    <option>On-site</option>
-                    <option>Remote</option>
+                <select id="ddlJobWorkModeFilter" class="table-filter-select" onchange="applyJobsFilter();">
+                    <option value="">Work Mode</option>
+                    <option value="Hybrid">Hybrid</option>
+                    <option value="On-site">On-site</option>
+                    <option value="Remote">Remote</option>
+                    <option value="Full-time">Full-time</option>
+                    <option value="Part-time">Part-time</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Internship">Internship</option>
                 </select>
+                <button type="button" onclick="clearJobsFilter();" style="padding:6px 12px; background:#F1F5F9; border:1px solid #CBD5E1; border-radius:6px; font-size:12px; font-weight:600; color:#475569; cursor:pointer;" title="Reset Filters">
+                    <i class="fa-solid fa-arrows-rotate"></i> Reset
+                </button>
             </div>
 
             <asp:Label ID="lblActionMessage" runat="server" ForeColor="Green" style="display:block; margin: 10px 14px; font-size:13px; font-weight:600;" EnableViewState="false" />
@@ -121,7 +132,11 @@
                              ========================================================= -->
                         <asp:Repeater ID="rptCompanyJobs" runat="server" OnItemCommand="rptCompanyJobs_ItemCommand">
                             <ItemTemplate>
-                                <tr>
+                                <tr class="job-data-row"
+                                    data-title='<%# Eval("Title").ToString().ToLower() %>'
+                                    data-location='<%# Eval("Location").ToString().ToLower() %>'
+                                    data-type='<%# Eval("JobType").ToString().ToLower() %>'
+                                    data-status='<%# Eval("Status").ToString().ToLower() %>'>
                                     <td>
                                         <a href='<%# ResolveUrl("~/Company/Applicants.aspx") %>' class="job-table-title-link" style="font-weight:600;">
                                             <%# Eval("Title") %>
@@ -149,6 +164,13 @@
                                 </tr>
                             </ItemTemplate>
                         </asp:Repeater>
+                        <tr id="rowNoMatchingJobs" style="display:none;">
+                            <td colspan="7" style="text-align:center; padding:32px 16px; color:#64748B;">
+                                <i class="fa-solid fa-filter" style="font-size:24px; color:#CBD5E1; margin-bottom:8px; display:block;"></i>
+                                <div style="font-weight:600; color:#334155; margin-bottom:4px;">No Jobs Match Your Filter</div>
+                                <div style="font-size:12px;">Try adjusting your search query, status, location, or work mode filter.</div>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -191,16 +213,96 @@
     <script type="text/javascript">
         var jobsCurrentPage = 1;
         var jobsPageSize = 10;
+        var matchingJobsRows = [];
 
-        function getJobsRows() {
+        function getAllJobRows() {
             var table = document.querySelector(".jobs-data-table tbody");
             if (!table) return [];
-            return Array.from(table.querySelectorAll("tr"));
+            return Array.from(table.querySelectorAll("tr.job-data-row"));
+        }
+
+        function populateDynamicLocations() {
+            var rows = getAllJobRows();
+            var select = document.getElementById("ddlJobLocationFilter");
+            if (!select) return;
+
+            var locations = new Set();
+            rows.forEach(function (r) {
+                var loc = r.getAttribute("data-location");
+                if (loc) {
+                    loc.split(',').forEach(function(part) {
+                        var clean = part.trim();
+                        if (clean.length > 1) {
+                            var cap = clean.charAt(0).toUpperCase() + clean.slice(1);
+                            locations.add(cap);
+                        }
+                    });
+                }
+            });
+
+            var existing = Array.from(select.options).map(function(o) { return o.value.toLowerCase(); });
+            locations.forEach(function (l) {
+                if (existing.indexOf(l.toLowerCase()) === -1) {
+                    var opt = document.createElement("option");
+                    opt.value = l;
+                    opt.innerText = l;
+                    select.appendChild(opt);
+                }
+            });
+        }
+
+        function applyJobsFilter() {
+            var q = (document.getElementById("txtJobSearch")?.value || "").trim().toLowerCase();
+            var statusFilter = (document.getElementById("ddlJobStatusFilter")?.value || "").trim().toLowerCase();
+            var locFilter = (document.getElementById("ddlJobLocationFilter")?.value || "").trim().toLowerCase();
+            var modeFilter = (document.getElementById("ddlJobWorkModeFilter")?.value || "").trim().toLowerCase();
+
+            var allRows = getAllJobRows();
+            matchingJobsRows = [];
+
+            allRows.forEach(function (row) {
+                var title = row.getAttribute("data-title") || "";
+                var loc = row.getAttribute("data-location") || "";
+                var type = row.getAttribute("data-type") || "";
+                var stat = row.getAttribute("data-status") || "";
+                var fullText = (row.innerText || "").toLowerCase();
+
+                var matchSearch = !q || fullText.indexOf(q) !== -1 || title.indexOf(q) !== -1 || loc.indexOf(q) !== -1;
+                var matchStatus = !statusFilter || stat === statusFilter || (statusFilter === "closed" && stat !== "active" && stat !== "draft");
+                var matchLoc = !locFilter || loc.indexOf(locFilter) !== -1;
+                var matchMode = !modeFilter || type.indexOf(modeFilter) !== -1;
+
+                if (matchSearch && matchStatus && matchLoc && matchMode) {
+                    matchingJobsRows.push(row);
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            var noMatchRow = document.getElementById("rowNoMatchingJobs");
+            if (noMatchRow) {
+                noMatchRow.style.display = (allRows.length > 0 && matchingJobsRows.length === 0) ? "" : "none";
+            }
+
+            jobsCurrentPage = 1;
+            renderJobsPagination();
+        }
+
+        function clearJobsFilter() {
+            var s = document.getElementById("txtJobSearch");
+            if (s) s.value = "";
+            var st = document.getElementById("ddlJobStatusFilter");
+            if (st) st.value = "";
+            var l = document.getElementById("ddlJobLocationFilter");
+            if (l) l.value = "";
+            var m = document.getElementById("ddlJobWorkModeFilter");
+            if (m) m.value = "";
+
+            applyJobsFilter();
         }
 
         function renderJobsPagination() {
-            var rows = getJobsRows();
-            var total = rows.length;
+            var total = matchingJobsRows.length;
             var totalPages = Math.ceil(total / jobsPageSize) || 1;
 
             if (jobsCurrentPage < 1) jobsCurrentPage = 1;
@@ -209,7 +311,7 @@
             var start = (jobsCurrentPage - 1) * jobsPageSize;
             var end = Math.min(start + jobsPageSize, total);
 
-            rows.forEach(function (row, idx) {
+            matchingJobsRows.forEach(function (row, idx) {
                 if (idx >= start && idx < end) {
                     row.style.display = "";
                 } else {
@@ -253,7 +355,9 @@
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-            renderJobsPagination();
+            populateDynamicLocations();
+            matchingJobsRows = getAllJobRows();
+            applyJobsFilter();
         });
     </script>
 </asp:Content>

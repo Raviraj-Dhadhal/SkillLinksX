@@ -116,13 +116,11 @@
         <!-- 2-Column Section: Applications Overview ApexChart (Left) + Recruitment Funnel (Right) -->
         <div class="analytics-charts-grid">
 
-            <!-- Left: Applications Overview with ApexCharts -->
+            <!-- Left: Applications & Recruitment Activity with ApexCharts -->
             <div class="chart-box-card">
                 <div class="chart-card-header">
-                    <h3 class="chart-card-title">Applications Overview</h3>
-                    <button type="button" class="btn-chart-more" aria-label="More Options">
-                        <i class="fa-solid fa-ellipsis"></i>
-                    </button>
+                    <h3 class="chart-card-title">Recruitment Activity</h3>
+                    <div style="font-size:12px; color:#64748B; font-weight:500;">Direct from Database</div>
                 </div>
 
                 <!-- ApexCharts container -->
@@ -130,7 +128,9 @@
 
                 <!-- Database-injected chart data payload -->
                 <script type="text/javascript">
+                    window.dbCompanyChartCategories = <%= ChartCategoriesJson %>;
                     window.dbCompanyAppMonthly = <%= ChartMonthlyAppsJson %>;
+                    window.dbCompanyInterviewMonthly = <%= ChartMonthlyInterviewsJson %>;
                 </script>
             </div>
 

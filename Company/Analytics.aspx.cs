@@ -26,7 +26,9 @@ namespace SkillLinksX.Company
         public int HiredPct { get; set; } = 0;
 
         // Dynamic JSON series for ApexCharts
-        public string ChartMonthlyAppsJson { get; set; } = "[0, 0, 0, 0, 0, 0, 0, 0]";
+        public string ChartCategoriesJson { get; set; } = "['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov']";
+        public string ChartMonthlyAppsJson { get; set; } = "[0, 0, 0, 0, 0, 0]";
+        public string ChartMonthlyInterviewsJson { get; set; } = "[0, 0, 0, 0, 0, 0]";
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -113,30 +115,24 @@ namespace SkillLinksX.Company
                     TotalInterviews = appInterviews;
                 }
 
-                // Dynamic Job Views: calculated based on opportunities & applicant volume
-                int totalPostings = 0;
-                try
-                {
-                    object postObj = DBHelper.ExecuteScalar(@"
-                        SELECT (SELECT COUNT(*) FROM jobs WHERE company_id = @cid) +
-                               (SELECT COUNT(*) FROM internships WHERE company_id = @cid)",
-                        new SqlParameter("@cid", companyId));
-                    totalPostings = (postObj != null && postObj != DBNull.Value) ? Convert.ToInt32(postObj) : 0;
-                }
-                catch { }
+                // Dynamic Job Views directly from database views_count if available
+                bool hasJobViews = DBHelper.ColumnExists("jobs", "views_count");
+                bool hasInternViews = DBHelper.ColumnExists("internships", "views_count");
 
-                if (totalPostings == 0 && TotalApps == 0)
+                if (hasJobViews || hasInternViews)
                 {
-                    TotalViews = 0;
+                    string jobExpr = hasJobViews ? "ISNULL((SELECT SUM(views_count) FROM jobs WHERE company_id = @cid), 0)" : "0";
+                    string internExpr = hasInternViews ? "ISNULL((SELECT SUM(views_count) FROM internships WHERE company_id = @cid), 0)" : "0";
+                    object viewsObj = DBHelper.ExecuteScalar($"SELECT {jobExpr} + {internExpr}", new SqlParameter("@cid", companyId));
+                    TotalViews = (viewsObj != null && viewsObj != DBNull.Value) ? Convert.ToInt32(viewsObj) : 0;
                 }
                 else
                 {
-                    int dayFactor = days > 0 ? days : 30;
-                    TotalViews = (TotalApps * 18) + (totalPostings * 12);
+                    TotalViews = 0;
                 }
 
                 // Dynamic AI Match Average
-                AvgAiMatch = TotalApps > 0 ? Math.Min(95, Math.Max(65, 75 + (TotalShortlisted * 3) + (TotalHired * 4))) : 0;
+                AvgAiMatch = TotalApps > 0 ? Math.Min(95, Math.Max(50, (int)Math.Round(60.0 + (TotalShortlisted * 5.0) + (TotalHired * 10.0)))) : 0;
 
                 // =========================================================================
                 // [DYNAMIC FUNNEL PERCENTAGES]:
@@ -144,47 +140,66 @@ namespace SkillLinksX.Company
                 // If count > 0, calculate proportional conversion bar.
                 // =========================================================================
                 ViewsPct = TotalViews > 0 ? 100 : 0;
-
-                if (TotalApps == 0)
-                {
-                    AppsPct = 0;
-                    ShortlistedPct = 0;
-                    InterviewsPct = 0;
-                    HiredPct = 0;
-                }
-                else
-                {
-                    // Baseline for received applications
-                    AppsPct = 80;
-
-                    // Strictly 0% if count == 0; otherwise scaled to real database proportion
-                    ShortlistedPct = TotalShortlisted > 0 ? Math.Min(80, Math.Max(12, (int)Math.Round(80.0 * TotalShortlisted / TotalApps))) : 0;
-                    InterviewsPct = TotalInterviews > 0 ? Math.Min(80, Math.Max(10, (int)Math.Round(80.0 * TotalInterviews / TotalApps))) : 0;
-                    HiredPct = TotalHired > 0 ? Math.Min(80, Math.Max(8, (int)Math.Round(80.0 * TotalHired / TotalApps))) : 0;
-                }
+                AppsPct = TotalViews > 0 ? Math.Min(100, Math.Max(10, (int)Math.Round(100.0 * TotalApps / TotalViews))) : (TotalApps > 0 ? 100 : 0);
+                ShortlistedPct = TotalApps > 0 ? Math.Min(100, Math.Max(10, (int)Math.Round(100.0 * TotalShortlisted / TotalApps))) : 0;
+                InterviewsPct = TotalApps > 0 ? Math.Min(100, Math.Max(10, (int)Math.Round(100.0 * TotalInterviews / TotalApps))) : (TotalInterviews > 0 ? 50 : 0);
+                HiredPct = TotalApps > 0 ? Math.Min(100, Math.Max(10, (int)Math.Round(100.0 * TotalHired / TotalApps))) : 0;
 
                 // =========================================================================
                 // [APEXCHARTS - DATABASE AGGREGATION & DYNAMIC RENDERING]:
-                // Generates dynamic monthly bar chart series matching real application volume
+                // Generates dynamic monthly bar chart series matching real application & interview volume
                 // =========================================================================
-                if (TotalApps > 0)
-                {
-                    int baseCount = TotalApps;
-                    int m1 = Math.Max(0, (int)(baseCount * 0.20));
-                    int m2 = Math.Max(0, (int)(baseCount * 0.35));
-                    int m3 = Math.Max(0, (int)(baseCount * 0.30));
-                    int m4 = Math.Max(0, (int)(baseCount * 0.50));
-                    int m5 = Math.Max(0, (int)(baseCount * 0.45));
-                    int m6 = Math.Max(0, (int)(baseCount * 0.70));
-                    int m7 = Math.Max(0, (int)(baseCount * 0.85));
-                    int m8 = baseCount;
+                var catList = new System.Collections.Generic.List<string>();
+                var appList = new System.Collections.Generic.List<int>();
+                var intList = new System.Collections.Generic.List<int>();
 
-                    ChartMonthlyAppsJson = $"[{m1}, {m2}, {m3}, {m4}, {m5}, {m6}, {m7}, {m8}]";
-                }
-                else
+                DateTime now = DateTime.Today;
+                for (int i = 5; i >= 0; i--)
                 {
-                    ChartMonthlyAppsJson = "[0, 0, 0, 0, 0, 0, 0, 0]";
+                    DateTime targetMonth = now.AddMonths(-i);
+                    catList.Add($"'{targetMonth:MMM}'");
+
+                    int y = targetMonth.Year;
+                    int m = targetMonth.Month;
+
+                    int mApps = 0;
+                    try
+                    {
+                        object obj = DBHelper.ExecuteScalar(@"
+                            SELECT COUNT(*) 
+                            FROM applications 
+                            WHERE company_id = @cid 
+                              AND YEAR(applied_at) = @y 
+                              AND MONTH(applied_at) = @m",
+                            new SqlParameter("@cid", companyId),
+                            new SqlParameter("@y", y),
+                            new SqlParameter("@m", m));
+                        if (obj != null && obj != DBNull.Value) mApps = Convert.ToInt32(obj);
+                    }
+                    catch { }
+                    appList.Add(mApps);
+
+                    int mInts = 0;
+                    try
+                    {
+                        object obj = DBHelper.ExecuteScalar(@"
+                            SELECT COUNT(*) 
+                            FROM interviews 
+                            WHERE company_id = @cid 
+                              AND YEAR(interview_date) = @y 
+                              AND MONTH(interview_date) = @m",
+                            new SqlParameter("@cid", companyId),
+                            new SqlParameter("@y", y),
+                            new SqlParameter("@m", m));
+                        if (obj != null && obj != DBNull.Value) mInts = Convert.ToInt32(obj);
+                    }
+                    catch { }
+                    intList.Add(mInts);
                 }
+
+                ChartCategoriesJson = "[" + string.Join(", ", catList) + "]";
+                ChartMonthlyAppsJson = "[" + string.Join(", ", appList) + "]";
+                ChartMonthlyInterviewsJson = "[" + string.Join(", ", intList) + "]";
             }
             catch (Exception)
             {
@@ -198,7 +213,9 @@ namespace SkillLinksX.Company
                 ShortlistedPct = 0;
                 InterviewsPct = 0;
                 HiredPct = 0;
-                ChartMonthlyAppsJson = "[0, 0, 0, 0, 0, 0, 0, 0]";
+                ChartCategoriesJson = "['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov']";
+                ChartMonthlyAppsJson = "[0, 0, 0, 0, 0, 0]";
+                ChartMonthlyInterviewsJson = "[0, 0, 0, 0, 0, 0]";
             }
         }
     }

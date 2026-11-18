@@ -153,22 +153,79 @@ namespace SkillLinksX.Company
 
         // =========================================================================
         // [DATABASE & BACKEND CONNECTION]: Load Company Interviews
-        // Queries 'interviews' joined with 'member_master_table'
+        // Strict adherence to DATABASE_SCHEMA_REFERENCE.md
+        // Uses native 'notes' column to extract candidate name & job title dynamically
         // =========================================================================
+        private static string ExtractCandidateName(string notes, string candidateColVal, string memberFullName)
+        {
+            if (!string.IsNullOrWhiteSpace(candidateColVal))
+                return candidateColVal.Trim();
+
+            if (!string.IsNullOrEmpty(notes))
+            {
+                int candIdx = notes.IndexOf("Candidate: ", StringComparison.OrdinalIgnoreCase);
+                if (candIdx >= 0)
+                {
+                    int start = candIdx + 11;
+                    int end = notes.IndexOf(" | Role: ", start, StringComparison.OrdinalIgnoreCase);
+                    if (end > start)
+                        return notes.Substring(start, end - start).Trim();
+
+                    int endNotes = notes.IndexOf(" | Notes: ", start, StringComparison.OrdinalIgnoreCase);
+                    if (endNotes > start)
+                        return notes.Substring(start, endNotes - start).Trim();
+
+                    return notes.Substring(start).Trim();
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(memberFullName))
+                return memberFullName.Trim();
+
+            return "Candidate";
+        }
+
+        private static string ExtractJobTitle(string notes, string roleColVal)
+        {
+            if (!string.IsNullOrWhiteSpace(roleColVal))
+                return roleColVal.Trim();
+
+            if (!string.IsNullOrEmpty(notes))
+            {
+                int roleIdx = notes.IndexOf(" | Role: ", StringComparison.OrdinalIgnoreCase);
+                if (roleIdx >= 0)
+                {
+                    int start = roleIdx + 9;
+                    int end = notes.IndexOf(" | Notes: ", start, StringComparison.OrdinalIgnoreCase);
+                    if (end > start)
+                        return notes.Substring(start, end - start).Trim();
+
+                    return notes.Substring(start).Trim();
+                }
+
+                int roundIdx = notes.IndexOf("Interview round for ", StringComparison.OrdinalIgnoreCase);
+                if (roundIdx >= 0)
+                {
+                    return notes.Substring(roundIdx + 20).Trim();
+                }
+            }
+
+            return "Applicant";
+        }
+
         private void LoadCompanyInterviews(int companyId)
         {
-            string sql = @"
-                SELECT i.interview_id, i.interview_date, i.interview_time, i.mode, i.meeting_link_or_venue, i.status,
-                       m.full_name AS StudentName,
-                       m.profile_photo AS ProfilePhoto,
-                       COALESCE(
-                           (SELECT TOP 1 j.job_title FROM applications a INNER JOIN jobs j ON a.job_id = j.job_id WHERE a.user_id = i.user_id AND j.company_id = i.company_id),
-                           (SELECT TOP 1 i2.internship_title FROM applications a INNER JOIN internships i2 ON a.internship_id = i2.internship_id WHERE a.user_id = i.user_id AND i2.company_id = i.company_id),
-                           (SELECT TOP 1 j.job_title FROM jobs j WHERE j.company_id = i.company_id),
-                           'Applicant'
-                       ) AS JobTitle
+            bool hasCandCol = DBHelper.ColumnExists("interviews", "candidate_name");
+            bool hasJobCol = DBHelper.ColumnExists("interviews", "job_title");
+
+            string selectFields = "i.interview_id, i.interview_date, i.interview_time, i.mode, i.meeting_link_or_venue, i.status, i.notes, m.full_name AS MemberFullName, m.profile_photo AS ProfilePhoto";
+            if (hasCandCol) selectFields += ", i.candidate_name";
+            if (hasJobCol) selectFields += ", i.job_title";
+
+            string sql = $@"
+                SELECT {selectFields}
                 FROM interviews i
-                INNER JOIN member_master_table m ON i.user_id = m.id
+                LEFT JOIN member_master_table m ON i.user_id = m.id
                 WHERE i.company_id = @cid
                 ORDER BY i.interview_date DESC, i.interview_time DESC";
 
@@ -181,12 +238,10 @@ namespace SkillLinksX.Company
             {
                 // Fallback query if interview_time or mode column missing in legacy test table
                 dt = DBHelper.ExecuteQuery(@"
-                    SELECT i.interview_id, i.interview_date, i.meeting_link_or_venue, i.status,
-                           m.full_name AS StudentName,
-                           m.profile_photo AS ProfilePhoto,
-                           'Applicant' AS JobTitle
+                    SELECT i.interview_id, i.interview_date, i.meeting_link_or_venue, i.status, i.notes,
+                           m.full_name AS MemberFullName, m.profile_photo AS ProfilePhoto
                     FROM interviews i
-                    INNER JOIN member_master_table m ON i.user_id = m.id
+                    LEFT JOIN member_master_table m ON i.user_id = m.id
                     WHERE i.company_id = @cid
                     ORDER BY i.interview_date DESC", new SqlParameter("@cid", companyId));
             }
@@ -234,9 +289,15 @@ namespace SkillLinksX.Company
                     else if (status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase)) statusClass = "rejected";
 
                     string meetLink = r["meeting_link_or_venue"] != DBNull.Value ? r["meeting_link_or_venue"].ToString() : "https://meet.google.com/new";
-                    string role = r.Table.Columns.Contains("JobTitle") && r["JobTitle"] != DBNull.Value ? r["JobTitle"].ToString() : "Candidate Interview";
                     string photo = r.Table.Columns.Contains("ProfilePhoto") && r["ProfilePhoto"] != DBNull.Value ? r["ProfilePhoto"].ToString() : "";
-                    string studentName = r["StudentName"] != DBNull.Value ? r["StudentName"].ToString() : "Candidate";
+
+                    string rawCandCol = (r.Table.Columns.Contains("candidate_name") && r["candidate_name"] != DBNull.Value) ? r["candidate_name"].ToString() : null;
+                    string rawJobCol = (r.Table.Columns.Contains("job_title") && r["job_title"] != DBNull.Value) ? r["job_title"].ToString() : null;
+                    string memberName = (r.Table.Columns.Contains("MemberFullName") && r["MemberFullName"] != DBNull.Value) ? r["MemberFullName"].ToString() : null;
+                    string notes = (r.Table.Columns.Contains("notes") && r["notes"] != DBNull.Value) ? r["notes"].ToString() : "";
+
+                    string studentName = ExtractCandidateName(notes, rawCandCol, memberName);
+                    string role = ExtractJobTitle(notes, rawJobCol);
 
                     var item = new CompanyInterviewItem
                     {
@@ -496,34 +557,66 @@ namespace SkillLinksX.Company
 
             string mode = "Google Meet";
             string interviewerName = Session["UserName"] != null ? Session["UserName"].ToString() : "Hiring Team";
-            string interviewNotes = !string.IsNullOrEmpty(role) ? "Interview round for " + role : "Candidate Interview";
+            string interviewNotes = $"Candidate: {candName} | Role: {role} | Notes: {(!string.IsNullOrEmpty(role) ? "Interview round for " + role : "Candidate Interview")}";
 
             try
             {
+                bool hasDedicatedCols = DBHelper.ColumnExists("interviews", "candidate_name");
+
                 if (interviewId > 0)
                 {
                     // Update existing interview
-                    string sql = @"
-                        UPDATE interviews 
-                        SET interview_date = @idate,
-                            interview_time = @itime,
-                            meeting_link_or_venue = @link,
-                            mode = @mode,
-                            interviewer_name = @interviewer,
-                            notes = @notes,
-                            status = @stat
-                        WHERE interview_id = @iid AND company_id = @cid";
+                    if (hasDedicatedCols)
+                    {
+                        string sql = @"
+                            UPDATE interviews 
+                            SET candidate_name = @candName,
+                                job_title = @role,
+                                interview_date = @idate,
+                                interview_time = @itime,
+                                meeting_link_or_venue = @link,
+                                mode = @mode,
+                                interviewer_name = @interviewer,
+                                notes = @notes,
+                                status = @stat
+                            WHERE interview_id = @iid AND company_id = @cid";
 
-                    DBHelper.ExecuteNonQuery(sql,
-                        new SqlParameter("@idate", interviewDateOnly),
-                        new SqlParameter("@itime", SqlDbType.Time) { Value = interviewTime },
-                        new SqlParameter("@link", meetLink),
-                        new SqlParameter("@mode", mode),
-                        new SqlParameter("@interviewer", interviewerName),
-                        new SqlParameter("@notes", interviewNotes),
-                        new SqlParameter("@stat", status),
-                        new SqlParameter("@iid", interviewId),
-                        new SqlParameter("@cid", companyId));
+                        DBHelper.ExecuteNonQuery(sql,
+                            new SqlParameter("@candName", string.IsNullOrEmpty(candName) ? (object)DBNull.Value : candName),
+                            new SqlParameter("@role", string.IsNullOrEmpty(role) ? (object)DBNull.Value : role),
+                            new SqlParameter("@idate", interviewDateOnly),
+                            new SqlParameter("@itime", SqlDbType.Time) { Value = interviewTime },
+                            new SqlParameter("@link", meetLink),
+                            new SqlParameter("@mode", mode),
+                            new SqlParameter("@interviewer", interviewerName),
+                            new SqlParameter("@notes", interviewNotes),
+                            new SqlParameter("@stat", status),
+                            new SqlParameter("@iid", interviewId),
+                            new SqlParameter("@cid", companyId));
+                    }
+                    else
+                    {
+                        // Standard schema columns per DATABASE_SCHEMA_REFERENCE.md
+                        DBHelper.ExecuteNonQuery(@"
+                            UPDATE interviews 
+                            SET interview_date = @idate,
+                                interview_time = @itime,
+                                meeting_link_or_venue = @link,
+                                mode = @mode,
+                                interviewer_name = @interviewer,
+                                notes = @notes,
+                                status = @stat
+                            WHERE interview_id = @iid AND company_id = @cid",
+                            new SqlParameter("@idate", interviewDateOnly),
+                            new SqlParameter("@itime", SqlDbType.Time) { Value = interviewTime },
+                            new SqlParameter("@link", meetLink),
+                            new SqlParameter("@mode", mode),
+                            new SqlParameter("@interviewer", interviewerName),
+                            new SqlParameter("@notes", interviewNotes),
+                            new SqlParameter("@stat", status),
+                            new SqlParameter("@iid", interviewId),
+                            new SqlParameter("@cid", companyId));
+                    }
 
                     lblScheduleMsg.ForeColor = System.Drawing.Color.Green;
                     lblScheduleMsg.Text = "Interview updated successfully!";
@@ -557,7 +650,10 @@ namespace SkillLinksX.Company
                             if (firstMember != null && firstMember != DBNull.Value)
                                 candidateUserId = Convert.ToInt32(firstMember);
                             else
-                                candidateUserId = 1;
+                            {
+                                object firstAuth = DBHelper.ExecuteScalar("SELECT TOP 1 user_id FROM user_auth ORDER BY user_id ASC");
+                                candidateUserId = (firstAuth != null && firstAuth != DBNull.Value) ? Convert.ToInt32(firstAuth) : 1;
+                            }
                         }
                     }
 
@@ -582,21 +678,43 @@ namespace SkillLinksX.Company
                     }
                     catch { }
 
-                    string insertSql = @"
-                        INSERT INTO interviews (company_id, user_id, application_id, interview_date, interview_time, mode, meeting_link_or_venue, interviewer_name, notes, status)
-                        VALUES (@cid, @uid, @appid, @idate, @itime, @mode, @link, @interviewer, @notes, @stat)";
+                    if (hasDedicatedCols)
+                    {
+                        string insertSql = @"
+                            INSERT INTO interviews (company_id, user_id, application_id, candidate_name, job_title, interview_date, interview_time, mode, meeting_link_or_venue, interviewer_name, notes, status)
+                            VALUES (@cid, @uid, @appid, @candName, @role, @idate, @itime, @mode, @link, @interviewer, @notes, @stat)";
 
-                    DBHelper.ExecuteNonQuery(insertSql,
-                        new SqlParameter("@cid", companyId),
-                        new SqlParameter("@uid", candidateUserId),
-                        new SqlParameter("@appid", targetAppId > 0 ? (object)targetAppId : DBNull.Value),
-                        new SqlParameter("@idate", interviewDateOnly),
-                        new SqlParameter("@itime", SqlDbType.Time) { Value = interviewTime },
-                        new SqlParameter("@mode", mode),
-                        new SqlParameter("@link", meetLink),
-                        new SqlParameter("@interviewer", interviewerName),
-                        new SqlParameter("@notes", interviewNotes),
-                        new SqlParameter("@stat", status));
+                        DBHelper.ExecuteNonQuery(insertSql,
+                            new SqlParameter("@cid", companyId),
+                            new SqlParameter("@uid", candidateUserId),
+                            new SqlParameter("@appid", targetAppId > 0 ? (object)targetAppId : DBNull.Value),
+                            new SqlParameter("@candName", string.IsNullOrEmpty(candName) ? (object)DBNull.Value : candName),
+                            new SqlParameter("@role", string.IsNullOrEmpty(role) ? (object)DBNull.Value : role),
+                            new SqlParameter("@idate", interviewDateOnly),
+                            new SqlParameter("@itime", SqlDbType.Time) { Value = interviewTime },
+                            new SqlParameter("@mode", mode),
+                            new SqlParameter("@link", meetLink),
+                            new SqlParameter("@interviewer", interviewerName),
+                            new SqlParameter("@notes", interviewNotes),
+                            new SqlParameter("@stat", status));
+                    }
+                    else
+                    {
+                        // Standard schema columns per DATABASE_SCHEMA_REFERENCE.md
+                        DBHelper.ExecuteNonQuery(@"
+                            INSERT INTO interviews (company_id, user_id, application_id, interview_date, interview_time, mode, meeting_link_or_venue, interviewer_name, notes, status)
+                            VALUES (@cid, @uid, @appid, @idate, @itime, @mode, @link, @interviewer, @notes, @stat)",
+                            new SqlParameter("@cid", companyId),
+                            new SqlParameter("@uid", candidateUserId),
+                            new SqlParameter("@appid", targetAppId > 0 ? (object)targetAppId : DBNull.Value),
+                            new SqlParameter("@idate", interviewDateOnly),
+                            new SqlParameter("@itime", SqlDbType.Time) { Value = interviewTime },
+                            new SqlParameter("@mode", mode),
+                            new SqlParameter("@link", meetLink),
+                            new SqlParameter("@interviewer", interviewerName),
+                            new SqlParameter("@notes", interviewNotes),
+                            new SqlParameter("@stat", status));
+                    }
 
                     // If linked to an application, update application status to 'Interview Scheduled'
                     if (targetAppId > 0)
@@ -610,14 +728,18 @@ namespace SkillLinksX.Company
                         catch { }
                     }
 
-                    // Send notification to candidate
-                    DBHelper.SendNotification(candidateUserId, 
-                        "Interview Scheduled 📅", 
-                        $"An interview for {role} has been scheduled on {interviewDateTime:MMM dd, yyyy - hh:mm tt}. Join link: {meetLink}", 
-                        "~/User/Applications.aspx");
+                    // Send notification to candidate if registered
+                    if (candidateUserId > 0)
+                    {
+                        string notifRole = !string.IsNullOrEmpty(role) ? role : "your application";
+                        DBHelper.SendNotification(candidateUserId, 
+                            "Interview Scheduled 📅", 
+                            $"An interview for {notifRole} has been scheduled on {interviewDateTime:MMM dd, yyyy - hh:mm tt}. Join link: {meetLink}", 
+                            "~/User/Applications.aspx");
+                    }
 
                     lblScheduleMsg.ForeColor = System.Drawing.Color.Green;
-                    lblScheduleMsg.Text = "Interview scheduled successfully! Candidate notified.";
+                    lblScheduleMsg.Text = "Interview scheduled successfully!";
                 }
 
                 // Close modal and refresh interviews

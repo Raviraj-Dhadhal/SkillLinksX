@@ -75,8 +75,23 @@
             <div class="table-filter-bar">
                 <div class="table-search-input-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Search internships..." />
+                    <input type="text" id="txtInternshipSearch" placeholder="Search internships..." oninput="applyInternshipsFilter();" />
                 </div>
+                <select id="ddlInternshipStatusFilter" class="table-filter-select" onchange="applyInternshipsFilter();">
+                    <option value="">Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Draft">Draft</option>
+                    <option value="Closed">Closed</option>
+                </select>
+                <select id="ddlInternshipLocFilter" class="table-filter-select" onchange="applyInternshipsFilter();">
+                    <option value="">Work Mode / Location</option>
+                    <option value="Remote">Remote</option>
+                    <option value="Hybrid">Hybrid</option>
+                    <option value="On-site">On-site</option>
+                </select>
+                <button type="button" onclick="clearInternshipsFilter();" style="padding:6px 12px; background:#F1F5F9; border:1px solid #CBD5E1; border-radius:6px; font-size:12px; font-weight:600; color:#475569; cursor:pointer;" title="Reset Filters">
+                    <i class="fa-solid fa-arrows-rotate"></i> Reset
+                </button>
             </div>
 
             <asp:Label ID="lblActionMessage" runat="server" style="display:block; margin:8px 12px; font-size:13px; font-weight:600;" EnableViewState="false" />
@@ -99,7 +114,10 @@
                     <tbody>
                         <asp:Repeater ID="rptInternships" runat="server" OnItemCommand="rptInternships_ItemCommand">
                             <ItemTemplate>
-                                <tr>
+                                <tr class="intern-data-row"
+                                    data-title='<%# Eval("Title").ToString().ToLower() %>'
+                                    data-location='<%# Eval("Location").ToString().ToLower() %>'
+                                    data-status='<%# Eval("Status").ToString().ToLower() %>'>
                                     <td>
                                         <a href='<%# ResolveUrl("~/Company/Applicants.aspx") %>' class="job-table-title-link" style="font-weight:600;">
                                             <%# Eval("Title") %>
@@ -128,6 +146,13 @@
                                 </tr>
                             </ItemTemplate>
                         </asp:Repeater>
+                        <tr id="rowNoMatchingInternships" style="display:none;">
+                            <td colspan="8" style="text-align:center; padding:32px 16px; color:#64748B;">
+                                <i class="fa-solid fa-filter" style="font-size:24px; color:#CBD5E1; margin-bottom:8px; display:block;"></i>
+                                <div style="font-weight:600; color:#334155; margin-bottom:4px;">No Internships Match Your Filter</div>
+                                <div style="font-size:12px;">Try adjusting your search query, status, or location filter.</div>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -170,16 +195,61 @@
     <script type="text/javascript">
         var internCurrentPage = 1;
         var internPageSize = 10;
+        var matchingInternRows = [];
 
-        function getInternRows() {
+        function getAllInternRows() {
             var table = document.querySelector(".jobs-data-table tbody");
             if (!table) return [];
-            return Array.from(table.querySelectorAll("tr"));
+            return Array.from(table.querySelectorAll("tr.intern-data-row"));
+        }
+
+        function applyInternshipsFilter() {
+            var q = (document.getElementById("txtInternshipSearch")?.value || "").trim().toLowerCase();
+            var statusFilter = (document.getElementById("ddlInternshipStatusFilter")?.value || "").trim().toLowerCase();
+            var locFilter = (document.getElementById("ddlInternshipLocFilter")?.value || "").trim().toLowerCase();
+
+            var allRows = getAllInternRows();
+            matchingInternRows = [];
+
+            allRows.forEach(function (row) {
+                var title = row.getAttribute("data-title") || "";
+                var loc = row.getAttribute("data-location") || "";
+                var stat = row.getAttribute("data-status") || "";
+                var fullText = (row.innerText || "").toLowerCase();
+
+                var matchSearch = !q || fullText.indexOf(q) !== -1 || title.indexOf(q) !== -1 || loc.indexOf(q) !== -1;
+                var matchStatus = !statusFilter || stat === statusFilter || (statusFilter === "closed" && stat !== "active" && stat !== "draft");
+                var matchLoc = !locFilter || loc.indexOf(locFilter) !== -1;
+
+                if (matchSearch && matchStatus && matchLoc) {
+                    matchingInternRows.push(row);
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            var noMatchRow = document.getElementById("rowNoMatchingInternships");
+            if (noMatchRow) {
+                noMatchRow.style.display = (allRows.length > 0 && matchingInternRows.length === 0) ? "" : "none";
+            }
+
+            internCurrentPage = 1;
+            renderInternPagination();
+        }
+
+        function clearInternshipsFilter() {
+            var s = document.getElementById("txtInternshipSearch");
+            if (s) s.value = "";
+            var st = document.getElementById("ddlInternshipStatusFilter");
+            if (st) st.value = "";
+            var l = document.getElementById("ddlInternshipLocFilter");
+            if (l) l.value = "";
+
+            applyInternshipsFilter();
         }
 
         function renderInternPagination() {
-            var rows = getInternRows();
-            var total = rows.length;
+            var total = matchingInternRows.length;
             var totalPages = Math.ceil(total / internPageSize) || 1;
 
             if (internCurrentPage < 1) internCurrentPage = 1;
@@ -188,7 +258,7 @@
             var start = (internCurrentPage - 1) * internPageSize;
             var end = Math.min(start + internPageSize, total);
 
-            rows.forEach(function (row, idx) {
+            matchingInternRows.forEach(function (row, idx) {
                 if (idx >= start && idx < end) {
                     row.style.display = "";
                 } else {
@@ -232,7 +302,8 @@
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-            renderInternPagination();
+            matchingInternRows = getAllInternRows();
+            applyInternshipsFilter();
         });
     </script>
 </asp:Content>

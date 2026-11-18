@@ -10,13 +10,18 @@
         <!-- 1. Top Welcome & Profile Completion Banner -->
         <div class="company-welcome-card">
             <div class="welcome-info">
-                <h1 class="welcome-title">Good morning, TechNova!</h1>
+                <h1 class="welcome-title"><%= GreetingText %>, <%= DisplayCompanyName %>!</h1>
                 <div class="completion-row">
                     <span>Profile Completion:</span>
-                    <span class="completion-percent">85%</span>
+                    <span class="completion-percent"><%= ProfileCompletionPercentage %>%</span>
+                    <% if (ProfileCompletionPercentage < 100) { %>
+                        <span style="font-size:12px; color:#64748b; margin-left:8px;">(Complete your profile to attract top talent)</span>
+                    <% } else { %>
+                        <span style="font-size:12px; color:#16a34a; font-weight:600; margin-left:8px;"><i class="fa-solid fa-circle-check"></i> 100% Completed</span>
+                    <% } %>
                 </div>
                 <div class="welcome-progress-track">
-                    <div class="welcome-progress-fill" style="width: 85%;"></div>
+                    <div class="welcome-progress-fill" style="width: <%= ProfileCompletionPercentage %>%;"></div>
                 </div>
             </div>
             <div>
@@ -24,42 +29,44 @@
             </div>
         </div>
 
-        <!-- 2. 6-Column Metric Cards Grid -->
+        <!-- =========================================================================
+             [DYNAMIC METRIC CARDS]: Aggregated counts from SQL Server tables
+             ========================================================================= -->
         <div class="company-metrics-grid">
             <!-- Active Jobs -->
             <div class="company-metric-card">
-                <div class="metric-number">12</div>
+                <div class="metric-number"><%= ActiveJobsCount %></div>
                 <div class="metric-sub-title">Active Jobs</div>
             </div>
 
             <!-- Active Internships -->
             <div class="company-metric-card">
-                <div class="metric-number">8</div>
+                <div class="metric-number"><%= ActiveInternshipsCount %></div>
                 <div class="metric-sub-title">Active Internships</div>
             </div>
 
             <!-- Total Applicants -->
             <div class="company-metric-card">
-                <div class="metric-number highlight-green">458</div>
+                <div class="metric-number highlight-green"><%= TotalApplicantsCount %></div>
                 <div class="metric-sub-title">Total Applicants</div>
             </div>
 
             <!-- Shortlisted -->
             <div class="company-metric-card">
-                <div class="metric-number">42</div>
+                <div class="metric-number"><%= ShortlistedCount %></div>
                 <div class="metric-sub-title">Shortlisted</div>
             </div>
 
             <!-- Interviews -->
             <div class="company-metric-card">
-                <div class="metric-number">15</div>
+                <div class="metric-number"><%= InterviewsCount %></div>
                 <div class="metric-sub-title">Interviews</div>
             </div>
 
             <!-- Hired -->
             <div class="company-metric-card">
-                <div class="metric-number highlight-green">6</div>
-                <div class="metric-sub-title">Hired</div>
+                <div class="metric-number highlight-green"><%= HiredCount %></div>
+                <div class="metric-sub-title">Hired / Selected</div>
             </div>
         </div>
 
@@ -71,41 +78,41 @@
                 <h2 class="company-widget-title">Recruitment Pipeline</h2>
                 
                 <div class="pipeline-track-wrapper">
-                    <!-- Step 1: Applications (458) -->
+                    <!-- Step 1: Applications -->
                     <div class="pipeline-step">
-                        <div class="pipeline-circle c-grey">458</div>
+                        <div class="pipeline-circle c-grey"><%= TotalApplicantsCount %></div>
                         <span class="pipeline-label">Applications</span>
                     </div>
 
                     <div class="pipeline-connector-line"></div>
 
-                    <!-- Step 2: Review (112) -->
+                    <!-- Step 2: Review -->
                     <div class="pipeline-step">
-                        <div class="pipeline-circle c-blue-soft">112</div>
+                        <div class="pipeline-circle c-blue-soft"><%= ReviewCount %></div>
                         <span class="pipeline-label">Review</span>
                     </div>
 
                     <div class="pipeline-connector-line"></div>
 
-                    <!-- Step 3: Shortlisted (42) -->
+                    <!-- Step 3: Shortlisted -->
                     <div class="pipeline-step">
-                        <div class="pipeline-circle c-purple-soft">42</div>
+                        <div class="pipeline-circle c-purple-soft"><%= ShortlistedCount %></div>
                         <span class="pipeline-label">Shortlisted</span>
                     </div>
 
                     <div class="pipeline-connector-line"></div>
 
-                    <!-- Step 4: Interview (15) -->
+                    <!-- Step 4: Interview -->
                     <div class="pipeline-step">
-                        <div class="pipeline-circle c-green-soft">15</div>
+                        <div class="pipeline-circle c-green-soft"><%= InterviewsCount %></div>
                         <span class="pipeline-label">Interview</span>
                     </div>
 
                     <div class="pipeline-connector-line"></div>
 
-                    <!-- Step 5: Hired (6) -->
+                    <!-- Step 5: Hired -->
                     <div class="pipeline-step">
-                        <div class="pipeline-circle c-blue-solid">6</div>
+                        <div class="pipeline-circle c-blue-solid"><%= HiredCount %></div>
                         <span class="pipeline-label">Hired</span>
                     </div>
                 </div>
