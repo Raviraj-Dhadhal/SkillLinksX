@@ -91,166 +91,36 @@
                             </div>
                         </ItemTemplate>
                     </asp:Repeater>
-                </div>
 
-            </div>
-                        <div class="app-row-left">
-                            <div class="app-company-logo">
-                                <img src="<%= ResolveUrl("~/assets/images/technova-avatar.svg") %>" alt="Flipkart" class="app-logo-img" />
-                            </div>
-                            <div class="app-details-stack">
-                                <h3 class="app-role-name">Product Management Intern</h3>
-                                <div class="app-meta-line">
-                                    <span class="app-comp">Flipkart</span> &bull; 
-                                    <span class="app-loc">Bengaluru</span> &bull; 
-                                    <span class="app-time">Applied 5 days ago</span>
-                                </div>
-                                <div class="app-type-badge-wrap">
-                                    <span class="app-type-pill">Internship</span>
-                                </div>
-                            </div>
+                    <% if (TotalApplications == 0) { %>
+                        <div style="padding:48px 24px; text-align:center; background:#fff; border-radius:12px; border:1px dashed #cbd5e1; margin-top:16px;">
+                            <i class="fa-regular fa-folder-open" style="font-size:36px; color:#94a3b8; margin-bottom:12px; display:block;"></i>
+                            <h3 style="font-size:16px; font-weight:700; color:#1e293b; margin:0 0 6px;">No Applications Submitted Yet</h3>
+                            <p style="font-size:13px; color:#64748b; margin:0 0 16px;">Explore open internships and jobs to start applying directly.</p>
+                            <a href="<%= ResolveUrl("~/User/Internships.aspx") %>" style="display:inline-block; padding:9px 20px; background:#2563eb; color:#fff; font-size:13px; font-weight:600; border-radius:8px; text-decoration:none;">
+                                Browse Internships
+                            </a>
                         </div>
-                        <div class="app-row-right">
-                            <span class="app-status-badge badge-shortlisted">&bull; Shortlisted</span>
-                        </div>
-                    </div>
-
-                    <!-- App 3: Backend Engineering Intern (Go) at Zomato (Selected / Active) -->
-                    <div class="app-row-card selected-app-row">
-                        <div class="app-row-left">
-                            <div class="app-company-logo">
-                                <img src="<%= ResolveUrl("~/assets/images/zomato-logo.svg") %>" alt="Zomato" class="app-logo-img" />
-                            </div>
-                            <div class="app-details-stack">
-                                <h3 class="app-role-name">Backend Engineering Intern (Go)</h3>
-                                <div class="app-meta-line">
-                                    <span class="app-comp">Zomato</span> &bull; 
-                                    <span class="app-loc">Gurugram</span> &bull; 
-                                    <span class="app-time">Applied 1 week ago</span>
-                                </div>
-                                <div class="app-type-badge-wrap">
-                                    <span class="app-type-pill">Internship</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="app-row-right flex-actions">
-                            <span class="app-status-badge badge-interview-sched">&bull; Interview Scheduled</span>
-                            <a href="<%= ResolveUrl("~/User/InternshipDetails.aspx") %>" class="btn-app-view-details">View Details</a>
-                        </div>
-                    </div>
-
-                    <!-- App 4: Software Developer at TechFlow Mumbai -->
-                    <div class="app-row-card">
-                        <div class="app-row-left">
-                            <div class="app-company-logo">
-                                <img src="<%= ResolveUrl("~/assets/images/techflow-logo.svg") %>" alt="TechFlow" class="app-logo-img" />
-                            </div>
-                            <div class="app-details-stack">
-                                <h3 class="app-role-name">Software Developer</h3>
-                                <div class="app-meta-line">
-                                    <span class="app-comp">TechFlow Mumbai</span> &bull; 
-                                    <span class="app-loc">Mumbai</span> &bull; 
-                                    <span class="app-time">Applied 2 weeks ago</span>
-                                </div>
-                                <div class="app-type-badge-wrap">
-                                    <span class="app-type-pill">Job</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="app-row-right">
-                            <span class="app-status-badge badge-selected">&bull; Selected</span>
-                        </div>
-                    </div>
-
+                    <% } %>
                 </div>
 
             </div>
 
             <!-- Right Sidebar Column (Upcoming Interviews + Application Details) -->
             <div class="apps-sidebar-column">
-
-                <!-- 1. Upcoming Interview Card -->
-                <div class="apps-side-card">
-                    <div class="side-card-top-title">
-                        <i class="fa-regular fa-calendar-check text-primary"></i> Upcoming Interview
+                <% if (TotalApplications > 0) { %>
+                    <!-- Application Details Card -->
+                    <div class="apps-side-card">
+                        <h3 class="side-card-top-title">Application Status</h3>
+                        <p style="font-size:13px; color:#64748b; margin-top:8px;">You have <strong><%= TotalApplications %></strong> active application(s). Check your Notifications for updates from recruiters.</p>
                     </div>
-                    <div class="interview-preview-box">
-                        <h4 class="interview-round-name">Zomato Technical Round</h4>
-                        <div class="interview-schedule-line">
-                            <i class="fa-regular fa-calendar"></i> Oct 28, 2:00 PM
-                        </div>
-                        <div class="interview-schedule-line">
-                            <i class="fa-solid fa-video"></i> Video Call
-                        </div>
-                        <a href="https://meet.google.com" target="_blank" rel="noopener noreferrer" class="btn-join-round-primary">
-                            Join Interview
-                        </a>
+                <% } else { %>
+                    <div class="apps-side-card" style="text-align:center; padding:28px 16px;">
+                        <i class="fa-regular fa-clipboard" style="font-size:28px; color:#94a3b8; margin-bottom:10px; display:block;"></i>
+                        <h4 style="font-size:14px; font-weight:700; color:#334155; margin:0 0 4px;">No Active Application</h4>
+                        <p style="font-size:12px; color:#64748b; margin:0;">Select or submit an application to view live tracking.</p>
                     </div>
-                </div>
-
-                <!-- 2. Application Details Card -->
-                <div class="apps-side-card">
-                    <h3 class="side-card-top-title">Application Details</h3>
-                    <div class="app-selected-summary text-center">
-                        <div class="app-details-avatar-circle">
-                            <img src="<%= ResolveUrl("~/assets/images/zomato-logo.svg") %>" alt="Zomato" class="avatar-circle-img" />
-                        </div>
-                        <h4 class="app-selected-role">Backend Engineering Intern (Go)</h4>
-                        <div class="app-selected-company">Zomato</div>
-                        <div class="app-selected-badge-wrap">
-                            <span class="badge-interview-sched">&bull; Interview Scheduled</span>
-                        </div>
-                    </div>
-
-                    <!-- Status Timeline -->
-                    <div class="app-timeline-block">
-                        <div class="timeline-heading-txt">STATUS TIMELINE</div>
-                        <div class="app-status-timeline">
-                            <div class="timeline-step done">
-                                <div class="step-dot"></div>
-                                <div class="step-info">
-                                    <div class="step-title">Applied</div>
-                                    <div class="step-date">Oct 15, 2023</div>
-                                </div>
-                            </div>
-                            <div class="timeline-step done">
-                                <div class="step-dot"></div>
-                                <div class="step-info">
-                                    <div class="step-title">Shortlisted</div>
-                                    <div class="step-date">Oct 20, 2023</div>
-                                </div>
-                            </div>
-                            <div class="timeline-step active">
-                                <div class="step-dot orange"></div>
-                                <div class="step-info">
-                                    <div class="step-title">Technical Round</div>
-                                    <div class="step-date font-bold">Oct 28, 2:00 PM</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Information Fields -->
-                    <div class="app-info-fields-block">
-                        <div class="timeline-heading-txt">INFORMATION</div>
-                        <div class="info-field-row">
-                            <span class="info-field-lbl">Recruiter Name</span>
-                            <span class="info-field-val">Anjali Sharma</span>
-                        </div>
-                        <div class="info-field-row">
-                            <span class="info-field-lbl">Next Step</span>
-                            <span class="info-field-val">Technical Round</span>
-                        </div>
-                    </div>
-
-                    <!-- Withdraw Application Button -->
-                    <div class="app-withdraw-wrap">
-                        <button type="button" class="btn-withdraw-app" onclick="if(confirm('Are you sure you want to withdraw this application?')) alert('Application withdrawn.');">
-                            Withdraw Application
-                        </button>
-                    </div>
-                </div>
-
+                <% } %>
             </div>
 
         </div>

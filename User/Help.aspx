@@ -226,10 +226,10 @@
                 <p class="help-tile-desc">Understand application statuses (Applied, Shortlisted, In Review, Offered) and next steps.</p>
             </a>
 
-            <a href="<%= ResolveUrl("~/User/Interviews.aspx") %>" class="help-tile-card">
-                <div class="help-tile-icon"><i class="fa-solid fa-calendar-check"></i></div>
-                <div class="help-tile-title">Interviews &amp; Rounds</div>
-                <p class="help-tile-desc">View scheduled technical rounds, meeting links, recruiter instructions, and preparation tips.</p>
+            <a href="<%= ResolveUrl("~/User/Notifications.aspx") %>" class="help-tile-card">
+                <div class="help-tile-icon"><i class="fa-solid fa-bell"></i></div>
+                <div class="help-tile-title">Interview Notifications</div>
+                <p class="help-tile-desc">Interview schedules and meeting links are delivered directly to your Notifications and Messages.</p>
             </a>
 
             <a href="<%= ResolveUrl("~/User/CareerAssistant.aspx") %>" class="help-tile-card">
@@ -268,17 +268,22 @@
 
             <div class="faq-accordion-item">
                 <div class="faq-question"><i class="fa-solid fa-chevron-right text-primary" style="font-size:11px;"></i> Where do I see interview links and recruiter messages?</div>
-                <p class="faq-answer">Check your <strong>Interviews</strong> tab for scheduled dates and meeting links, and the <strong>Messages</strong> tab to chat directly with recruiters.</p>
+                <p class="faq-answer">Check your <strong>Notifications</strong> tab for scheduled dates and meeting links, and the <strong>Messages</strong> tab to chat directly with recruiters.</p>
             </div>
         </div>
 
         <!-- Still Need Help Box -->
-        <div class="help-contact-box">
-            <h3>Still have questions or facing technical issues?</h3>
-            <p>Our support team and platform coordinators are here to assist you.</p>
-            <a href="mailto:support@skilllinksx.com" class="btn-contact-support">
-                <i class="fa-solid fa-envelope"></i> Contact Support Team
-            </a>
+        <div class="help-contact-box" style="text-align:center; padding:32px 24px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; margin-top:36px;">
+            <div style="width:48px; height:48px; border-radius:50%; background:#eff6ff; color:#2563eb; display:inline-flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:12px;">
+                <i class="fa-solid fa-envelope"></i>
+            </div>
+            <h3 style="font-size:18px; font-weight:700; color:#0f172a; margin:0 0 6px;">Still have questions or facing technical issues?</h3>
+            <p style="font-size:14px; color:#64748b; margin:0 0 16px;">Contact us directly via email and our support team will assist you:</p>
+            <div style="display:inline-block; padding:10px 24px; background:#fff; border:1px solid #cbd5e1; border-radius:30px; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                <a href="mailto:support@skilllinksx.com" style="font-size:15px; font-weight:600; color:#2563eb; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="fa-regular fa-envelope"></i> support@skilllinksx.com
+                </a>
+            </div>
         </div>
     </div>
 

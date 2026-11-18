@@ -80,7 +80,12 @@ namespace SkillLinksX.User
 
             // Upcoming interviews from 'interviews' table
             string sqlInterviews = @"
-                SELECT TOP 1 i.interview_date, i.role_title, c.comp_name
+                SELECT TOP 1 i.interview_date, c.comp_name,
+                       COALESCE(
+                           (SELECT TOP 1 j.job_title FROM applications a INNER JOIN jobs j ON a.job_id = j.job_id WHERE a.user_id = i.user_id AND j.company_id = i.company_id),
+                           (SELECT TOP 1 j.job_title FROM jobs j WHERE j.company_id = i.company_id),
+                           'Technical Interview'
+                       ) AS InterviewRole
                 FROM interviews i
                 LEFT JOIN company_table c ON i.company_id = c.company_id
                 WHERE i.user_id = @id AND i.interview_date >= GETDATE()
@@ -93,7 +98,7 @@ namespace SkillLinksX.User
                 TotalInterviews = dtInterviews.Rows.Count;
                 DataRow ir = dtInterviews.Rows[0];
                 InterviewCompany = ir["comp_name"] != DBNull.Value ? ir["comp_name"].ToString() : "Hiring Company";
-                InterviewRole = ir["role_title"] != DBNull.Value ? ir["role_title"].ToString() : "Interview";
+                InterviewRole = ir["InterviewRole"] != DBNull.Value ? ir["InterviewRole"].ToString() : "Interview";
                 InterviewDateFormatted = Convert.ToDateTime(ir["interview_date"]).ToString("MMM dd, hh:mm tt");
             }
             else
@@ -118,7 +123,7 @@ namespace SkillLinksX.User
             // ---------------------------------------------------------------------
             DataTable dtJobs = DBHelper.ExecuteQuery(
                 @"SELECT TOP 6 j.job_id, j.job_title AS title, j.location, j.job_type, 
-                         ('₹' + CAST(CAST(j.salary_min AS INT) AS NVARCHAR) + ' - ₹' + CAST(CAST(j.salary_max AS INT) AS NVARCHAR)) AS salary_range, 
+                         j.salary_min, j.salary_max,
                          j.requirements AS required_skills, c.comp_name AS company_name 
                   FROM jobs j 
                   INNER JOIN company_table c ON j.company_id = c.company_id 
@@ -139,6 +144,13 @@ namespace SkillLinksX.User
                 if (match > highestScore)
                     highestScore = match;
 
+                string salaryDisplay = "Best in Industry";
+                if (row["salary_min"] != DBNull.Value && decimal.TryParse(row["salary_min"].ToString(), out decimal sMin))
+                {
+                    decimal sMax = (row["salary_max"] != DBNull.Value && decimal.TryParse(row["salary_max"].ToString(), out decimal maxVal)) ? maxVal : sMin;
+                    salaryDisplay = $"₹{sMin:N0} - ₹{sMax:N0}";
+                }
+
                 rankedJobs.Add(new
                 {
                     JobId = row["job_id"],
@@ -146,7 +158,7 @@ namespace SkillLinksX.User
                     CompanyName = row["company_name"].ToString(),
                     Location = row["location"].ToString(),
                     JobType = row["job_type"].ToString(),
-                    SalaryRange = row["salary_range"] != DBNull.Value ? row["salary_range"].ToString() : "Best in Industry",
+                    SalaryRange = salaryDisplay,
                     AiMatchScore = match
                 });
             }

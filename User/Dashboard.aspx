@@ -196,7 +196,7 @@
                         <div class="interview-date-row">
                             <i class="fa-regular fa-calendar"></i> <%= InterviewDateFormatted %>
                         </div>
-                        <a href='<%= ResolveUrl("~/User/Interviews.aspx") %>' class="btn-join-meeting">View Interview Details</a>
+                        <a href='<%= ResolveUrl("~/User/Notifications.aspx") %>' class="btn-join-meeting">View in Notifications</a>
                     </div>
                     <% } else { %>
                     <div style="padding: 16px 10px; text-align: center; color: #64748b; font-size: 13px;">
@@ -269,12 +269,6 @@
                                 </div>
                             </ItemTemplate>
                         </asp:Repeater>
-                    </div>
-                </div>
-                            <button type="button" class="btn-connect-action" aria-label="Connect">
-                                <i class="fa-solid fa-user-plus"></i>
-                            </button>
-                        </div>
                     </div>
                 </div>
 
