@@ -54,6 +54,29 @@
                     <div class="settings-card-body">
                         <asp:Label ID="lblSettingsStatus" runat="server" style="display:block; margin-bottom:12px; font-size:14px; font-weight:600;" EnableViewState="false" />
 
+                        <!-- Company Logo Section -->
+                        <div class="settings-logo-section" style="padding-bottom:20px; margin-bottom:20px; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; gap:24px; flex-wrap:wrap;">
+                            <div class="settings-logo-preview" style="width:84px; height:84px; border-radius:12px; background:#eff6ff; display:flex; align-items:center; justify-content:center; color:#2563eb; font-weight:800; font-size:32px; border:2px solid #bfdbfe; overflow:hidden; flex-shrink:0;">
+                                <% if (!string.IsNullOrEmpty(CompanyLogoUrl)) { %>
+                                    <img src="<%= ResolveUrl(CompanyLogoUrl) %>" alt="Company Logo" style="width:100%; height:100%; object-fit:cover;" />
+                                <% } else { %>
+                                    <i class="fa-solid fa-building" style="font-size:36px; color:#94a3b8;"></i>
+                                <% } %>
+                            </div>
+                            <div style="flex:1; min-width:240px;">
+                                <h3 style="margin:0 0 4px; font-size:15px; font-weight:700; color:#0f172a;">Company Logo / Profile Picture</h3>
+                                <p style="margin:0 0 10px; font-size:12.5px; color:#64748b;">Upload your official company logo. If no logo is uploaded, a default building icon is shown.</p>
+                                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                                    <asp:FileUpload ID="fileCompanyLogo" runat="server" accept=".jpg,.jpeg,.png" style="font-size:12px; max-width:240px;" />
+                                    <asp:Button ID="btnUploadLogo" runat="server" Text="Upload Logo" CssClass="btn-save" style="padding:6px 14px; font-size:12px; height:auto; cursor:pointer;" OnClick="btnUploadLogo_Click" />
+                                    <% if (!string.IsNullOrEmpty(CompanyLogoUrl)) { %>
+                                        <asp:Button ID="btnRemoveLogo" runat="server" Text="Remove Logo" CssClass="btn-cancel" style="padding:6px 14px; font-size:12px; height:auto; color:#ef4444; border-color:#fca5a5; cursor:pointer;" OnClick="btnRemoveLogo_Click" />
+                                    <% } %>
+                                </div>
+                                <asp:Label ID="lblLogoStatus" runat="server" style="display:block; margin-top:6px; font-size:12.5px; font-weight:600;" EnableViewState="false" />
+                            </div>
+                        </div>
+
                         <!-- Form 2x2 fields -->
                         <div class="settings-form-grid">
                             <!-- Company Name -->
@@ -129,56 +152,66 @@
                 <!-- 2. Team Members Card -->
                 <div class="settings-section-card" id="sectionTeamMembers">
                     <div class="settings-card-header flex-between">
-                        <h2 class="settings-card-title">Team Members</h2>
+                        <div>
+                            <h2 class="settings-card-title">Team Members</h2>
+                            <p style="font-size:12.5px; color:#64748B; margin:4px 0 0 0;">Candidates you select/hire automatically join your company team roster.</p>
+                        </div>
                     </div>
+                    <asp:Label ID="lblTeamActionMsg" runat="server" EnableViewState="false" style="margin:8px 16px; display:block; font-size:13px;" />
                     <div class="settings-card-body p-0">
-                        <% if (IsTechNova) { %>
-                            <div class="team-table-scroll-wrapper">
-                                <table class="team-members-table">
-                                    <thead>
-                                        <tr>
-                                            <th>USER</th>
-                                            <th>ROLE</th>
-                                            <th>STATUS</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <div class="team-user-cell">
-                                                    <div class="member-avatar bg-blue-dark">AK</div>
-                                                    <div class="member-info">
-                                                        <div class="member-name">Arjun Kapoor</div>
-                                                        <div class="member-email">arjun@technova.in</div>
+                        <div class="team-table-scroll-wrapper" style="overflow-x:auto;">
+                            <table class="team-members-table">
+                                <thead>
+                                    <tr>
+                                        <th>USER</th>
+                                        <th>ROLE</th>
+                                        <th>STATUS</th>
+                                        <th style="text-align:right;">ACTION</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <asp:Repeater ID="rptTeamMembers" runat="server" OnItemCommand="rptTeamMembers_ItemCommand">
+                                        <ItemTemplate>
+                                            <tr>
+                                                <td>
+                                                    <div class="team-user-cell">
+                                                        <div class="member-avatar" style="background:#f1f5f9; color:#64748b; font-size:16px; border:1px solid #cbd5e1; overflow:hidden; display:inline-flex; align-items:center; justify-content:center;">
+                                                            <%# (Eval("ProfilePhoto") != null && !string.IsNullOrEmpty(Eval("ProfilePhoto").ToString())) 
+                                                                ? "<img src='" + ResolveUrl(Eval("ProfilePhoto").ToString()) + "' style='width:100%; height:100%; border-radius:50%; object-fit:cover;' />" 
+                                                                : "<i class=\"fa-regular fa-user\"></i>" %>
+                                                        </div>
+                                                        <div class="member-info">
+                                                            <div class="member-name"><%# Eval("FullName") %></div>
+                                                            <div class="member-email"><%# Eval("Email") %></div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td><span class="member-role-text">Company Admin</span></td>
-                                            <td><span class="badge-status-active">Active</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="team-user-cell">
-                                                    <div class="member-avatar bg-blue-light">P</div>
-                                                    <div class="member-info">
-                                                        <div class="member-name">Priya Sharma</div>
-                                                        <div class="member-email">priya@technova.in</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><span class="member-role-text">Senior Recruiter</span></td>
-                                            <td><span class="badge-status-active">Active</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        <% } else { %>
-                            <div style="padding:28px 16px; text-align:center; color:#64748b; background:#f8fafc;">
-                                <i class="fa-solid fa-users" style="font-size:28px; color:#94a3b8; margin-bottom:8px; display:block;"></i>
-                                <h4 style="font-size:14px; font-weight:600; color:#334155; margin-bottom:4px;">No Additional Members</h4>
-                                <p style="font-size:13px; margin:0;">You are currently the primary administrator for this company workspace.</p>
-                            </div>
-                        <% } %>
+                                                </td>
+                                                <td><span class="member-role-text"><%# Eval("RoleName") %></span></td>
+                                                <td><span class="badge-status-active"><%# Eval("Status") %></span></td>
+                                                <td style="text-align:right;">
+                                                    <asp:LinkButton ID="btnReleaseMember" runat="server" CommandName="ReleaseMember" 
+                                                        CommandArgument='<%# Eval("ApplicationId") %>' 
+                                                        Visible='<%# Convert.ToInt32(Eval("ApplicationId")) > 0 %>' 
+                                                        OnClientClick="return confirm('Release this employee from your company team? They will be able to apply for other jobs.');" 
+                                                        style='padding:5px 10px; border-radius:6px; font-size:12px; font-weight:600; background:#FEE2E2; color:#DC2626; border:1px solid #FCA5A5; text-decoration:none; display:inline-flex; align-items:center; gap:4px;'>
+                                                        <i class='fa-solid fa-user-minus'></i> Release
+                                                    </asp:LinkButton>
+                                                    <asp:Label ID="lblOwner" runat="server" 
+                                                        Visible='<%# Convert.ToInt32(Eval("ApplicationId")) == 0 %>' 
+                                                        Text="Account Owner" 
+                                                        style='font-size:11.5px; color:#64748B; font-weight:600;' />
+                                                </td>
+                                            </tr>
+                                        </ItemTemplate>
+                                        <FooterTemplate>
+                                            <asp:Panel ID="pnlNoMembers" runat="server" Visible='<%# rptTeamMembers.Items.Count == 0 %>' style="padding:24px; text-align:center; color:#64748b;">
+                                                <p style="margin:0; font-size:13px;">No active team members.</p>
+                                            </asp:Panel>
+                                        </FooterTemplate>
+                                    </asp:Repeater>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 

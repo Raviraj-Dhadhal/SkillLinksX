@@ -2,6 +2,36 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <!-- Analytics Head -->
+    <style>
+        .funnel-bar-track {
+            position: relative !important;
+            flex: 1 !important;
+            height: 40px !important;
+            background-color: #F1F5F9 !important;
+            border-radius: 8px !important;
+            overflow: hidden !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        .funnel-bar-fill {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            bottom: 0 !important;
+            height: 100% !important;
+            border-radius: 8px !important;
+            transition: width 0.4s ease !important;
+            z-index: 1 !important;
+        }
+        .funnel-label-name {
+            position: relative !important;
+            z-index: 2 !important;
+            padding-left: 14px !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            line-height: 40px !important;
+        }
+    </style>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -76,8 +106,8 @@
                 <div class="analytics-metric-card">
                     <div class="an-metric-label">Avg AI Match</div>
                     <div class="an-metric-row">
-                        <span class="an-metric-value color-blue">89%</span>
-                        <span class="an-match-quality-text">Solid</span>
+                        <span class="an-metric-value color-blue"><%= AvgAiMatch %>%</span>
+                        <span class="an-match-quality-text"><%= AvgAiMatch >= 75 ? "Strong" : (AvgAiMatch >= 50 ? "Solid" : "Building") %></span>
                     </div>
                 </div>
             </div>
@@ -114,9 +144,10 @@
                     <!-- Funnel 1: Views -->
                     <div class="funnel-row-item">
                         <div class="funnel-bar-track">
-                            <div class="funnel-bar-fill fill-100">
-                                <span class="funnel-label-name">Views</span>
-                            </div>
+                            <% if (ViewsPct > 0) { %>
+                                <div class="funnel-bar-fill" style="width: <%= ViewsPct %>%; background-color: #E2E8F0;"></div>
+                            <% } %>
+                            <span class="funnel-label-name" style="color: #0F172A;">Views</span>
                         </div>
                         <span class="funnel-count"><%= TotalViews.ToString("N0") %></span>
                     </div>
@@ -124,9 +155,10 @@
                     <!-- Funnel 2: Applications -->
                     <div class="funnel-row-item">
                         <div class="funnel-bar-track">
-                            <div class="funnel-bar-fill fill-75">
-                                <span class="funnel-label-name">Applications</span>
-                            </div>
+                            <% if (AppsPct > 0) { %>
+                                <div class="funnel-bar-fill" style="width: <%= AppsPct %>%; background-color: #C7D7F7;"></div>
+                            <% } %>
+                            <span class="funnel-label-name" style="color: #0F172A;">Applications</span>
                         </div>
                         <span class="funnel-count"><%= TotalApps %></span>
                     </div>
@@ -134,9 +166,10 @@
                     <!-- Funnel 3: Shortlisted -->
                     <div class="funnel-row-item">
                         <div class="funnel-bar-track">
-                            <div class="funnel-bar-fill fill-50">
-                                <span class="funnel-label-name">Shortlisted</span>
-                            </div>
+                            <% if (ShortlistedPct > 0) { %>
+                                <div class="funnel-bar-fill" style="width: <%= ShortlistedPct %>%; background-color: #93B0FC;"></div>
+                            <% } %>
+                            <span class="funnel-label-name" style="color: #0F172A;">Shortlisted</span>
                         </div>
                         <span class="funnel-count"><%= TotalShortlisted %></span>
                     </div>
@@ -144,9 +177,10 @@
                     <!-- Funnel 4: Interviews -->
                     <div class="funnel-row-item">
                         <div class="funnel-bar-track">
-                            <div class="funnel-bar-fill fill-30">
-                                <span class="funnel-label-name">Interviews</span>
-                            </div>
+                            <% if (InterviewsPct > 0) { %>
+                                <div class="funnel-bar-fill" style="width: <%= InterviewsPct %>%; background-color: #4C7DE8;"></div>
+                            <% } %>
+                            <span class="funnel-label-name" style="color: <%= InterviewsPct >= 35 ? "#FFFFFF" : "#0F172A" %>;">Interviews</span>
                         </div>
                         <span class="funnel-count"><%= TotalInterviews %></span>
                     </div>
@@ -154,9 +188,10 @@
                     <!-- Funnel 5: Hired -->
                     <div class="funnel-row-item">
                         <div class="funnel-bar-track">
-                            <div class="funnel-bar-fill fill-15">
-                                <span class="funnel-label-name">Hired / Selected</span>
-                            </div>
+                            <% if (HiredPct > 0) { %>
+                                <div class="funnel-bar-fill" style="width: <%= HiredPct %>%; background-color: #0040A2;"></div>
+                            <% } %>
+                            <span class="funnel-label-name" style="color: <%= HiredPct >= 35 ? "#FFFFFF" : "#0F172A" %>;">Hired / Selected</span>
                         </div>
                         <span class="funnel-count"><%= TotalHired %></span>
                     </div>
