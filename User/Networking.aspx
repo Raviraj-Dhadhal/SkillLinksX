@@ -174,27 +174,29 @@
                 </div>
             </div>
 
-            <!-- Right Sidebar Column (Recommended Recruiters) -->
+            <!-- Right Sidebar Column: Verified Companies / Recruiters from DB -->
             <aside class="net-sidebar-column">
-                <div class="rec-recruiters-card">
-                    <h3 class="rec-card-heading">Recommended Recruiters</h3>
-
-                    <!-- Recruiter Item 1: Mahek Godvani at TechFlow Mumbai -->
-                    <div class="recruiter-box-item">
-                        <div class="recruiter-avatar-wrap">
-                            <img src="<%= ResolveUrl("~/assets/images/user-female-logo.png") %>" alt="Mahek Godvani" class="recruiter-img" />
-                        </div>
-                        <div class="recruiter-info-wrap">
-                            <h4 class="recruiter-name">Mahek Godvani</h4>
-                            <div class="recruiter-company">TechFlow Mumbai</div>
-                            <div class="recruiter-hiring-badge">Hiring: Software Engineer</div>
-                        </div>
-                    </div>
-
-                    <div class="recruiter-action-row">
-                        <button type="button" class="btn-recruiter-connect" onclick="this.innerHTML='Request Sent';">
-                            Connect
-                        </button>
+                <div class="net-recruiter-sidecard" style="background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:20px;">
+                    <h3 style="font-size:15px; font-weight:700; color:#0f172a; margin:0 0 16px;">Verified Recruiters</h3>
+                    <div style="display:flex; flex-direction:column; gap:14px;">
+                        <asp:Repeater ID="rptVerifiedRecruiters" runat="server">
+                            <ItemTemplate>
+                                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        <div style="width:38px; height:38px; border-radius:8px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:16px;">
+                                            <i class="fa-solid fa-building"></i>
+                                        </div>
+                                        <div>
+                                            <h4 style="font-size:13.5px; font-weight:600; color:#1e293b; margin:0;"><%# Eval("CompanyName") %></h4>
+                                            <span style="font-size:12px; color:#64748b;"><%# Eval("Location") %></span>
+                                        </div>
+                                    </div>
+                                    <a href='<%= ResolveUrl("~/User/Messages.aspx") %>' style="padding:5px 12px; font-size:12px; font-weight:600; color:#2563eb; border:1px solid #bfdbfe; border-radius:6px; text-decoration:none; background:#f8fafc;">
+                                        Connect
+                                    </a>
+                                </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
                     </div>
                 </div>
             </aside>

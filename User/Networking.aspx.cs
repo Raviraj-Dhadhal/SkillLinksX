@@ -181,6 +181,12 @@ namespace SkillLinksX.User
 
                 rptPendingRequests.DataSource = pendingList;
                 rptPendingRequests.DataBind();
+
+                // 5. Load Verified Companies / Recruiters dynamically from company_table
+                string sqlRecruiters = "SELECT TOP 4 company_id, comp_name AS CompanyName, COALESCE(city, 'India') AS Location FROM company_table ORDER BY company_id ASC";
+                DataTable dtRecruiters = DBHelper.ExecuteQuery(sqlRecruiters);
+                rptVerifiedRecruiters.DataSource = dtRecruiters;
+                rptVerifiedRecruiters.DataBind();
             }
             catch (Exception ex)
             {

@@ -43,8 +43,8 @@
 
             <div class="saved-metric-tile danger-tile">
                 <div class="saved-metric-top">
-                    <span class="saved-metric-label color-red" style="color: #DC2626 !important;">Active</span>
-                    <i class="fa-solid fa-check-circle saved-metric-icon color-green" style="color: #059669 !important;"></i>
+                    <span class="saved-metric-label" style="color: #059669 !important;">Active</span>
+                    <i class="fa-solid fa-check-circle saved-metric-icon" style="color: #059669 !important;"></i>
                 </div>
                 <span class="saved-metric-val" style="color: #059669 !important;"><%= TotalSavedCount %></span>
             </div>
@@ -58,13 +58,13 @@
 
                 <!-- Filter Tabs: All, Jobs, Internships -->
                 <div class="saved-filter-tabs">
-                    <button type="button" class="saved-tab-btn active">All</button>
-                    <button type="button" class="saved-tab-btn">Jobs</button>
-                    <button type="button" class="saved-tab-btn">Internships</button>
+                    <button type="button" class="saved-tab-btn active" onclick="filterCategory('all', this);">All</button>
+                    <button type="button" class="saved-tab-btn" onclick="filterCategory('job', this);">Jobs</button>
+                    <button type="button" class="saved-tab-btn" onclick="filterCategory('internship', this);">Internships</button>
                 </div>
 
                 <!-- =================================================================
-                     [OOP COLLECTION REPEATER]: Binds List<BaseOpportunity>
+                     [SAVED OPPORTUNITIES REPEATER]: Dynamically loaded from database
                      ================================================================= -->
                 <div class="saved-cards-stack">
                     <asp:Repeater ID="rptSavedList" runat="server" OnItemCommand="rptSavedList_ItemCommand">
@@ -98,91 +98,21 @@
                             </div>
                         </ItemTemplate>
                     </asp:Repeater>
-                </div>
 
-                        <div class="saved-tags-row">
-                            <span class="saved-tag-pill">Java</span>
-                            <span class="saved-tag-pill">Spring Boot</span>
-                            <span class="saved-tag-pill">Microservices</span>
-                        </div>
-
-                        <div class="saved-card-footer flex-between">
-                            <div class="saved-footer-left">
-                                <div class="ai-match-chip-pill">
-                                    <i class="fa-regular fa-circle-check"></i>
-                                    <span>AI MATCH <strong>88% Strong</strong></span>
-                                </div>
-                                <div class="saved-date-note">SAVED Oct 12, 2026</div>
-                            </div>
-                            <div class="saved-footer-right">
-                                <a href="<%= ResolveUrl("~/User/JobDetails.aspx") %>" class="btn-saved-outline">View Details</a>
-                                <a href="<%= ResolveUrl("~/User/JobDetails.aspx") %>" class="btn-saved-primary">Apply Now</a>
-                            </div>
-                        </div>
+                    <!-- Clean Empty State when user has no saved opportunities -->
+                    <% if (TotalSavedCount == 0) { %>
+                    <div style="padding:48px 20px; text-align:center; color:#64748b; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px;">
+                        <i class="fa-regular fa-bookmark" style="font-size:36px; color:#94a3b8; margin-bottom:12px; display:block;"></i>
+                        <h4 style="font-size:16px; font-weight:700; color:#1e293b; margin-bottom:6px;">No saved opportunities yet</h4>
+                        <p style="font-size:13px; color:#64748b; margin:0 0 16px;">You haven't bookmarked any opportunities yet. Explore jobs and internships to save the ones you are interested in.</p>
+                        <a href="<%= ResolveUrl("~/User/Jobs.aspx") %>" style="display:inline-block; padding:9px 22px; background:#2563eb; color:#fff; border-radius:6px; font-size:13.5px; font-weight:600; text-decoration:none;">Browse Opportunities</a>
                     </div>
-
-                    <!-- Saved Item 2: Data Science Intern at Infosys -->
-                    <div class="saved-opp-card" data-category="internship">
-                        <div class="saved-card-top flex-between">
-                            <div class="saved-brand-info-flex">
-                                <div class="saved-company-avatar">
-                                    <img src="<%= ResolveUrl("~/assets/images/infosys-logo.svg") %>" alt="Infosys" class="saved-logo-img" />
-                                </div>
-                                <div class="saved-role-meta">
-                                    <div class="saved-title-badge-flex">
-                                        <h3 class="saved-role-title">Data Science Intern</h3>
-                                        <span class="badge-type-blue">INTERNSHIP</span>
-                                    </div>
-                                    <div class="saved-company-name">Infosys</div>
-                                </div>
-                            </div>
-                            <button type="button" class="btn-saved-bookmark active" title="Remove from Saved">
-                                <i class="fa-solid fa-bookmark"></i>
-                            </button>
-                        </div>
-
-                        <div class="saved-meta-specs-row">
-                            <span><i class="fa-solid fa-location-dot"></i> Pune</span>
-                            <span><i class="fa-solid fa-briefcase"></i> On-site</span>
-                            <span><i class="fa-solid fa-wallet"></i> &#8377;25k/month</span>
-                        </div>
-
-                        <div class="saved-tags-row">
-                            <span class="saved-tag-pill">Python</span>
-                            <span class="saved-tag-pill">Machine Learning</span>
-                            <span class="saved-tag-pill">SQL</span>
-                        </div>
-
-                        <div class="saved-card-footer flex-between">
-                            <div class="saved-footer-left">
-                                <div class="ai-match-chip-pill blue-tone">
-                                    <i class="fa-solid fa-chart-simple"></i>
-                                    <span>AI MATCH <strong>72% Good</strong></span>
-                                </div>
-                                <div class="saved-date-note">SAVED Oct 10, 2026</div>
-                            </div>
-                            <div class="saved-footer-right">
-                                <a href="<%= ResolveUrl("~/User/InternshipDetails.aspx") %>" class="btn-saved-outline">View Details</a>
-                                <a href="<%= ResolveUrl("~/User/InternshipDetails.aspx") %>" class="btn-saved-primary">Apply Now</a>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Pagination -->
-                <div class="saved-pagination-wrap">
-                    <a href="#" class="btn-page-arrow" aria-label="Previous Page"><i class="fa-solid fa-chevron-left"></i></a>
-                    <a href="#" class="btn-page-num active">1</a>
-                    <a href="#" class="btn-page-num">2</a>
-                    <a href="#" class="btn-page-num">3</a>
-                    <span class="page-ellipsis">&hellip;</span>
-                    <a href="#" class="btn-page-arrow" aria-label="Next Page"><i class="fa-solid fa-chevron-right"></i></a>
+                    <% } %>
                 </div>
 
             </div>
 
-            <!-- Right Sidebar: Closing Soon Panel -->
+            <!-- Right Sidebar: Closing Soon Panel (Dynamic) -->
             <aside class="saved-sidebar-column">
                 <div class="closing-soon-card">
                     <div class="closing-card-header">
@@ -191,53 +121,39 @@
                     </div>
 
                     <div class="closing-list-stack">
-
-                        <!-- Item 1: Product Designer at Ola -->
-                        <div class="closing-item-box">
-                            <div class="closing-item-top flex-between">
-                                <div class="closing-brand-wrap">
-                                    <div class="closing-company-logo">
-                                        <img src="<%= ResolveUrl("~/assets/images/ola-logo.svg") %>" alt="Ola" class="closing-logo-img" />
+                        <asp:Repeater ID="rptClosingSoon" runat="server">
+                            <ItemTemplate>
+                                <div class="closing-item-box">
+                                    <div class="closing-item-top flex-between">
+                                        <div class="closing-brand-wrap">
+                                            <div class="closing-company-avatar" style="width:36px; height:36px; border-radius:8px; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#2563eb; margin-right:10px;">
+                                                <i class="fa-solid fa-building" style="font-size:16px;"></i>
+                                            </div>
+                                            <div class="closing-meta">
+                                                <h4 class="closing-role-name"><%# Eval("Title") %></h4>
+                                                <div class="closing-company-name"><%# Eval("CompanyName") %></div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="closing-meta">
-                                        <h4 class="closing-role-name">Product Designer</h4>
-                                        <div class="closing-company-name">Ola</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="closing-footer-row flex-between">
-                                <span class="closing-timer color-red">
-                                    <i class="fa-regular fa-clock"></i> 2 DAYS LEFT
-                                </span>
-                                <a href="<%= ResolveUrl("~/User/JobDetails.aspx") %>" class="btn-closing-apply">Apply</a>
-                            </div>
-                        </div>
-
-                        <!-- Item 2: Frontend Eng Intern at Paytm -->
-                        <div class="closing-item-box">
-                            <div class="closing-item-top flex-between">
-                                <div class="closing-brand-wrap">
-                                    <div class="closing-company-logo">
-                                        <img src="<%= ResolveUrl("~/assets/images/paytm-logo.svg") %>" alt="Paytm" class="closing-logo-img" />
-                                    </div>
-                                    <div class="closing-meta">
-                                        <h4 class="closing-role-name">Frontend Eng Intern</h4>
-                                        <div class="closing-company-name">Paytm</div>
+                                    <div class="closing-footer-row flex-between">
+                                        <span class="closing-timer color-red">
+                                            <i class="fa-regular fa-clock"></i> <%# Eval("DaysLeft") %>
+                                        </span>
+                                        <a href='<%# ResolveUrl("~/User/JobDetails.aspx?id=" + Eval("JobId")) %>' class="btn-closing-apply">Apply</a>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="closing-footer-row flex-between">
-                                <span class="closing-timer color-red">
-                                    <i class="fa-regular fa-clock"></i> 4 DAYS LEFT
-                                </span>
-                                <a href="<%= ResolveUrl("~/User/JobDetails.aspx") %>" class="btn-closing-apply">Apply</a>
-                            </div>
-                        </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
 
+                        <% if (rptClosingSoon.Items.Count == 0) { %>
+                        <div style="padding: 20px; text-align: center; color: #94a3b8; font-size: 13px;">
+                            No urgent deadlines right now.
+                        </div>
+                        <% } %>
                     </div>
 
                     <div class="closing-card-footer">
-                        <a href="<%= ResolveUrl("~/User/JobDetails.aspx") %>" class="closing-view-all-link">View all deadlines</a>
+                        <a href="<%= ResolveUrl("~/User/Jobs.aspx") %>" class="closing-view-all-link">View all opportunities</a>
                     </div>
                 </div>
             </aside>
@@ -245,4 +161,21 @@
         </div>
 
     </div>
+
+    <script type="text/javascript">
+        function filterCategory(cat, btn) {
+            document.querySelectorAll('.saved-tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            const cards = document.querySelectorAll('.saved-opp-card');
+            cards.forEach(c => {
+                const cardCat = c.getAttribute('data-category');
+                if (cat === 'all' || cardCat === cat) {
+                    c.style.display = 'block';
+                } else {
+                    c.style.display = 'none';
+                }
+            });
+        }
+    </script>
 </asp:Content>
