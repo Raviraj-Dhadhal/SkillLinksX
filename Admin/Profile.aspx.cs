@@ -13,6 +13,7 @@ namespace SkillLinksX.Admin
         public string AdminPhone { get; set; } = "+91 98765 43210";
         public string AdminLocation { get; set; } = "Ahmedabad, Gujarat, India";
         public string AdminInitials { get; set; } = "A";
+        public string AdminPhotoUrl { get; set; } = "";
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -37,7 +38,8 @@ namespace SkillLinksX.Admin
             try
             {
                 // Query database for admin user details
-                string sql = "SELECT user_id, username, email FROM user_auth WHERE user_id = @uid";
+                DBHelper.EnsureProfilePhotoColumns();
+                string sql = "SELECT user_id, username, email, profile_photo FROM user_auth WHERE user_id = @uid";
                 SqlParameter[] p = { new SqlParameter("@uid", adminId) };
                 DataTable dt = DBHelper.ExecuteQuery(sql, p);
 
@@ -46,6 +48,8 @@ namespace SkillLinksX.Admin
                     DataRow row = dt.Rows[0];
                     AdminFullName = row["username"] != DBNull.Value ? row["username"].ToString() : sessionName;
                     AdminEmail = row["email"] != DBNull.Value ? row["email"].ToString() : (sessionName.ToLower().Replace(" ", ".") + "@skilllinkx.com");
+                    if (row["profile_photo"] != DBNull.Value)
+                        AdminPhotoUrl = row["profile_photo"].ToString().Trim();
                 }
                 else
                 {

@@ -88,11 +88,15 @@ document.addEventListener("DOMContentLoaded", function () {
         // =========================================================================
         const liveStudentData = (typeof window.dbAdminStudentGrowth !== "undefined" && Array.isArray(window.dbAdminStudentGrowth)) 
             ? window.dbAdminStudentGrowth 
-            : [12000, 18500, 24000, 31000, 38500, 45231];
+            : [0, 0, 0, 0, 0, 0];
 
         const liveCompanyData = (typeof window.dbAdminCompanyGrowth !== "undefined" && Array.isArray(window.dbAdminCompanyGrowth))
             ? window.dbAdminCompanyGrowth
-            : [420, 680, 950, 1250, 1580, 1845];
+            : [0, 0, 0, 0, 0, 0];
+
+        const liveCategories = (typeof window.dbAdminCategories !== "undefined" && Array.isArray(window.dbAdminCategories))
+            ? window.dbAdminCategories
+            : ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
 
         const chartOptions = {
             series: [
@@ -129,7 +133,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 enabled: false
             },
             xaxis: {
-                categories: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                categories: liveCategories,
                 axisBorder: { show: false },
                 axisTicks: { show: false },
                 labels: {
@@ -747,25 +751,16 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /* ----------------------------------------------------------------------
-       15. Analytics Date Range Selector Dropdown
+       15. Analytics Date Range Selector Dropdown (Dynamic from Database)
        ---------------------------------------------------------------------- */
     try {
         const analyticsTimePeriod = document.getElementById("analyticsTimePeriod");
         if (analyticsTimePeriod) {
             analyticsTimePeriod.addEventListener("change", function () {
-                const selectedText = this.options[this.selectedIndex].text;
-                // Toast or simulated live update
                 const statVal = document.querySelector(".admin-reports-top-metrics .stat-num-val");
                 if (statVal) {
-                    if (this.value === "7") {
-                        statVal.textContent = "6,140";
-                    } else if (this.value === "30") {
-                        statVal.textContent = "25,480";
-                    } else if (this.value === "90") {
-                        statVal.textContent = "78,920";
-                    } else {
-                        statVal.textContent = "142,650";
-                    }
+                    const count = this.getAttribute("data-count-" + this.value) || this.getAttribute("data-count-30") || "0";
+                    statVal.textContent = Number(count).toLocaleString();
                 }
             });
         }
