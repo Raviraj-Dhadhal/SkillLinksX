@@ -19,6 +19,9 @@ namespace SkillLinksX.Company
             set => ViewState["ActiveCandidateId"] = value;
         }
 
+        public string ActiveCandidatePhoto { get; set; } = "";
+        public string CurrentCompanyPhoto { get; set; } = "";
+
         protected void Page_Load(object sender, EventArgs e)
         {
             // Verify Company Authorization
@@ -27,6 +30,26 @@ namespace SkillLinksX.Company
                 Response.Redirect("~/Public/Login.aspx");
                 return;
             }
+
+            DBHelper.EnsureProfilePhotoColumns();
+
+            try
+            {
+                if (Session["CompanyProfilePhoto"] != null && !string.IsNullOrEmpty(Session["CompanyProfilePhoto"].ToString()))
+                {
+                    CurrentCompanyPhoto = Session["CompanyProfilePhoto"].ToString();
+                }
+                else
+                {
+                    int cid = DBHelper.GetCurrentCompanyId(Convert.ToInt32(Session["UserId"]), Session);
+                    if (cid > 0)
+                    {
+                        object pObj = DBHelper.ExecuteScalar("SELECT profile_photo FROM company_table WHERE company_id = @cid", new SqlParameter("@cid", cid));
+                        if (pObj != null && pObj != DBNull.Value) CurrentCompanyPhoto = pObj.ToString().Trim();
+                    }
+                }
+            }
+            catch { }
 
             if (!IsPostBack)
             {
@@ -56,12 +79,15 @@ namespace SkillLinksX.Company
         {
             try
             {
+                int companyId = DBHelper.GetCurrentCompanyId(Convert.ToInt32(Session["UserId"]), Session);
+
                 string sql = @"
                     SELECT 
                         m.id AS candidate_id, 
                         m.full_name, 
                         m.email_add AS email, 
                         m.skills,
+                        m.profile_photo,
                         (SELECT TOP 1 message_text FROM messages 
                          WHERE (sender_id = m.id AND receiver_id = @uid) 
                             OR (sender_id = @uid AND receiver_id = m.id) 
@@ -72,31 +98,60 @@ namespace SkillLinksX.Company
                         (SELECT COUNT(*) FROM messages 
                          WHERE sender_id = m.id AND receiver_id = @uid AND is_read = 0) AS unread_count
                     FROM member_master_table m
+                    WHERE EXISTS (
+                        SELECT 1 FROM applications a 
+                        LEFT JOIN jobs j ON a.job_id = j.job_id
+                        LEFT JOIN internships i ON a.internship_id = i.internship_id
+                        WHERE a.user_id = m.id AND (a.company_id = @cid OR j.company_id = @cid OR i.company_id = @cid)
+                    )
+                    OR EXISTS (
+                        SELECT 1 FROM connections conn 
+                        WHERE ((conn.sender_id = @uid AND conn.receiver_id = m.id) OR (conn.sender_id = m.id AND conn.receiver_id = @uid))
+                          AND conn.status = 'Accepted'
+                    )
+                    OR EXISTS (
+                        SELECT 1 FROM messages msg 
+                        WHERE (msg.sender_id = m.id AND msg.receiver_id = @uid) OR (msg.sender_id = @uid AND msg.receiver_id = m.id)
+                    )
                     ORDER BY 
                         CASE WHEN (SELECT MAX(sent_at) FROM messages WHERE (sender_id = m.id AND receiver_id = @uid) OR (sender_id = @uid AND receiver_id = m.id)) IS NOT NULL THEN 0 ELSE 1 END,
                         last_activity DESC,
                         m.id DESC";
 
-                DataTable dt = DBHelper.ExecuteQuery(sql, new SqlParameter("@uid", CurrentCompanyUserId));
+                DataTable dt = DBHelper.ExecuteQuery(sql,
+                    new SqlParameter("@uid", CurrentCompanyUserId),
+                    new SqlParameter("@cid", companyId));
 
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     rptCandidateThreads.DataSource = dt;
                     rptCandidateThreads.DataBind();
 
-                    if (ActiveCandidateId <= 0)
+                    bool exists = false;
+                    foreach (DataRow r in dt.Rows)
+                    {
+                        if (Convert.ToInt32(r["candidate_id"]) == ActiveCandidateId)
+                        {
+                            exists = true;
+                            break;
+                        }
+                    }
+
+                    if (!exists)
                     {
                         ActiveCandidateId = Convert.ToInt32(dt.Rows[0]["candidate_id"]);
                     }
                 }
                 else
                 {
+                    ActiveCandidateId = 0;
                     rptCandidateThreads.DataSource = null;
                     rptCandidateThreads.DataBind();
                 }
             }
             catch (Exception)
             {
+                ActiveCandidateId = 0;
                 rptCandidateThreads.DataSource = null;
                 rptCandidateThreads.DataBind();
             }
@@ -111,27 +166,47 @@ namespace SkillLinksX.Company
             {
                 if (candidateId <= 0)
                 {
+                    litActiveCandidateName.Text = "No candidate selected";
+                    litActiveCandidateEmail.Text = "Select a candidate from the left to start messaging";
+                    litActiveCandidateInitial.Text = "<i class=\"fa-regular fa-user\"></i>";
+                    ActiveCandidatePhoto = "";
                     rptCompanyChatMessages.DataSource = null;
                     rptCompanyChatMessages.DataBind();
                     pnlNoCompanyMessages.Visible = true;
+                    txtCompanyMessageInput.Enabled = false;
+                    btnSendCompanyMessage.Enabled = false;
+                    txtCompanyMessageInput.Attributes["placeholder"] = "No candidate selected...";
                     return;
                 }
 
+                txtCompanyMessageInput.Enabled = true;
+                btnSendCompanyMessage.Enabled = true;
+                txtCompanyMessageInput.Attributes["placeholder"] = "Write a message to candidate...";
+
                 // 1. Fetch Candidate Name & Email
-                string candSql = "SELECT full_name, email_add AS email FROM member_master_table WHERE id = @cid";
+                string candSql = "SELECT full_name, email_add AS email, profile_photo FROM member_master_table WHERE id = @cid";
                 DataTable dtCandidate = DBHelper.ExecuteQuery(candSql, new SqlParameter("@cid", candidateId));
                 if (dtCandidate != null && dtCandidate.Rows.Count > 0)
                 {
                     string name = dtCandidate.Rows[0]["full_name"].ToString();
                     litActiveCandidateName.Text = name;
                     litActiveCandidateEmail.Text = dtCandidate.Rows[0]["email"].ToString();
-                    litActiveCandidateInitial.Text = GetInitials(name);
+                    string photo = dtCandidate.Rows[0]["profile_photo"] != DBNull.Value ? dtCandidate.Rows[0]["profile_photo"].ToString().Trim() : "";
+                    ActiveCandidatePhoto = photo;
+                    if (!string.IsNullOrEmpty(photo))
+                    {
+                        litActiveCandidateInitial.Text = $"<img src='{ResolveUrl(photo)}' style='width:100%; height:100%; border-radius:50%; object-fit:cover;' />";
+                    }
+                    else
+                    {
+                        litActiveCandidateInitial.Text = "<i class=\"fa-regular fa-user\"></i>";
+                    }
                 }
                 else
                 {
                     litActiveCandidateName.Text = "Candidate #" + candidateId;
                     litActiveCandidateEmail.Text = "";
-                    litActiveCandidateInitial.Text = "C";
+                    litActiveCandidateInitial.Text = "<i class=\"fa-regular fa-user\"></i>";
                 }
 
                 // 2. Fetch Conversation History strictly according to schema:

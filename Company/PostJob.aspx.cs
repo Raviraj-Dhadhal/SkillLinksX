@@ -26,7 +26,7 @@ namespace SkillLinksX.Company
         {
             if (!Page.IsValid) return;
 
-            int companyId = Session["CompanyId"] != null ? Convert.ToInt32(Session["CompanyId"]) : 1;
+            int companyId = DBHelper.GetCurrentCompanyId(Convert.ToInt32(Session["UserId"]), Session);
 
             string title = txtJobTitle.Text.Trim();
             string department = ddlDepartment.SelectedValue;
@@ -51,34 +51,81 @@ namespace SkillLinksX.Company
             string requiredSkills = txtRequiredSkills.Text.Trim();
             if (string.IsNullOrEmpty(requiredSkills)) requiredSkills = "C#, ASP.NET, SQL Server";
 
+            bool isInternship = employmentType.IndexOf("Intern", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                (Request.QueryString["type"] != null && Request.QueryString["type"].Equals("internship", StringComparison.OrdinalIgnoreCase));
+
             try
             {
-                // Parameterized SQL INSERT into 'jobs' table
-                string sql = @"
-                    INSERT INTO jobs 
-                    (company_id, job_title, location, job_type, category, experience_required, salary_min, salary_max, city, state, job_description, requirements, benefits, status, created_at, deadline)
-                    VALUES 
-                    (@cid, @title, @location, @jobType, 'Software Development', '0-2 Years', 400000, 800000, 'Mumbai', 'Maharashtra', @desc, @skills, 'Health Insurance, Flexible Hours', 'Active', GETDATE(), DATEADD(month, 1, GETDATE()))";
-
-                int rowsAffected = DBHelper.ExecuteNonQuery(
-                    sql,
-                    new SqlParameter("@cid", companyId),
-                    new SqlParameter("@title", title),
-                    new SqlParameter("@location", location),
-                    new SqlParameter("@jobType", employmentType),
-                    new SqlParameter("@desc", description),
-                    new SqlParameter("@skills", requiredSkills)
-                );
-
-                if (rowsAffected > 0)
+                if (isInternship)
                 {
-                    Response.Redirect("~/Company/ManageJobs.aspx");
+                    decimal stipend = 15000;
+                    if (!string.IsNullOrEmpty(salaryMin)) decimal.TryParse(salaryMin, out stipend);
+                    if (stipend <= 0) stipend = 15000;
+
+                    string sqlIntern = @"
+                        INSERT INTO internships 
+                        (company_id, internship_title, category, duration_months, stipend_amount, stipend_type, location_type, description, skills_required, perks, status, created_at, deadline)
+                        VALUES 
+                        (@cid, @title, @category, 3, @stipend, 'Fixed', @locType, @desc, @skills, 'Certificate, Flexible Work Hours, Letter of Recommendation', 'Active', GETDATE(), DATEADD(month, 2, GETDATE()))";
+
+                    int rows = DBHelper.ExecuteNonQuery(
+                        sqlIntern,
+                        new SqlParameter("@cid", companyId),
+                        new SqlParameter("@title", title),
+                        new SqlParameter("@category", string.IsNullOrEmpty(department) ? "Software Development" : department),
+                        new SqlParameter("@stipend", stipend),
+                        new SqlParameter("@locType", workType),
+                        new SqlParameter("@desc", description),
+                        new SqlParameter("@skills", requiredSkills)
+                    );
+
+                    if (rows > 0)
+                    {
+                        Response.Redirect("~/Company/ManageInternships.aspx");
+                        return;
+                    }
                 }
                 else
                 {
-                    lblPostStatus.ForeColor = System.Drawing.Color.Red;
-                    lblPostStatus.Text = "Failed to publish opportunity. Please check details and try again.";
+                    decimal sMin = 400000;
+                    decimal sMax = 800000;
+                    if (!string.IsNullOrEmpty(salaryMin)) decimal.TryParse(salaryMin, out sMin);
+                    if (!string.IsNullOrEmpty(salaryMax)) decimal.TryParse(salaryMax, out sMax);
+                    if (sMin <= 0) sMin = 400000;
+                    if (sMax <= 0) sMax = 800000;
+
+                    // Parameterized SQL INSERT into 'jobs' table
+                    string sql = @"
+                        INSERT INTO jobs 
+                        (company_id, job_title, location, job_type, category, experience_required, salary_min, salary_max, city, state, job_description, requirements, benefits, status, created_at, deadline)
+                        VALUES 
+                        (@cid, @title, @location, @jobType, @category, @exp, @smin, @smax, @city, @state, @desc, @skills, 'Health Insurance, Flexible Hours, Performance Bonus', 'Active', GETDATE(), DATEADD(month, 1, GETDATE()))";
+
+                    int rowsAffected = DBHelper.ExecuteNonQuery(
+                        sql,
+                        new SqlParameter("@cid", companyId),
+                        new SqlParameter("@title", title),
+                        new SqlParameter("@location", location),
+                        new SqlParameter("@jobType", employmentType),
+                        new SqlParameter("@category", string.IsNullOrEmpty(department) ? "Software Development" : department),
+                        new SqlParameter("@exp", string.IsNullOrEmpty(experienceLevel) ? "0-2 Years" : experienceLevel),
+                        new SqlParameter("@smin", sMin),
+                        new SqlParameter("@smax", sMax),
+                        new SqlParameter("@city", city),
+                        new SqlParameter("@state", state),
+                        new SqlParameter("@desc", description),
+                        new SqlParameter("@skills", requiredSkills)
+                    );
+
+                    if (rowsAffected > 0)
+                    {
+                        Response.Redirect("~/Company/ManageJobs.aspx");
+                        return;
+                    }
                 }
+
+                lblPostStatus.ForeColor = System.Drawing.Color.Red;
+                lblPostStatus.Text = "Failed to publish opportunity. Please check details and try again.";
             }
             catch (Exception ex)
             {

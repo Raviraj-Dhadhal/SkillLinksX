@@ -10,33 +10,39 @@
         <!-- 1. Top Company Overview Header Card -->
         <div class="profile-header-card">
             <div class="profile-header-top">
-                <!-- TechNova Logo Monogram -->
-                <div class="company-profile-logo-box">
-                    <img src='<%= ResolveUrl("~/assets/images/technova-logo.svg") %>' alt="TechNova Logo" />
+                <!-- Company Logo Monogram -->
+                <div class="company-profile-logo-box" style="overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                    <% if (!string.IsNullOrEmpty(CompanyLogoUrl)) { %>
+                        <img src="<%= ResolveUrl(CompanyLogoUrl) %>" alt="<%= CompanyName %>" style="width:100%; height:100%; object-fit:cover;" />
+                    <% } else { %>
+                        <i class="fa-solid fa-building" style="font-size:32px; color:#64748b;"></i>
+                    <% } %>
                 </div>
 
                 <!-- Company Details -->
                 <div class="profile-header-details">
-                    <h1 class="profile-company-name">TechNova</h1>
+                    <h1 class="profile-company-name"><%= CompanyName %></h1>
                     <div class="profile-meta-tags-row">
                         <div class="profile-meta-item">
-                            <i class="fa-solid fa-briefcase"></i> IT Services & Consulting
+                            <i class="fa-solid fa-briefcase"></i> <%= CompanyIndustry %>
                         </div>
                         <div class="profile-meta-item">
-                            <i class="fa-solid fa-location-dot"></i> Bengaluru, KA
+                            <i class="fa-solid fa-location-dot"></i> <%= CompanyLocation %>
                         </div>
                         <div class="profile-meta-item">
-                            <i class="fa-solid fa-users"></i> 501-1,000 employees
+                            <i class="fa-solid fa-users"></i> <%= EmployeeCount %>
                         </div>
                     </div>
-                    <div class="profile-meta-tags-row">
-                        <div class="profile-meta-item">
-                            <i class="fa-regular fa-calendar"></i> Founded 2015
+                    <% if (!string.IsNullOrEmpty(CompanyWebsite)) { %>
+                        <div class="profile-meta-tags-row">
+                            <div class="profile-meta-item">
+                                <i class="fa-solid fa-globe"></i> 
+                                <a href="<%= CompanyWebsite.StartsWith("http") ? CompanyWebsite : "https://" + CompanyWebsite %>" target="_blank" rel="noopener noreferrer" style="color:inherit; text-decoration:none;">
+                                    <%= CompanyWebsite %>
+                                </a>
+                            </div>
                         </div>
-                        <div class="profile-meta-item">
-                            <i class="fa-solid fa-globe"></i> technova.ai
-                        </div>
-                    </div>
+                    <% } %>
                 </div>
 
                 <!-- Action Buttons: Share & Edit -->
@@ -54,10 +60,10 @@
             <div class="profile-completion-section">
                 <div class="profile-completion-header">
                     <span>PROFILE COMPLETION</span>
-                    <span>85%</span>
+                    <span><%= ProfileCompletionPercentage %>%</span>
                 </div>
                 <div class="profile-completion-track">
-                    <div class="profile-completion-bar" style="width: 85%;"></div>
+                    <div class="profile-completion-bar" style="width: <%= ProfileCompletionPercentage %>%;"></div>
                 </div>
             </div>
         </div>
@@ -68,22 +74,22 @@
             <!-- Left Column -->
             <div class="profile-left-col">
                 
-                <!-- About TechNova Card -->
+                <!-- About Company Card -->
                 <div class="profile-card">
-                    <h2 class="profile-card-title">About TechNova</h2>
+                    <h2 class="profile-card-title">About <%= CompanyName %></h2>
                     <p class="about-company-desc">
-                        TechNova is a premier IT services and consulting firm specializing in AI and digital transformation. We partner with forward-thinking enterprises to design, build, and deploy intelligent software solutions that drive operational efficiency and create new revenue streams. Our team of expert engineers and data scientists are dedicated to solving complex business challenges with cutting-edge technology.
+                        <%= CompanyDescription %>
                     </p>
 
                     <!-- Mission & Vision 2-Col Box -->
                     <div class="mission-vision-row">
                         <div class="mission-vision-box">
                             <span class="mv-badge">MISSION</span>
-                            <p class="mv-quote">"Empowering businesses through intelligent technology."</p>
+                            <p class="mv-quote">"Empowering businesses through intelligent technology and innovative talent."</p>
                         </div>
                         <div class="mission-vision-box">
                             <span class="mv-badge">VISION</span>
-                            <p class="mv-quote">"To be the global leader in AI-driven solutions."</p>
+                            <p class="mv-quote">"To build scalable, next-generation solutions for global enterprise challenges."</p>
                         </div>
                     </div>
                 </div>
@@ -91,45 +97,37 @@
                 <!-- Open Positions Section -->
                 <div>
                     <div class="positions-header-row">
-                        <h2 class="profile-card-title" style="margin-bottom:0;">Open Positions</h2>
+                        <h2 class="profile-card-title" style="margin-bottom:0;">Open Positions (<%= PostedJobsList.Count %>)</h2>
                         <a href="<%= ResolveUrl("~/Company/ManageJobs.aspx") %>" class="view-all-positions-link">View all</a>
                     </div>
 
-                    <!-- Position Card 1: Senior Software Engineer -->
-                    <div class="position-item-card">
-                        <div class="position-top-row">
-                            <h3 class="position-role-title">Senior Software Engineer</h3>
-                            <span class="position-badge-active">Active</span>
-                        </div>
-                        <div class="position-company-sub">TechNova &bull; Full-time</div>
-                        <div class="position-pills-row">
-                            <span class="position-pill"><i class="fa-solid fa-location-dot"></i> Bengaluru</span>
-                            <span class="position-pill"><i class="fa-solid fa-briefcase"></i> 5+ yrs</span>
-                            <span class="position-pill"><i class="fa-solid fa-money-bill-wave"></i> &#8377;18L - &#8377;25L</span>
-                        </div>
-                        <div class="position-bottom-row">
-                            <span class="position-applicants-count">12 applicants</span>
-                            <a href="<%= ResolveUrl("~/Company/ManageJobs.aspx") %>" class="manage-job-btn-link">Manage Job</a>
-                        </div>
-                    </div>
-
-                    <!-- Position Card 2: Frontend Developer Intern -->
-                    <div class="position-item-card">
-                        <div class="position-top-row">
-                            <h3 class="position-role-title">Frontend Developer Intern</h3>
-                            <span class="position-badge-active">Active</span>
-                        </div>
-                        <div class="position-company-sub">TechNova &bull; Internship</div>
-                        <div class="position-pills-row">
-                            <span class="position-pill"><i class="fa-solid fa-laptop"></i> Remote</span>
-                            <span class="position-pill"><i class="fa-regular fa-clock"></i> 6 months</span>
-                            <span class="position-pill"><i class="fa-solid fa-money-bill-wave"></i> &#8377;25k/mo</span>
-                        </div>
-                        <div class="position-bottom-row">
-                            <span class="position-applicants-count">45 applicants</span>
-                            <a href="<%= ResolveUrl("~/Company/ManageJobs.aspx") %>" class="manage-job-btn-link">Manage Job</a>
-                        </div>
-                    </div>
+                    <% if (PostedJobsList != null && PostedJobsList.Count > 0) { 
+                           foreach(var job in PostedJobsList) { %>
+                               <div class="position-item-card">
+                                   <div class="position-top-row">
+                                       <h3 class="position-role-title"><%= job.Title %></h3>
+                                       <span class="position-badge-active"><%= job.Status %></span>
+                                   </div>
+                                   <div class="position-company-sub"><%= CompanyName %> &bull; <%= job.JobType %></div>
+                                   <div class="position-pills-row">
+                                       <span class="position-pill"><i class="fa-solid fa-location-dot"></i> <%= job.Location %></span>
+                                       <span class="position-pill"><i class="fa-solid fa-briefcase"></i> <%= job.Experience %></span>
+                                       <span class="position-pill"><i class="fa-solid fa-money-bill-wave"></i> <%= job.Salary %></span>
+                                   </div>
+                                   <div class="position-bottom-row">
+                                       <span class="position-applicants-count"><%= job.ApplicantCount %> applicants</span>
+                                       <a href="<%= ResolveUrl("~/Company/ManageJobs.aspx") %>" class="manage-job-btn-link">Manage Job</a>
+                                   </div>
+                               </div>
+                    <%     } 
+                       } else { %>
+                           <div style="padding:28px 16px; text-align:center; color:#64748b; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:10px; margin-bottom:20px;">
+                               <i class="fa-solid fa-briefcase" style="font-size:32px; color:#94a3b8; margin-bottom:8px; display:block;"></i>
+                               <h4 style="font-size:15px; font-weight:600; color:#334155; margin-bottom:4px;">No Positions Posted Yet</h4>
+                               <p style="font-size:13px; margin:0 0 12px;">Create your first opening to attract top candidates.</p>
+                               <a href="<%= ResolveUrl("~/Company/PostJob.aspx") %>" class="manage-job-btn-link" style="display:inline-block; padding:8px 16px;">Post a Job</a>
+                           </div>
+                    <% } %>
                 </div>
 
                 <!-- Our Hiring Process Card -->
@@ -175,12 +173,12 @@
                 <!-- 2-Column Stats (Active Jobs & Total Hires) -->
                 <div class="profile-stats-2col">
                     <div class="profile-stat-box">
-                        <div class="profile-stat-num">12</div>
+                        <div class="profile-stat-num"><%= ActiveJobsCount %></div>
                         <div class="profile-stat-label">Active Jobs</div>
                     </div>
                     <div class="profile-stat-box">
-                        <div class="profile-stat-num">156</div>
-                        <div class="profile-stat-label">Total Hires</div>
+                        <div class="profile-stat-num"><%= TotalApplicantsCount %></div>
+                        <div class="profile-stat-label">Total Applicants</div>
                     </div>
                 </div>
 
@@ -194,14 +192,16 @@
                 <div class="primary-recruiter-card">
                     <div class="recruiter-header-label">PRIMARY RECRUITER</div>
                     <div class="recruiter-profile-row">
-                        <img src='<%= ResolveUrl("~/assets/images/user-female-logo.png") %>' alt="Mahek Godvani" class="recruiter-avatar-circle" />
+                        <span style="width:40px; height:40px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#64748b; font-size:18px; border:1px solid #cbd5e1;">
+                            <i class="fa-regular fa-user"></i>
+                        </span>
                         <div>
-                            <h4 class="recruiter-name">Mahek Godvani</h4>
-                            <span class="recruiter-role">Senior Talent Acquisition</span>
+                            <h4 class="recruiter-name"><%= Session["UserName"] ?? "Talent Acquisition" %></h4>
+                            <span class="recruiter-role">Lead Recruiter</span>
                         </div>
                     </div>
                     <a href="<%= ResolveUrl("~/Company/Messages.aspx") %>" class="btn-message-recruiter">
-                        <i class="fa-regular fa-message"></i> Message
+                        <i class="fa-regular fa-message"></i> Messages
                     </a>
                 </div>
 

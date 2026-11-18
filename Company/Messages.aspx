@@ -102,8 +102,10 @@
                                 CssClass='<%# "chat-thread-item " + (Convert.ToInt32(Eval("candidate_id")) == ActiveCandidateId ? "active" : "") %>'
                                 CommandArgument='<%# Eval("candidate_id") %>' OnClick="btnSelectCandidate_Click">
                                 <div class="thread-avatar-wrapper">
-                                    <span class="thread-avatar-circle" style="width:40px; height:40px; border-radius:50%; background:#dbeafe; display:inline-flex; align-items:center; justify-content:center; color:#1e40af; font-size:16px; font-weight:600;">
-                                        <%# GetInitials(Eval("full_name").ToString()) %>
+                                    <span class="thread-avatar-circle" style="width:40px; height:40px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#64748b; font-size:16px; border:1px solid #cbd5e1; overflow:hidden;">
+                                        <%# (Eval("profile_photo") != DBNull.Value && !string.IsNullOrEmpty(Eval("profile_photo").ToString())) 
+                                            ? "<img src='" + ResolveUrl(Eval("profile_photo").ToString()) + "' style='width:100%; height:100%; border-radius:50%; object-fit:cover;' />"
+                                            : "<i class=\"fa-regular fa-user\"></i>" %>
                                     </span>
                                 </div>
                                 <div class="thread-info-content" style="flex:1; min-width:0; margin-left: 4px;">
@@ -138,8 +140,8 @@
                 <div class="chat-main-header" style="padding:14px 20px; background:#fff; border-bottom:1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center;">
                     <div class="chat-header-user" style="display:flex; align-items:center; gap:12px;">
                         <div class="thread-avatar-wrapper">
-                            <span class="thread-avatar-circle" style="width:40px; height:40px; border-radius:50%; background:#dbeafe; display:inline-flex; align-items:center; justify-content:center; color:#1e40af; font-size:16px; font-weight:600;">
-                                <asp:Literal ID="litActiveCandidateInitial" runat="server">C</asp:Literal>
+                            <span class="thread-avatar-circle" style="width:40px; height:40px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#64748b; font-size:16px; border:1px solid #cbd5e1; overflow:hidden;">
+                                <asp:Literal ID="litActiveCandidateInitial" runat="server"><i class="fa-regular fa-user"></i></asp:Literal>
                             </span>
                         </div>
                         <div>
@@ -167,13 +169,20 @@
                     <asp:Repeater ID="rptCompanyChatMessages" runat="server">
                         <ItemTemplate>
                             <div class='<%# Convert.ToInt32(Eval("sender_id")) == CurrentCompanyUserId ? "message-bubble-row outgoing" : "message-bubble-row incoming" %>'>
-                                <%# Convert.ToInt32(Eval("sender_id")) == CurrentCompanyUserId ? "" : "<span class='msg-bubble-avatar' style='width:30px; height:30px; border-radius:50%; background:#e2e8f0; display:inline-flex; align-items:center; justify-content:center; color:#475569; font-size:12px; font-weight:600; margin-right:6px; flex-shrink:0;'><i class=\"fa-regular fa-user\"></i></span>" %>
+                                <%# Convert.ToInt32(Eval("sender_id")) == CurrentCompanyUserId ? "" : 
+                                    ("<span class='msg-bubble-avatar' style='width:30px; height:30px; border-radius:50%; background:#e2e8f0; display:inline-flex; align-items:center; justify-content:center; color:#475569; font-size:12px; margin-right:6px; flex-shrink:0; overflow:hidden;'>" + 
+                                    (!string.IsNullOrEmpty(ActiveCandidatePhoto) ? "<img src='" + ResolveUrl(ActiveCandidatePhoto) + "' style='width:100%; height:100%; border-radius:50%; object-fit:cover;' />" : "<i class=\"fa-regular fa-user\"></i>") + 
+                                    "</span>") %>
                                 <div class='<%# Convert.ToInt32(Eval("sender_id")) == CurrentCompanyUserId ? "msg-bubble-content outgoing-bubble" : "msg-bubble-content incoming-bubble" %>'>
                                     <p><%# Eval("message_text") %></p>
                                     <span class='<%# "msg-time-stamp " + (Convert.ToInt32(Eval("sender_id")) == CurrentCompanyUserId ? "sent-stamp" : "") %>' style="font-size:10px; opacity:0.8; display:block; text-align:right;">
                                         <%# Convert.ToDateTime(Eval("sent_at")).ToString("hh:mm tt") %>
                                     </span>
                                 </div>
+                                <%# Convert.ToInt32(Eval("sender_id")) == CurrentCompanyUserId ? 
+                                    ("<span class='msg-bubble-avatar' style='width:30px; height:30px; border-radius:50%; background:#e2e8f0; display:inline-flex; align-items:center; justify-content:center; color:#475569; font-size:12px; margin-left:6px; flex-shrink:0; overflow:hidden;'>" + 
+                                    (!string.IsNullOrEmpty(CurrentCompanyPhoto) ? "<img src='" + ResolveUrl(CurrentCompanyPhoto) + "' style='width:100%; height:100%; border-radius:50%; object-fit:cover;' />" : "<i class=\"fa-solid fa-building\"></i>") + 
+                                    "</span>") : "" %>
                             </div>
                         </ItemTemplate>
                     </asp:Repeater>
