@@ -1,7 +1,62 @@
 <%@ Page Title="Manage Companies - SkillLinkX" Language="C#" MasterPageFile="~/MasterPages/Admin.Master" AutoEventWireup="true" CodeBehind="Companies.aspx.cs" Inherits="SkillLinksX.Admin.Companies" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
-    <!-- Admin Companies Head -->
+    <!-- Admin Companies Head Styling -->
+    <style>
+        .company-row {
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .company-row:hover {
+            background-color: #F8FAFC;
+        }
+        .company-row.active-row {
+            background-color: #EFF6FF !important;
+        }
+        .btn-filter-clear-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 16px;
+            background: #F1F5F9;
+            color: #475569;
+            font-size: 12.5px;
+            font-weight: 600;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .btn-filter-clear-link:hover {
+            background: #E2E8F0;
+            color: #0F172A;
+        }
+        .badge-status-verified {
+            background-color: #ECFDF5;
+            color: #065F46;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .badge-status-pending {
+            background-color: #FEF3C7;
+            color: #92400E;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .badge-status-suspended {
+            background-color: #FEE2E2;
+            color: #991B1B;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+    </style>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -11,20 +66,21 @@
         <div class="admin-page-header-flex">
             <div>
                 <h1 class="admin-page-main-title">Manage Companies</h1>
-                <p class="admin-page-main-sub">Review and manage companies registered on SkillLinkX.</p>
+                <p class="admin-page-main-sub">Review and manage partner companies registered on SkillLinkX.</p>
             </div>
-            <button type="button" class="btn-admin-primary-add" id="btnOpenAddCompanyModal">
+            <a href="<%= ResolveUrl("~/Public/CompanyRegister.aspx") %>" target="_blank" class="btn-admin-primary-add" style="text-decoration:none;">
                 <i class="fa-solid fa-plus"></i> Add Company
-            </button>
+            </a>
         </div>
 
         <!-- =========================================================================
-             [DYNAMIC METRIC TILES]: Aggregated Company counts from SQL Server
+             [DYNAMIC METRIC TILES]: Aggregated Company counts from SQL Server Database
              ========================================================================= -->
         <div class="admin-metrics-5grid">
             <div class="admin-stat-card">
                 <div class="stat-top-row">
                     <span class="stat-label">TOTAL COMPANIES</span>
+                    <span class="stat-icon-wrap bg-blue-subtle"><i class="fa-solid fa-building"></i></span>
                 </div>
                 <div class="stat-num-val"><%= TotalCompaniesCount %></div>
             </div>
@@ -32,6 +88,7 @@
             <div class="admin-stat-card">
                 <div class="stat-top-row">
                     <span class="stat-label">VERIFIED</span>
+                    <span class="stat-icon-wrap bg-green-subtle"><i class="fa-regular fa-circle-check"></i></span>
                 </div>
                 <div class="stat-num-val color-green"><%= VerifiedCompaniesCount %></div>
             </div>
@@ -39,6 +96,7 @@
             <div class="admin-stat-card">
                 <div class="stat-top-row">
                     <span class="stat-label">PENDING VERIFICATION</span>
+                    <span class="stat-icon-wrap bg-purple-subtle"><i class="fa-solid fa-clock"></i></span>
                 </div>
                 <div class="stat-num-val color-blue"><%= PendingCompaniesCount %></div>
             </div>
@@ -46,6 +104,7 @@
             <div class="admin-stat-card">
                 <div class="stat-top-row">
                     <span class="stat-label">TOTAL JOBS POSTED</span>
+                    <span class="stat-icon-wrap bg-green-subtle"><i class="fa-solid fa-briefcase"></i></span>
                 </div>
                 <div class="stat-num-val"><%= TotalJobsPostedCount %></div>
             </div>
@@ -53,51 +112,40 @@
             <div class="admin-stat-card">
                 <div class="stat-top-row">
                     <span class="stat-label">VERIFIED RATIO</span>
+                    <span class="stat-icon-wrap bg-blue-subtle"><i class="fa-solid fa-chart-pie"></i></span>
                 </div>
-                <div class="stat-num-val"><%= TotalCompaniesCount > 0 ? (VerifiedCompaniesCount * 100 / TotalCompaniesCount) : 100 %>%</div>
+                <div class="stat-num-val"><%= TotalCompaniesCount > 0 ? (VerifiedCompaniesCount * 100 / TotalCompaniesCount) : 0 %>%</div>
             </div>
         </div>
 
         <asp:Label ID="lblAdminCompanyStatus" runat="server" ForeColor="Green" style="margin: 10px 14px; display:block; font-size:13px; font-weight:600;" EnableViewState="false" />
 
-        <!-- Filter Bar Row -->
+        <!-- Filter Bar Row (100% Dynamic from Database) -->
         <div class="admin-filter-bar-card">
             <div class="admin-search-input-wrap">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchCompanyInput" placeholder="Search company..." />
+                <asp:TextBox ID="txtSearchCompany" runat="server" placeholder="Search company name, industry, city..." AutoPostBack="true" OnTextChanged="txtSearchCompany_TextChanged" />
             </div>
 
             <div class="admin-dropdown-wrap">
-                <select id="filterIndustry">
-                    <option value="">All Industries</option>
-                    <option value="IT">IT &amp; Software</option>
-                    <option value="E-Commerce">E-Commerce</option>
-                    <option value="Healthcare">Healthcare</option>
-                    <option value="Education">Education</option>
-                    <option value="FinTech">FinTech</option>
-                </select>
+                <asp:DropDownList ID="ddlIndustryFilter" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlIndustryFilter_SelectedIndexChanged" />
             </div>
 
             <div class="admin-dropdown-wrap">
-                <select id="filterCompanyLocation">
-                    <option value="">All Locations</option>
-                    <option value="Bengaluru">Bengaluru</option>
-                    <option value="Mumbai">Mumbai</option>
-                    <option value="Pune">Pune</option>
-                    <option value="Hyderabad">Hyderabad</option>
-                </select>
+                <asp:DropDownList ID="ddlLocationFilter" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlLocationFilter_SelectedIndexChanged" />
             </div>
 
             <div class="admin-dropdown-wrap">
-                <select id="filterCompanyStatus">
-                    <option value="">Status: All</option>
-                    <option value="Verified">Verified</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Suspended">Suspended</option>
-                </select>
+                <asp:DropDownList ID="ddlStatusFilter" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlStatusFilter_SelectedIndexChanged">
+                    <asp:ListItem Text="Status: All" Value="" />
+                    <asp:ListItem Text="Verified" Value="Verified" />
+                    <asp:ListItem Text="Pending" Value="Pending" />
+                </asp:DropDownList>
             </div>
 
-            <button type="button" class="btn-filter-icon" title="More Filters"><i class="fa-solid fa-sliders"></i></button>
+            <asp:LinkButton ID="btnClearFilters" runat="server" CssClass="btn-filter-clear-link" OnClick="btnClearFilters_Click">
+                <i class="fa-solid fa-rotate-left" style="margin-right: 6px;"></i> Clear
+            </asp:LinkButton>
         </div>
 
         <!-- Workspace Layout: Left Content (Table + Bottom 2 Cards) + Right Company Details Panel -->
@@ -124,14 +172,34 @@
                             <tbody>
                                 <!-- =========================================================
                                      [DYNAMIC COMPANIES REPEATER]: Binds all partner employers
+                                     Clicking any row dynamically updates the details panel!
                                      ========================================================= -->
                                 <asp:Repeater ID="rptCompaniesTable" runat="server" OnItemCommand="rptCompaniesTable_ItemCommand">
                                     <ItemTemplate>
-                                        <tr class="company-row">
-                                            <td><%# Container.ItemIndex + 1 %></td>
+                                        <tr class='company-row <%# (bool)Eval("IsSelected") ? "active-row" : "" %>'
+                                            data-id='<%# Eval("CompanyId") %>'
+                                            data-name='<%# Eval("CompanyName") %>'
+                                            data-initials='<%# Eval("Initials") %>'
+                                            data-status='<%# Eval("VerificationStatus") %>'
+                                            data-industry='<%# Eval("Industry") %>'
+                                            data-location='<%# Eval("Location") %>'
+                                            data-website='<%# Eval("Website") %>'
+                                            data-email='<%# Eval("Email") %>'
+                                            data-phone='<%# Eval("Phone") %>'
+                                            data-size='<%# Eval("Size") %>'
+                                            data-founded='-'
+                                            data-jobs='<%# Eval("JobCount") %>'
+                                            data-apps='<%# Eval("AppCount") %>'
+                                            data-hires='<%# Eval("HireCount") %>'>
+                                            
+                                            <td><input type="checkbox" /></td>
                                             <td>
                                                 <div class="company-cell-flex">
-                                                    <div class="company-avatar-box"><%# Eval("Initials") %></div>
+                                                    <div class="company-avatar-box" style="overflow:hidden; display:inline-flex; align-items:center; justify-content:center; background:#f1f5f9; color:#64748b; font-size:15px; border:1px solid #cbd5e1;">
+                                                        <%# !string.IsNullOrEmpty(Eval("LogoUrl") as string)
+                                                            ? "<img src='" + ResolveUrl(Eval("LogoUrl").ToString()) + "' alt='Logo' style='width:100%; height:100%; object-fit:cover;' />"
+                                                            : "<span style='font-weight:700; font-size:13px; color:#0040A2;'>" + Eval("Initials") + "</span>" %>
+                                                    </div>
                                                     <span class="company-name-bold"><%# Eval("CompanyName") %></span>
                                                 </div>
                                             </td>
@@ -146,7 +214,10 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                <asp:LinkButton ID="btnToggleVerify" runat="server" CommandName="ToggleVerify" CommandArgument='<%# Eval("CompanyId") + "|" + Eval("VerificationStatus") %>' CssClass="btn btn-sm btn-outline-primary" style="font-size:11.5px; text-decoration:none; padding:3px 8px; border:1px solid #2563eb; color:#2563eb; border-radius:4px;">
+                                                <asp:LinkButton ID="btnToggleVerify" runat="server" CommandName="ToggleVerify" CommandArgument='<%# Eval("CompanyId") + "|" + Eval("VerificationStatus") %>' 
+                                                    CssClass='<%# "btn btn-sm " + (Eval("VerificationStatus").ToString() == "Verified" ? "btn-outline-danger" : "btn-outline-primary") %>' 
+                                                    style="font-size:11.5px; text-decoration:none; padding:3px 8px; border-radius:4px;" 
+                                                    OnClientClick="event.stopPropagation();">
                                                     <%# Eval("VerificationStatus").ToString() == "Verified" ? "Unverify" : "Verify" %>
                                                 </asp:LinkButton>
                                             </td>
@@ -154,92 +225,64 @@
                                     </ItemTemplate>
                                 </asp:Repeater>
                             </tbody>
-                                    <td><span class="badge-status-verified">&bull; Verified</span></td>
-                                </tr>
-
-                                <!-- Company 4: EduStream -->
-                                <tr class="company-row"
-                                    data-company-name="EduStream"
-                                    data-initials="ES"
-                                    data-status="Suspended"
-                                    data-industry="Education"
-                                    data-location="Hyderabad, HQ"
-                                    data-website="edustream.in"
-                                    data-email="contact@edustream.in"
-                                    data-phone="+91 98480 55443"
-                                    data-size="20-50"
-                                    data-founded="2020"
-                                    data-jobs="3"
-                                    data-applicants="110"
-                                    data-hires="2">
-                                    <td><input type="checkbox" /></td>
-                                    <td>
-                                        <div class="company-cell-flex">
-                                            <div class="company-avatar-box bg-gray-tint">ES</div>
-                                            <span class="company-name-bold">EduStream</span>
-                                        </div>
-                                    </td>
-                                    <td>Education</td>
-                                    <td>Hyderabad</td>
-                                    <td>3</td>
-                                    <td><span class="badge-status-suspended">&bull; Suspended</span></td>
-                                </tr>
-                            </tbody>
                         </table>
+                    </div>
+
+                    <!-- Dynamic Real-Time Count Footer -->
+                    <div class="admin-table-pagination flex-between">
+                        <span class="pagination-entry-count">Showing <%= FilteredCompaniesCount %> of <%= TotalCompaniesCount %> partner companies</span>
                     </div>
                 </div>
 
-                <!-- Bottom 2-Cards Grid: Popular Industries & Top Locations -->
+                <!-- Bottom 2-Cards Grid: Dynamic Popular Industries & Top Locations from DB -->
                 <div class="admin-2cards-grid">
-                    <!-- Card 1: Popular Industries -->
+                    <!-- Card 1: Popular Industries (Real Database Aggregates) -->
                     <div class="admin-summary-card">
                         <div class="summary-card-header flex-between">
                             <span class="summary-card-title">POPULAR INDUSTRIES</span>
                             <i class="fa-solid fa-chart-pie summary-card-icon"></i>
                         </div>
                         <div class="industry-progress-stack">
-                            <div class="industry-progress-item">
-                                <div class="prog-label-flex">
-                                    <span>IT &amp; Software</span>
-                                    <span class="font-bold">45%</span>
-                                </div>
-                                <div class="progress-track"><div class="progress-fill fill-blue" style="width: 45%;"></div></div>
-                            </div>
-                            <div class="industry-progress-item">
-                                <div class="prog-label-flex">
-                                    <span>FinTech</span>
-                                    <span class="font-bold">25%</span>
-                                </div>
-                                <div class="progress-track"><div class="progress-fill fill-blue" style="width: 25%;"></div></div>
-                            </div>
+                            <asp:Repeater ID="rptPopularIndustries" runat="server">
+                                <ItemTemplate>
+                                    <div class="industry-progress-item">
+                                        <div class="prog-label-flex">
+                                            <span><%# Eval("IndustryName") %></span>
+                                            <span class="font-bold"><%# Eval("Percentage") %>%</span>
+                                        </div>
+                                        <div class="progress-track"><div class="progress-fill fill-blue" style='width: <%# Eval("Percentage") %>%;'></div></div>
+                                    </div>
+                                </ItemTemplate>
+                            </asp:Repeater>
                         </div>
                     </div>
 
-                    <!-- Card 2: Top Locations -->
+                    <!-- Card 2: Top Locations (Real Database Cities) -->
                     <div class="admin-summary-card">
                         <div class="summary-card-header flex-between">
                             <span class="summary-card-title">TOP LOCATIONS</span>
                             <i class="fa-regular fa-map summary-card-icon"></i>
                         </div>
                         <div class="locations-chips-wrap">
-                            <span class="loc-chip">Bengaluru</span>
-                            <span class="loc-chip">Mumbai</span>
-                            <span class="loc-chip">Ahmedabad</span>
-                            <span class="loc-chip">Pune</span>
+                            <asp:Repeater ID="rptTopLocations" runat="server">
+                                <ItemTemplate>
+                                    <span class="loc-chip"><%# Eval("CityName") %></span>
+                                </ItemTemplate>
+                            </asp:Repeater>
                         </div>
                     </div>
                 </div>
 
             </div>
 
-            <!-- Right Sidebar: Company Details Panel -->
+            <!-- Right Sidebar: 100% Dynamic Company Details Panel -->
             <div class="admin-details-sidebar-card" id="companyDetailsCard">
                 <div class="company-header-top-row flex-between">
                     <div class="cd-avatar-name-flex">
-                        <div class="cd-avatar-initials" id="cdInitials">RG</div>
+                        <div class="cd-avatar-initials" id="cdInitials" style="display:inline-flex; align-items:center; justify-content:center; background:#f1f5f9; color:#64748b; font-size:20px; font-weight:700; border:1px solid #cbd5e1; width:44px; height:44px; border-radius:8px;">CO</div>
                         <div>
-                            <h3 class="cd-company-title" id="cdName">RetailGenius</h3>
-                            <span class="badge-status-pending" id="cdStatus">&bull; Pending</span>
+                            <h3 class="cd-company-title" id="cdName">Select a company</h3>
+                            <span class="badge-status-pending" id="cdStatus">&bull; Status</span>
                         </div>
                     </div>
                     <button type="button" class="btn-close-details" id="btnCloseCompanyDetails" title="Close"><i class="fa-solid fa-xmark"></i></button>
@@ -251,48 +294,48 @@
                 <div class="cd-meta-block">
                     <div class="cd-section-heading">COMPANY DETAILS</div>
                     <div class="cd-meta-item">
-                        <i class="fa-solid fa-store"></i> <span id="cdIndustry">E-Commerce</span>
+                        <i class="fa-solid fa-store"></i> <span id="cdIndustry">-</span>
                     </div>
                     <div class="cd-meta-item">
-                        <i class="fa-solid fa-location-dot"></i> <span id="cdLocation">Mumbai, HQ</span>
+                        <i class="fa-solid fa-location-dot"></i> <span id="cdLocation">-</span>
                     </div>
                     <div class="cd-meta-item">
-                        <i class="fa-solid fa-globe"></i> <a href="#" id="cdWebsite" class="cd-link">retailgenius.com</a>
+                        <i class="fa-solid fa-globe"></i> <a href="#" id="cdWebsite" target="_blank" class="cd-link">-</a>
                     </div>
                     <div class="cd-meta-item">
-                        <i class="fa-regular fa-envelope"></i> <a href="#" id="cdEmail" class="cd-link">hr@retailgenius.com</a>
+                        <i class="fa-regular fa-envelope"></i> <a href="#" id="cdEmail" class="cd-link">-</a>
                     </div>
                     <div class="cd-meta-item">
-                        <i class="fa-solid fa-phone"></i> <span id="cdPhone">+91 98765 43210</span>
+                        <i class="fa-solid fa-phone"></i> <span id="cdPhone">-</span>
                     </div>
                     <div class="cd-meta-2col-row">
                         <div>
                             <span class="cd-sub-lbl">Size</span>
-                            <div class="cd-sub-val" id="cdSize">50-200</div>
+                            <div class="cd-sub-val" id="cdSize">-</div>
                         </div>
                         <div>
                             <span class="cd-sub-lbl">Founded</span>
-                            <div class="cd-sub-val" id="cdFounded">2018</div>
+                            <div class="cd-sub-val" id="cdFounded">-</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="details-section-divider"></div>
 
-                <!-- Recruitment Activity 3-Tiles -->
+                <!-- Recruitment Activity 3-Tiles (Real Dynamic Volume) -->
                 <div class="cd-meta-block">
                     <div class="cd-section-heading">RECRUITMENT ACTIVITY</div>
                     <div class="cd-recruit-3grid">
                         <div class="recruit-stat-box">
-                            <span class="r-stat-num" id="cdJobsCount">8</span>
+                            <span class="r-stat-num" id="cdJobsCount">0</span>
                             <span class="r-stat-lbl">Jobs</span>
                         </div>
                         <div class="recruit-stat-box">
-                            <span class="r-stat-num" id="cdAppCount">450</span>
+                            <span class="r-stat-num" id="cdAppCount">0</span>
                             <span class="r-stat-lbl">Applicants</span>
                         </div>
                         <div class="recruit-stat-box">
-                            <span class="r-stat-num" id="cdHiresCount">12</span>
+                            <span class="r-stat-num" id="cdHiresCount">0</span>
                             <span class="r-stat-lbl">Hires</span>
                         </div>
                     </div>
@@ -300,32 +343,11 @@
 
                 <div class="details-section-divider"></div>
 
-                <!-- Verification Documents -->
-                <div class="cd-meta-block">
-                    <div class="cd-section-heading">VERIFICATION DOCUMENTS</div>
-                    <div class="cd-docs-stack">
-                        <div class="cd-doc-card">
-                            <i class="fa-regular fa-file-lines"></i> Registration Cert
-                        </div>
-                        <div class="cd-doc-card">
-                            <i class="fa-regular fa-file-lines"></i> GST Certificate
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Actions Button Stack -->
+                <!-- Verification Action Block -->
+                <asp:HiddenField ID="hdnSelectedCompanyId" runat="server" />
                 <div class="cd-actions-stack">
-                    <button type="button" class="btn-cd-approve" onclick="alert('Company verified & approved successfully');">
-                        Approve Company
-                    </button>
-                    <div class="cd-action-2btn-row">
-                        <button type="button" class="btn-cd-request" onclick="alert('Information request sent to company.');">
-                            Request Info
-                        </button>
-                        <button type="button" class="btn-cd-reject" onclick="if(confirm('Are you sure you want to reject this company?')) alert('Company rejected.');">
-                            Reject
-                        </button>
-                    </div>
+                    <asp:Button ID="btnSidebarApprove" runat="server" Text="Approve & Verify Company" CssClass="btn-cd-approve" OnClick="btnSidebarApprove_Click" />
+                    <asp:Button ID="btnSidebarReject" runat="server" Text="Revoke Verification (Pending)" CssClass="btn-cd-reject" OnClick="btnSidebarReject_Click" />
                 </div>
             </div>
 
@@ -333,49 +355,25 @@
 
     </div>
 
-    <!-- Add Company Modal -->
-    <div class="modal-backdrop-overlay" id="addCompanyModal" style="display:none;">
-        <div class="modal-dialog-box">
-            <div class="modal-header-row">
-                <h3 class="modal-title">Add New Company</h3>
-                <button type="button" class="btn-modal-close" onclick="document.getElementById('addCompanyModal').style.display='none';">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <div class="modal-body-content">
-                <div class="admin-form-group">
-                    <label class="admin-input-label">Company Name *</label>
-                    <input type="text" class="admin-profile-input" id="newCompanyName" placeholder="e.g. NextGen AI Labs" />
-                </div>
-                <div class="form-2col-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                    <div class="admin-form-group">
-                        <label class="admin-input-label">Industry *</label>
-                        <select class="admin-filter-select" id="newCompanyIndustry">
-                            <option value="IT & Software">IT &amp; Software</option>
-                            <option value="FinTech">FinTech</option>
-                            <option value="Healthcare">Healthcare</option>
-                            <option value="E-Commerce">E-Commerce</option>
-                            <option value="Education">Education</option>
-                        </select>
-                    </div>
-                    <div class="admin-form-group">
-                        <label class="admin-input-label">Location (City) *</label>
-                        <input type="text" class="admin-profile-input" id="newCompanyLocation" placeholder="e.g. Bengaluru" />
-                    </div>
-                </div>
-                <div class="admin-form-group">
-                    <label class="admin-input-label">Work Email Address *</label>
-                    <input type="email" class="admin-profile-input" id="newCompanyEmail" placeholder="e.g. hr@company.com" />
-                </div>
-                <div class="admin-form-group">
-                    <label class="admin-input-label">Website URL</label>
-                    <input type="url" class="admin-profile-input" id="newCompanyWebsite" placeholder="e.g. company.com" />
-                </div>
-            </div>
-            <div class="modal-footer-row" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-                <button type="button" class="btn-cancel-modal" onclick="document.getElementById('addCompanyModal').style.display='none';">Cancel</button>
-                <button type="button" class="btn-submit-modal" id="btnSubmitAddCompany">Add Company</button>
-            </div>
-        </div>
-    </div>
+    <!-- Script to Synchronize HiddenField with Active Selected Company -->
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            // Auto click first company on load to populate sidebar
+            var firstRow = document.querySelector(".company-row.active-row") || document.querySelector(".company-row");
+            if (firstRow) {
+                firstRow.click();
+            }
+
+            // Sync hidden field on row click
+            document.querySelectorAll(".company-row").forEach(function (row) {
+                row.addEventListener("click", function () {
+                    var cid = this.getAttribute("data-id");
+                    var hdn = document.getElementById("<%= hdnSelectedCompanyId.ClientID %>");
+                    if (hdn && cid) {
+                        hdn.value = cid;
+                    }
+                });
+            });
+        });
+    </script>
 </asp:Content>
