@@ -31,42 +31,59 @@ namespace SkillLinksX.Public
         // =========================================================================
         private void LoadPublicOpportunities()
         {
-            string sql = @"
-                SELECT TOP 4 j.job_id, j.title, j.location, j.job_type, j.salary_range,
-                       c.company_name
-                FROM jobs j
-                INNER JOIN companies c ON j.company_id = c.company_id
-                WHERE j.status = 'Active'
-                ORDER BY j.created_at DESC";
-
-            DataTable dt = DBHelper.ExecuteQuery(sql);
-
-            if (dt.Rows.Count > 0)
+            try
             {
-                // Top #1 is shown in the Big Featured Hero Card
-                DataRow first = dt.Rows[0];
-                FeaturedTitle = first["title"].ToString();
-                FeaturedCompany = first["company_name"].ToString();
-                FeaturedLocation = first["location"].ToString();
-                FeaturedJobType = first["job_type"].ToString();
-                FeaturedSalary = first["salary_range"] != DBNull.Value ? first["salary_range"].ToString() : "Best in Industry";
+                string sql = @"
+                    SELECT TOP 4 j.job_id, j.job_title AS title, j.location, j.job_type, 
+                           j.salary_min, j.salary_max,
+                           c.comp_name AS company_name
+                    FROM jobs j
+                    INNER JOIN company_table c ON j.company_id = c.company_id
+                    WHERE j.status = 'Active'
+                    ORDER BY j.created_at DESC";
 
-                // Remaining 3 are bound to the stacked cards on the right
-                var stackList = new List<dynamic>();
-                for (int i = 1; i < dt.Rows.Count; i++)
+                DataTable dt = DBHelper.ExecuteQuery(sql);
+
+                if (dt != null && dt.Rows.Count > 0)
                 {
-                    DataRow r = dt.Rows[i];
-                    stackList.Add(new
-                    {
-                        JobId = r["job_id"],
-                        Title = r["title"].ToString(),
-                        CompanyName = r["company_name"].ToString(),
-                        Location = r["location"].ToString()
-                    });
-                }
+                    // Top #1 is shown in the Big Featured Hero Card
+                    DataRow first = dt.Rows[0];
+                    FeaturedTitle = first["title"] != DBNull.Value ? first["title"].ToString() : FeaturedTitle;
+                    FeaturedCompany = first["company_name"] != DBNull.Value ? first["company_name"].ToString() : FeaturedCompany;
+                    FeaturedLocation = first["location"] != DBNull.Value ? first["location"].ToString() : FeaturedLocation;
+                    FeaturedJobType = first["job_type"] != DBNull.Value ? first["job_type"].ToString() : FeaturedJobType;
 
-                rptStackedJobs.DataSource = stackList;
-                rptStackedJobs.DataBind();
+                    if (first["salary_min"] != DBNull.Value && decimal.TryParse(first["salary_min"].ToString(), out decimal sMin))
+                    {
+                        decimal sMax = (first["salary_max"] != DBNull.Value && decimal.TryParse(first["salary_max"].ToString(), out decimal maxVal)) ? maxVal : sMin;
+                        FeaturedSalary = $"₹{sMin:N0} - ₹{sMax:N0}";
+                    }
+                    else
+                    {
+                        FeaturedSalary = "Best in Industry";
+                    }
+
+                    // Remaining 3 are bound to the stacked cards on the right
+                    var stackList = new List<dynamic>();
+                    for (int i = 1; i < dt.Rows.Count; i++)
+                    {
+                        DataRow r = dt.Rows[i];
+                        stackList.Add(new
+                        {
+                            JobId = r["job_id"],
+                            Title = r["title"].ToString(),
+                            CompanyName = r["company_name"].ToString(),
+                            Location = r["location"].ToString()
+                        });
+                    }
+
+                    rptStackedJobs.DataSource = stackList;
+                    rptStackedJobs.DataBind();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Fallback gracefully so guests always see a fully functional home page
             }
         }
     }

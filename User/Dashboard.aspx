@@ -19,9 +19,9 @@
                 <div class="progress-ring-box">
                     <svg class="progress-ring" width="46" height="46">
                         <circle class="progress-ring-bg" stroke="#E2E8F0" stroke-width="4" fill="transparent" r="19" cx="23" cy="23" />
-                        <circle class="progress-ring-fill" stroke="#059669" stroke-width="4" stroke-dasharray="119.38" stroke-dashoffset="17.9" stroke-linecap="round" fill="transparent" r="19" cx="23" cy="23" />
+                        <circle class="progress-ring-fill" stroke="<%= ProgressRingColor %>" stroke-width="4" stroke-dasharray="119.38" stroke-dashoffset="<%= ProgressRingDashOffset.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) %>" stroke-linecap="round" fill="transparent" r="19" cx="23" cy="23" />
                     </svg>
-                    <span class="progress-ring-text">85%</span>
+                    <span class="progress-ring-text"><%= ProfileCompletionPercent %>%</span>
                 </div>
                 <div class="profile-completion-info">
                     <span class="completion-label">Profile Completion</span>

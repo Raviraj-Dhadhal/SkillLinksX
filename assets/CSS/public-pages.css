@@ -1245,7 +1245,7 @@
 /* Role Selector Tabs */
 .role-tabs-selector {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     background-color: #F1F5F9;
     border-radius: 8px;
     padding: 4px;

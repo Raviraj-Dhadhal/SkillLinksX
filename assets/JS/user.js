@@ -72,21 +72,28 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
         const contribContainer = document.getElementById("contribHeatmap");
         if (contribContainer) {
-            // Pattern of commit intensity levels: 0 (empty) to 4 (high activity)
-            const pattern = [
-                0,1,0,2,3,4,1,0,2,3,0,1,2,0,4,3,2,1,0,2,3,4,1,0,1,2,3,0,1,2,0,1,
-                1,2,3,4,2,0,1,2,3,4,1,2,0,3,4,2,1,0,3,4,1,2,0,3,4,1,2,3,0,2,3,2,
-                0,3,2,1,0,2,3,4,1,2,0,3,4,1,2,3,0,1,2,3,4,2,0,1,2,3,4,1,0,1,2,3,
-                2,4,1,0,3,4,1,2,0,3,4,1,2,3,0,2,3,4,1,0,2,3,4,1,2,0,3,4,1,2,0,4,
-                3,1,0,2,3,4,1,0,2,3,0,1,2,0,4,3,2,1,0,2,3,4,1,0,1,2,3,0,1,2,3,1,
-                1,0,2,3,4,1,2,0,3,4,1,2,3,0,2,3,4,1,0,2,3,4,1,2,0,3,4,1,2,0,4,2,
-                0,2,1,0,3,4,1,2,0,3,4,1,2,3,0,2,3,4,1,0,2,3,4,1,2,0,3,4,1,2,0,1
-            ];
-
+            const hasActivity = contribContainer.getAttribute("data-has-activity") !== "false";
             let html = "";
-            for (let i = 0; i < pattern.length; i++) {
-                const level = pattern[i];
-                html += '<span class="contrib-cell c-' + level + '" title="Activity Level ' + level + '"></span>';
+            if (hasActivity) {
+                // Pattern of commit intensity levels: 0 (empty) to 4 (high activity)
+                const pattern = [
+                    0,1,0,2,3,4,1,0,2,3,0,1,2,0,4,3,2,1,0,2,3,4,1,0,1,2,3,0,1,2,0,1,
+                    1,2,3,4,2,0,1,2,3,4,1,2,0,3,4,2,1,0,3,4,1,2,0,3,4,1,2,3,0,2,3,2,
+                    0,3,2,1,0,2,3,4,1,2,0,3,4,1,2,3,0,1,2,3,4,2,0,1,2,3,4,1,0,1,2,3,
+                    2,4,1,0,3,4,1,2,0,3,4,1,2,3,0,2,3,4,1,0,2,3,4,1,2,0,3,4,1,2,0,4,
+                    3,1,0,2,3,4,1,0,2,3,0,1,2,0,4,3,2,1,0,2,3,4,1,0,1,2,3,0,1,2,3,1,
+                    1,0,2,3,4,1,2,0,3,4,1,2,3,0,2,3,4,1,0,2,3,4,1,2,0,3,4,1,2,0,4,2,
+                    0,2,1,0,3,4,1,2,0,3,4,1,2,3,0,2,3,4,1,0,2,3,4,1,2,0,3,4,1,2,0,1
+                ];
+                for (let i = 0; i < pattern.length; i++) {
+                    const level = pattern[i];
+                    html += '<span class="contrib-cell c-' + level + '" title="Activity Level ' + level + '"></span>';
+                }
+            } else {
+                // New user: display clean neutral inactive cells (all 0)
+                for (let i = 0; i < 224; i++) {
+                    html += '<span class="contrib-cell c-0" title="No activity recorded yet"></span>';
+                }
             }
             contribContainer.innerHTML = html;
         }
@@ -443,51 +450,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /* ----------------------------------------------------------------------
-       13. Resume Action Logging (Upload, View, Download) & Portfolio Dialog
+       13. Resume Actions - Handled directly via ASP.NET server postbacks
        ---------------------------------------------------------------------- */
-    try {
-        // Profile Page: Upload New Resume
-        const btnUploadResume = document.querySelector(".btn-upload-new-resume");
-        if (btnUploadResume) {
-            btnUploadResume.addEventListener("click", function (e) {
-                e.preventDefault();
-                console.log("you can upload a new resume");
-                alert("You can upload a new resume");
-            });
-        }
-
-        // Profile Page: View Resume icon
-        const btnViewResume = document.querySelector(".btn-resume-action[title*='View']");
-        if (btnViewResume) {
-            btnViewResume.addEventListener("click", function (e) {
-                e.preventDefault();
-                console.log("you are seeing resume");
-                alert("You are seeing resume");
-            });
-        }
-
-        // Profile Page: Download Resume icon
-        const btnDownloadResume = document.querySelector(".btn-resume-action[title*='Download']");
-        if (btnDownloadResume) {
-            btnDownloadResume.addEventListener("click", function (e) {
-                e.preventDefault();
-                console.log("resume is downloading");
-                alert("Resume is downloading...");
-            });
-        }
-
-        // Portfolio Page: Download Resume Button
-        const btnPortfolioDownload = document.querySelector(".btn-portfolio-download");
-        if (btnPortfolioDownload) {
-            btnPortfolioDownload.addEventListener("click", function (e) {
-                e.preventDefault();
-                console.log("resume is downloading");
-                alert("Resume is downloading...");
-            });
-        }
-    } catch (err) {
-        console.warn("SkillLinkX: Resume actions error", err);
-    }
 
     /* ----------------------------------------------------------------------
        14. Internships Page Filter Chips & Category Tabs (Client-Side Filter)

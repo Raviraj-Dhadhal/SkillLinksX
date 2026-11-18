@@ -20,6 +20,9 @@ namespace SkillLinksX.User
         public string InterviewCompany { get; set; } = "";
         public string InterviewRole { get; set; } = "";
         public string InterviewDateFormatted { get; set; } = "";
+        public int ProfileCompletionPercent { get; set; } = 65;
+        public double ProgressRingDashOffset { get; set; } = 41.78;
+        public string ProgressRingColor { get; set; } = "#2563eb";
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -67,6 +70,13 @@ namespace SkillLinksX.User
             rptTopSkillsPills.DataBind();
             rptSkillVerification.DataSource = skillsList;
             rptSkillVerification.DataBind();
+
+            // ---------------------------------------------------------------------
+            // Step 1B: Dynamic Profile Completion (Matches User/Profile.aspx)
+            // ---------------------------------------------------------------------
+            ProfileCompletionPercent = DBHelper.GetStudentProfileStrength(studentId);
+            ProgressRingDashOffset = 119.38 - (119.38 * ProfileCompletionPercent / 100.0);
+            ProgressRingColor = ProfileCompletionPercent >= 80 ? "#10b981" : (ProfileCompletionPercent >= 60 ? "#2563eb" : "#f59e0b");
 
             // ---------------------------------------------------------------------
             // Step 2: Query real-time metric counts from SQL Server tables
