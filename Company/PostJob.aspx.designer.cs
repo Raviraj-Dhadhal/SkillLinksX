@@ -33,6 +33,7 @@ namespace SkillLinksX.Company
         protected global::System.Web.UI.WebControls.TextBox txtJobDescription;
         protected global::System.Web.UI.WebControls.TextBox txtRequiredSkills;
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvJobDescription;
+        protected global::System.Web.UI.WebControls.Button btnSaveDraft;
         protected global::System.Web.UI.WebControls.Button btnPublishOpportunity;
     }
 }

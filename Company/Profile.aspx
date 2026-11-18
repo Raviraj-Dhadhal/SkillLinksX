@@ -80,18 +80,6 @@
                     <p class="about-company-desc">
                         <%= CompanyDescription %>
                     </p>
-
-                    <!-- Mission & Vision 2-Col Box -->
-                    <div class="mission-vision-row">
-                        <div class="mission-vision-box">
-                            <span class="mv-badge">MISSION</span>
-                            <p class="mv-quote">"Empowering businesses through intelligent technology and innovative talent."</p>
-                        </div>
-                        <div class="mission-vision-box">
-                            <span class="mv-badge">VISION</span>
-                            <p class="mv-quote">"To build scalable, next-generation solutions for global enterprise challenges."</p>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Open Positions Section -->

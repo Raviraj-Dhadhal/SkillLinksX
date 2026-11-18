@@ -165,11 +165,17 @@
 
             <div class="form-2col-row" style="margin-bottom:0;">
                 <div class="form-group-item">
-                    <label class="form-label">Salary Range (&#8377;)</label>
+                    <label class="form-label" id="lblCompensationTitle">Salary Range (&#8377;)</label>
                     <div style="display:flex; align-items:center; gap:8px;">
-                        <asp:TextBox ID="txtSalaryMin" runat="server" CssClass="form-control-input" placeholder="Min"></asp:TextBox>
+                        <asp:TextBox ID="txtSalaryMin" runat="server" CssClass="form-control-input" placeholder="Min"
+                            TextMode="Number" min="0" step="1"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                            onkeypress="return (event.charCode >= 48 && event.charCode <= 57);"></asp:TextBox>
                         <span style="color:#94A3B8;">-</span>
-                        <asp:TextBox ID="txtSalaryMax" runat="server" CssClass="form-control-input" placeholder="Max"></asp:TextBox>
+                        <asp:TextBox ID="txtSalaryMax" runat="server" CssClass="form-control-input" placeholder="Max"
+                            TextMode="Number" min="0" step="1"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                            onkeypress="return (event.charCode >= 48 && event.charCode <= 57);"></asp:TextBox>
                     </div>
                 </div>
                 <div class="form-group-item">
@@ -316,12 +322,144 @@
         <div class="post-opp-footer">
             <a href="<%= ResolveUrl("~/Company/Dashboard.aspx") %>" class="btn-post-cancel">Cancel</a>
             <div class="post-footer-right-buttons">
-                <button type="button" class="btn-post-draft">Save as Draft</button>
-                <button type="button" class="btn-post-preview">Preview</button>
+                <asp:Button ID="btnSaveDraft" runat="server" Text="Save as Draft" CssClass="btn-post-draft" CausesValidation="false" OnClick="btnSaveDraft_Click" />
+                <button type="button" class="btn-post-preview" onclick="openJobPreviewModal();">Preview</button>
                 <asp:Button ID="btnPublishOpportunity" runat="server" Text="Publish Opportunity"
-                    CssClass="btn-post-publish" ValidationGroup="vgPostOpportunity" OnClick="btnPublishOpportunity_Click" />
+                    CssClass="btn-post-publish" ValidationGroup="vgPostOpportunity" OnClick="btnPublishOpportunity_Click" OnClientClick="scrollToFirstInvalid();" />
+            </div>
+        </div>
+
+        <!-- =============================================================
+             [PREVIEW MODAL]: Interactive live preview of the opportunity
+             ============================================================= -->
+        <div id="jobPreviewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.6); z-index:99999; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(3px);">
+            <div style="background:#FFFFFF; border-radius:12px; width:100%; max-width:680px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); border:1px solid #E2E8F0;">
+                <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 24px; border-bottom:1px solid #E2E8F0;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="background:#EEF2FF; color:#4F46E5; font-size:12px; font-weight:700; padding:4px 10px; border-radius:6px; letter-spacing:0.5px;">PREVIEW MODE</span>
+                        <h3 style="font-size:17px; font-weight:700; color:#0F172A; margin:0;">Opportunity Preview</h3>
+                    </div>
+                    <button type="button" onclick="closeJobPreviewModal();" style="background:none; border:none; font-size:18px; color:#64748B; cursor:pointer; padding:4px 8px;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div style="padding:24px;">
+                    <h2 id="prevTitle" style="font-size:22px; font-weight:700; color:#0F172A; margin:0 0 8px 0;">Opportunity Title</h2>
+                    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;">
+                        <span id="prevOppTypeBadge" style="background:#EFF6FF; color:#0052CC; font-size:12px; font-weight:600; padding:4px 10px; border-radius:4px;">Full-time</span>
+                        <span id="prevWorkTypeBadge" style="background:#F1F5F9; color:#475569; font-size:12px; font-weight:600; padding:4px 10px; border-radius:4px;">Hybrid</span>
+                        <span id="prevExpBadge" style="background:#F1F5F9; color:#475569; font-size:12px; font-weight:600; padding:4px 10px; border-radius:4px;">0-2 Years</span>
+                        <span id="prevDeptBadge" style="background:#F1F5F9; color:#475569; font-size:12px; font-weight:600; padding:4px 10px; border-radius:4px;">Engineering</span>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:14px 18px; margin-bottom:20px;">
+                        <div>
+                            <span style="display:block; font-size:12px; color:#64748B; margin-bottom:2px;">Location</span>
+                            <strong id="prevLocation" style="font-size:13.5px; color:#0F172A;">Bengaluru, Karnataka, India</strong>
+                        </div>
+                        <div>
+                            <span style="display:block; font-size:12px; color:#64748B; margin-bottom:2px;">Compensation</span>
+                            <strong id="prevCompensation" style="font-size:13.5px; color:#059669;">₹4,00,000 - ₹8,00,000 / year</strong>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:18px;">
+                        <h4 style="font-size:14px; font-weight:700; color:#0F172A; margin:0 0 6px 0;">About the Role</h4>
+                        <p id="prevDescription" style="font-size:13.5px; color:#475569; line-height:1.6; margin:0; white-space:pre-wrap;">Job description will appear here...</p>
+                    </div>
+
+                    <div style="margin-bottom:20px;">
+                        <h4 style="font-size:14px; font-weight:700; color:#0F172A; margin:0 0 8px 0;">Required Skills</h4>
+                        <div id="prevSkillsContainer" style="display:flex; flex-wrap:wrap; gap:6px;">
+                            <span style="background:#F1F5F9; color:#334155; font-size:12px; padding:3px 10px; border-radius:4px;">General</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:14px 24px; border-top:1px solid #E2E8F0; background:#F8FAFC; border-radius:0 0 12px 12px;">
+                    <button type="button" onclick="closeJobPreviewModal();" style="padding:9px 18px; background:#FFFFFF; border:1px solid #CBD5E1; color:#334155; font-size:13px; font-weight:600; border-radius:6px; cursor:pointer;">Close Preview</button>
+                    <button type="button" onclick="closeJobPreviewModal(); document.getElementById('<%= btnPublishOpportunity.ClientID %>').click();" style="padding:9px 20px; background:#0052CC; border:none; color:#FFFFFF; font-size:13px; font-weight:600; border-radius:6px; cursor:pointer;">Publish Now</button>
+                </div>
             </div>
         </div>
 
     </div>
+
+    <!-- Client-Side Form Scripts: Auto-scroll on validation error & Live Preview Modal -->
+    <script type="text/javascript">
+        function scrollToFirstInvalid() {
+            setTimeout(function () {
+                if (typeof Page_Validators !== "undefined" && Page_Validators) {
+                    for (var i = 0; i < Page_Validators.length; i++) {
+                        var val = Page_Validators[i];
+                        if (val && !val.isvalid) {
+                            var ctrl = document.getElementById(val.controltovalidate);
+                            if (ctrl) {
+                                ctrl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                ctrl.focus();
+                                ctrl.style.borderColor = "#DC2626";
+                                ctrl.style.boxShadow = "0 0 0 3px rgba(220, 38, 38, 0.15)";
+                                setTimeout(function () {
+                                    ctrl.style.borderColor = "";
+                                    ctrl.style.boxShadow = "";
+                                }, 3000);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }, 100);
+        }
+
+        function openJobPreviewModal() {
+            var title = document.getElementById('<%= txtJobTitle.ClientID %>')?.value.trim() || "Untitled Opportunity";
+            var empType = document.getElementById('<%= ddlEmploymentType.ClientID %>')?.value || "Full-time";
+            var expLevel = document.getElementById('<%= ddlExperienceLevel.ClientID %>')?.value || "Not Specified";
+            var dept = document.getElementById('<%= ddlDepartment.ClientID %>')?.value || "General";
+            var hfWork = document.getElementById('<%= hfWorkType.ClientID %>')?.value || "Hybrid";
+
+            var city = document.getElementById('<%= ddlCity.ClientID %>')?.value || "";
+            var state = document.getElementById('<%= ddlState.ClientID %>')?.value || "";
+            var country = document.getElementById('<%= ddlCountry.ClientID %>')?.value || "India";
+            var locationParts = [city, state, country].filter(Boolean).join(", ") || "Remote / India";
+
+            var sMin = document.getElementById('<%= txtSalaryMin.ClientID %>')?.value.trim();
+            var sMax = document.getElementById('<%= txtSalaryMax.ClientID %>')?.value.trim();
+            var period = document.getElementById('<%= ddlSalaryPeriod.ClientID %>')?.value || "Per Year";
+            var compText = (sMin && sMax) ? ("₹" + Number(sMin).toLocaleString('en-IN') + " - ₹" + Number(sMax).toLocaleString('en-IN') + " " + period) : "Best in Industry";
+
+            var desc = document.getElementById('<%= txtJobDescription.ClientID %>')?.value.trim() || "No description provided yet.";
+            var skills = document.getElementById('<%= txtRequiredSkills.ClientID %>')?.value.trim() || "General";
+
+            document.getElementById("prevTitle").innerText = title;
+            document.getElementById("prevOppTypeBadge").innerText = empType;
+            document.getElementById("prevWorkTypeBadge").innerText = hfWork;
+            document.getElementById("prevExpBadge").innerText = expLevel;
+            document.getElementById("prevDeptBadge").innerText = dept;
+            document.getElementById("prevLocation").innerText = locationParts;
+            document.getElementById("prevCompensation").innerText = compText;
+            document.getElementById("prevDescription").innerText = desc;
+
+            var skillsContainer = document.getElementById("prevSkillsContainer");
+            if (skillsContainer) {
+                skillsContainer.innerHTML = "";
+                skills.split(',').forEach(function (s) {
+                    var trimmed = s.trim();
+                    if (trimmed) {
+                        var pill = document.createElement("span");
+                        pill.style.cssText = "background:#F1F5F9; color:#334155; font-size:12px; font-weight:500; padding:3px 10px; border-radius:4px;";
+                        pill.innerText = trimmed;
+                        skillsContainer.appendChild(pill);
+                    }
+                });
+            }
+
+            var modal = document.getElementById("jobPreviewModal");
+            if (modal) modal.style.display = "flex";
+        }
+
+        function closeJobPreviewModal() {
+            var modal = document.getElementById("jobPreviewModal");
+            if (modal) modal.style.display = "none";
+        }
+    </script>
 </asp:Content>
