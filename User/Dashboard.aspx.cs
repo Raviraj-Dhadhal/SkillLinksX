@@ -221,7 +221,7 @@ namespace SkillLinksX.User
             try
             {
                 string sqlConns = @"
-                    SELECT TOP 3 m.id, m.full_name, m.clg_name, m.degree
+                    SELECT TOP 3 m.id, m.full_name, m.clg_name, m.degree, m.profile_photo
                     FROM member_master_table m
                     WHERE m.id <> @uid
                     ORDER BY m.id DESC";
@@ -233,13 +233,13 @@ namespace SkillLinksX.User
                     string nm = cr["full_name"].ToString();
                     string deg = cr["degree"] != DBNull.Value && !string.IsNullOrEmpty(cr["degree"].ToString()) ? cr["degree"].ToString() : "Student";
                     string clg = cr["clg_name"] != DBNull.Value && !string.IsNullOrEmpty(cr["clg_name"].ToString()) ? cr["clg_name"].ToString() : "University";
-                    string initial = !string.IsNullOrEmpty(nm) ? nm.Substring(0, 1).ToUpper() : "U";
+                    string photo = cr["profile_photo"] != DBNull.Value ? cr["profile_photo"].ToString() : "";
 
                     connsList.Add(new
                     {
                         FullName = nm,
                         Subtitle = deg + " at " + clg,
-                        Initial = initial
+                        ProfilePhoto = photo
                     });
                 }
 

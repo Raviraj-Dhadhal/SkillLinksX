@@ -102,8 +102,10 @@
                                 CssClass='<%# "chat-thread-item " + (Convert.ToInt32(Eval("contact_id")) == ActiveContactId ? "active" : "") %>'
                                 CommandArgument='<%# Eval("contact_id") %>' OnClick="btnSelectThread_Click">
                                 <div class="thread-avatar-wrapper">
-                                    <span class="thread-avatar-circle" style="width:40px; height:40px; border-radius:50%; background:#e0e7ff; display:inline-flex; align-items:center; justify-content:center; color:#3730a3; font-size:16px; font-weight:600;">
-                                        <%# GetInitials(Eval("full_name").ToString()) %>
+                                    <span class="thread-avatar-circle" style="width:40px; height:40px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#64748b; font-size:16px; border:1px solid #cbd5e1; overflow:hidden;">
+                                        <%# (Eval("profile_photo") != DBNull.Value && !string.IsNullOrEmpty(Eval("profile_photo").ToString())) 
+                                            ? "<img src='" + ResolveUrl(Eval("profile_photo").ToString()) + "' style='width:100%; height:100%; border-radius:50%; object-fit:cover;' />"
+                                            : "<i class=\"fa-regular fa-user\"></i>" %>
                                     </span>
                                 </div>
                                 <div class="thread-info-content" style="flex:1; min-width:0; margin-left: 4px;">
@@ -139,8 +141,8 @@
                 <div class="chat-main-header">
                     <div class="chat-header-user">
                         <div class="thread-avatar-wrapper">
-                            <span class="thread-avatar-circle" style="width:40px; height:40px; border-radius:50%; background:#e0e7ff; display:inline-flex; align-items:center; justify-content:center; color:#3730a3; font-size:16px; font-weight:600;">
-                                <asp:Literal ID="litActiveContactInitial" runat="server">C</asp:Literal>
+                            <span class="thread-avatar-circle" style="width:40px; height:40px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#64748b; font-size:16px; border:1px solid #cbd5e1; overflow:hidden;">
+                                <asp:Literal ID="litActiveContactInitial" runat="server"><i class="fa-regular fa-user"></i></asp:Literal>
                             </span>
                         </div>
                         <div>
@@ -162,13 +164,20 @@
                     <asp:Repeater ID="rptChatMessages" runat="server">
                         <ItemTemplate>
                             <div class='<%# Convert.ToInt32(Eval("sender_id")) == CurrentUserId ? "message-bubble-row outgoing" : "message-bubble-row incoming" %>'>
-                                <%# Convert.ToInt32(Eval("sender_id")) == CurrentUserId ? "" : "<span class='msg-bubble-avatar' style='width:30px; height:30px; border-radius:50%; background:#e2e8f0; display:inline-flex; align-items:center; justify-content:center; color:#475569; font-size:12px; font-weight:600; margin-right:6px; flex-shrink:0;'><i class=\"fa-regular fa-user\"></i></span>" %>
+                                <%# Convert.ToInt32(Eval("sender_id")) == CurrentUserId ? "" : 
+                                    ("<span class='msg-bubble-avatar' style='width:30px; height:30px; border-radius:50%; background:#e2e8f0; display:inline-flex; align-items:center; justify-content:center; color:#475569; font-size:12px; margin-right:6px; flex-shrink:0; overflow:hidden;'>" + 
+                                    (!string.IsNullOrEmpty(ActiveContactPhoto) ? "<img src='" + ResolveUrl(ActiveContactPhoto) + "' style='width:100%; height:100%; border-radius:50%; object-fit:cover;' />" : "<i class=\"fa-regular fa-user\"></i>") + 
+                                    "</span>") %>
                                 <div class='<%# Convert.ToInt32(Eval("sender_id")) == CurrentUserId ? "msg-bubble-content outgoing-bubble" : "msg-bubble-content incoming-bubble" %>'>
                                     <p><%# Eval("message_text") %></p>
                                     <span class='<%# "msg-time-stamp " + (Convert.ToInt32(Eval("sender_id")) == CurrentUserId ? "sent-stamp" : "") %>' style="font-size:10px; opacity:0.8; display:block; text-align:right;">
                                         <%# Convert.ToDateTime(Eval("sent_at")).ToString("hh:mm tt") %>
                                     </span>
                                 </div>
+                                <%# Convert.ToInt32(Eval("sender_id")) == CurrentUserId ? 
+                                    ("<span class='msg-bubble-avatar' style='width:30px; height:30px; border-radius:50%; background:#e2e8f0; display:inline-flex; align-items:center; justify-content:center; color:#475569; font-size:12px; margin-left:6px; flex-shrink:0; overflow:hidden;'>" + 
+                                    (!string.IsNullOrEmpty(CurrentUserPhoto) ? "<img src='" + ResolveUrl(CurrentUserPhoto) + "' style='width:100%; height:100%; border-radius:50%; object-fit:cover;' />" : "<i class=\"fa-regular fa-user\"></i>") + 
+                                    "</span>") : "" %>
                             </div>
                         </ItemTemplate>
                         <FooterTemplate>

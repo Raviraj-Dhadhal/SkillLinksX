@@ -193,6 +193,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
+            // Look for user avatar on page or fallback to initial chip
+            var userAvatarEl = document.querySelector(".ai-msg-avatar.user-avatar");
+            var avatarHtml = '';
+            if (userAvatarEl && userAvatarEl.innerHTML.trim().length > 0) {
+                avatarHtml = userAvatarEl.innerHTML;
+            } else {
+                avatarHtml = '<span style="width:100%; height:100%; border-radius:50%; background:#f1f5f9; color:#64748b; display:inline-flex; align-items:center; justify-content:center; font-size:13px; border:1px solid #cbd5e1;"><i class="fa-regular fa-user"></i></span>';
+            }
+
             // Append User Bubble
             const userMsg = document.createElement("div");
             userMsg.className = "ai-msg-group user";
@@ -202,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="ai-msg-bubble user-bubble">${text}</div>
                 </div>
                 <div class="ai-msg-avatar user-avatar">
-                    <img src="../assets/images/user-male-logo.png" alt="Raviraj Dhadhal" />
+                    ${avatarHtml}
                 </div>
             `;
             aiChatMessages.appendChild(userMsg);

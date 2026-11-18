@@ -43,6 +43,14 @@ namespace SkillLinksX.User
 
             if (!IsPostBack)
             {
+                if (DBHelper.ColumnExists("internships", "views_count"))
+                {
+                    try
+                    {
+                        DBHelper.ExecuteNonQuery("UPDATE internships SET views_count = ISNULL(views_count, 0) + 1 WHERE internship_id = @iid", new SqlParameter("@iid", InternshipId));
+                    }
+                    catch { }
+                }
                 CheckAlreadyApplied();
             }
         }
@@ -102,9 +110,9 @@ namespace SkillLinksX.User
 
             // Guard: active employment check
             object hiredObj = DBHelper.ExecuteScalar(@"
-                SELECT TOP 1 c.comp_name 
+                SELECT TOP 1 COALESCE(c.comp_name, 'another company')
                 FROM applications a 
-                INNER JOIN company_table c ON a.company_id = c.company_id 
+                LEFT JOIN company_table c ON a.company_id = c.company_id 
                 WHERE a.user_id = @sid AND a.status = 'Selected'",
                 new SqlParameter("@sid", studentId));
 
@@ -143,9 +151,9 @@ namespace SkillLinksX.User
 
             // Guard: active employment check
             object hiredObj = DBHelper.ExecuteScalar(@"
-                SELECT TOP 1 c.comp_name 
+                SELECT TOP 1 COALESCE(c.comp_name, 'another company')
                 FROM applications a 
-                INNER JOIN company_table c ON a.company_id = c.company_id 
+                LEFT JOIN company_table c ON a.company_id = c.company_id 
                 WHERE a.user_id = @sid AND a.status = 'Selected'",
                 new SqlParameter("@sid", studentId));
 

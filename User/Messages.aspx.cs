@@ -19,6 +19,9 @@ namespace SkillLinksX.User
             set => ViewState["ActiveContactId"] = value;
         }
 
+        public string ActiveContactPhoto { get; set; } = "";
+        public string CurrentUserPhoto { get; set; } = "";
+
         protected void Page_Load(object sender, EventArgs e)
         {
             // Verify User Authentication
@@ -27,6 +30,15 @@ namespace SkillLinksX.User
                 Response.Redirect("~/Public/Login.aspx");
                 return;
             }
+
+            DBHelper.EnsureProfilePhotoColumns();
+
+            try
+            {
+                object myPhotoObj = DBHelper.ExecuteScalar("SELECT profile_photo FROM member_master_table WHERE id = @uid", new SqlParameter("@uid", CurrentUserId));
+                if (myPhotoObj != null && myPhotoObj != DBNull.Value) CurrentUserPhoto = myPhotoObj.ToString().Trim();
+            }
+            catch { }
 
             if (!IsPostBack)
             {
@@ -55,17 +67,41 @@ namespace SkillLinksX.User
 
         // =========================================================================
         // [DATABASE ACCESS]: Load Contact List with latest messages and unread counts
+        // Includes accepted peer connections, recruiters who messaged, and applied companies
+        // Strictly uses user_auth.user_id as contact_id (never company_id)
         // =========================================================================
         private void LoadContactThreads()
         {
             try
             {
+                // Self-healing: normalize any legacy messages stored with company_id instead of user_id
+                try
+                {
+                    string healSql = @"
+                        UPDATE m
+                        SET m.receiver_id = c.user_id
+                        FROM messages m
+                        INNER JOIN company_table c ON m.receiver_id = c.company_id
+                        WHERE m.receiver_id <> c.user_id
+                          AND NOT EXISTS (SELECT 1 FROM user_auth u WHERE u.user_id = m.receiver_id);
+
+                        UPDATE m
+                        SET m.sender_id = c.user_id
+                        FROM messages m
+                        INNER JOIN company_table c ON m.sender_id = c.company_id
+                        WHERE m.sender_id <> c.user_id
+                          AND NOT EXISTS (SELECT 1 FROM user_auth u WHERE u.user_id = m.sender_id);";
+                    DBHelper.ExecuteNonQuery(healSql);
+                }
+                catch { }
+
                 string sql = @"
                     SELECT 
                         c.contact_id, 
                         c.full_name, 
                         c.email, 
                         c.role_type,
+                        c.profile_photo,
                         (SELECT TOP 1 message_text FROM messages 
                          WHERE (sender_id = c.contact_id AND receiver_id = @uid) 
                             OR (sender_id = @uid AND receiver_id = c.contact_id) 
@@ -76,17 +112,43 @@ namespace SkillLinksX.User
                         (SELECT COUNT(*) FROM messages 
                          WHERE sender_id = c.contact_id AND receiver_id = @uid AND is_read = 0) AS unread_count
                     FROM (
-                        SELECT user_id AS contact_id, comp_name AS full_name, email_add AS email, 'Recruiter' AS role_type
-                        FROM company_table
-                        WHERE user_id IS NOT NULL AND user_id <> @uid
+                        SELECT 
+                            con_target.contact_id,
+                            COALESCE(comp.comp_name, m.full_name, u.email, 'Recruiter / Member') AS full_name,
+                            COALESCE(comp.email_add, m.email_add, u.email, '') AS email,
+                            CASE WHEN comp.user_id IS NOT NULL OR u.role_id = 3 THEN 'Recruiter' ELSE 'Connection' END AS role_type,
+                            COALESCE(comp.profile_photo, m.profile_photo, '') AS profile_photo
+                        FROM (
+                            SELECT DISTINCT contact_id FROM (
+                                -- 1. Contacts with existing messages (Recruiters or connected students)
+                                SELECT CASE WHEN msg.sender_id = @uid THEN msg.receiver_id ELSE msg.sender_id END AS contact_id
+                                FROM messages msg
+                                WHERE (msg.sender_id = @uid OR msg.receiver_id = @uid)
 
-                        UNION
+                                UNION
 
-                        SELECT id AS contact_id, full_name, email_add AS email, 'Student' AS role_type
-                        FROM member_master_table
-                        WHERE id <> @uid
+                                -- 2. Accepted peer connections
+                                SELECT CASE WHEN conn.sender_id = @uid THEN conn.receiver_id ELSE conn.sender_id END AS contact_id
+                                FROM connections conn
+                                WHERE (conn.sender_id = @uid OR conn.receiver_id = @uid)
+                                  AND conn.status = 'Accepted'
+
+                                UNION
+
+                                -- 3. Recruiters from companies the student applied to
+                                SELECT comp.user_id AS contact_id
+                                FROM applications a
+                                INNER JOIN company_table comp ON a.company_id = comp.company_id
+                                WHERE a.user_id = @uid
+                            ) raw_c
+                            WHERE contact_id IS NOT NULL AND contact_id <> @uid
+                        ) con_target
+                        LEFT JOIN company_table comp ON comp.user_id = con_target.contact_id
+                        LEFT JOIN member_master_table m ON m.id = con_target.contact_id
+                        LEFT JOIN user_auth u ON u.user_id = con_target.contact_id
                     ) c
                     ORDER BY 
+                        unread_count DESC,
                         CASE WHEN (SELECT MAX(sent_at) FROM messages WHERE (sender_id = c.contact_id AND receiver_id = @uid) OR (sender_id = @uid AND receiver_id = c.contact_id)) IS NOT NULL THEN 0 ELSE 1 END,
                         last_activity DESC,
                         c.full_name ASC";
@@ -98,19 +160,32 @@ namespace SkillLinksX.User
                     rptContactThreads.DataSource = dt;
                     rptContactThreads.DataBind();
 
-                    if (ActiveContactId == 0)
+                    // Check if ActiveContactId exists in the connection list
+                    bool activeExists = false;
+                    foreach (DataRow r in dt.Rows)
+                    {
+                        if (Convert.ToInt32(r["contact_id"]) == ActiveContactId)
+                        {
+                            activeExists = true;
+                            break;
+                        }
+                    }
+
+                    if (!activeExists)
                     {
                         ActiveContactId = Convert.ToInt32(dt.Rows[0]["contact_id"]);
                     }
                 }
                 else
                 {
+                    ActiveContactId = 0;
                     rptContactThreads.DataSource = null;
                     rptContactThreads.DataBind();
                 }
             }
             catch (Exception)
             {
+                ActiveContactId = 0;
                 rptContactThreads.DataSource = null;
                 rptContactThreads.DataBind();
             }
@@ -123,15 +198,48 @@ namespace SkillLinksX.User
         {
             try
             {
-                if (contactId <= 0) return;
+                if (contactId <= 0)
+                {
+                    litActiveContactName.Text = "No active connection";
+                    litActiveContactEmail.Text = "Connect with peers or recruiters in Networking to start chatting";
+                    litActiveContactInitial.Text = "<i class=\"fa-regular fa-user\"></i>";
+                    ActiveContactPhoto = "";
+                    rptChatMessages.DataSource = null;
+                    rptChatMessages.DataBind();
+                    txtMessageInput.Enabled = false;
+                    btnSend.Enabled = false;
+                    txtMessageInput.Attributes["placeholder"] = "No connected contacts yet...";
+                    return;
+                }
 
-                // 1. Fetch Contact Details
+                // Verify whether conversation is authorized (peer connection, recruiter, or message history)
+                if (!CanChatWithContact(CurrentUserId, contactId))
+                {
+                    litActiveContactName.Text = "Not Connected";
+                    litActiveContactEmail.Text = "You must be connected with this user or recruiter to exchange messages";
+                    litActiveContactInitial.Text = "<i class=\"fa-regular fa-user\"></i>";
+                    ActiveContactPhoto = "";
+                    rptChatMessages.DataSource = null;
+                    rptChatMessages.DataBind();
+                    txtMessageInput.Enabled = false;
+                    btnSend.Enabled = false;
+                    txtMessageInput.Attributes["placeholder"] = "Connect or apply to start chatting...";
+                    return;
+                }
+
+                txtMessageInput.Enabled = true;
+                btnSend.Enabled = true;
+                txtMessageInput.Attributes["placeholder"] = "Write a message...";
+
+                // 1. Fetch Contact Details strictly by user_id
                 string infoSql = @"
-                    SELECT full_name, email FROM (
-                        SELECT user_id AS contact_id, comp_name AS full_name, email_add AS email FROM company_table
-                        UNION
-                        SELECT id AS contact_id, full_name, email_add AS email FROM member_master_table
-                    ) x WHERE contact_id = @cid";
+                    SELECT TOP 1 full_name, email, profile_photo FROM (
+                        SELECT comp_name AS full_name, email_add AS email, profile_photo FROM company_table WHERE user_id = @cid
+                        UNION ALL
+                        SELECT full_name, email_add AS email, profile_photo FROM member_master_table WHERE id = @cid
+                        UNION ALL
+                        SELECT email AS full_name, email, '' AS profile_photo FROM user_auth WHERE user_id = @cid
+                    ) x";
 
                 DataTable dtInfo = DBHelper.ExecuteQuery(infoSql, new SqlParameter("@cid", contactId));
                 if (dtInfo != null && dtInfo.Rows.Count > 0)
@@ -139,13 +247,22 @@ namespace SkillLinksX.User
                     string name = dtInfo.Rows[0]["full_name"].ToString();
                     litActiveContactName.Text = name;
                     litActiveContactEmail.Text = dtInfo.Rows[0]["email"].ToString();
-                    litActiveContactInitial.Text = GetInitials(name);
+                    string photo = dtInfo.Rows[0]["profile_photo"] != DBNull.Value ? dtInfo.Rows[0]["profile_photo"].ToString().Trim() : "";
+                    ActiveContactPhoto = photo;
+                    if (!string.IsNullOrEmpty(photo))
+                    {
+                        litActiveContactInitial.Text = $"<img src='{ResolveUrl(photo)}' style='width:100%; height:100%; border-radius:50%; object-fit:cover;' />";
+                    }
+                    else
+                    {
+                        litActiveContactInitial.Text = "<i class=\"fa-regular fa-user\"></i>";
+                    }
                 }
                 else
                 {
                     litActiveContactName.Text = "Contact #" + contactId;
                     litActiveContactEmail.Text = "";
-                    litActiveContactInitial.Text = "C";
+                    litActiveContactInitial.Text = "<i class=\"fa-regular fa-user\"></i>";
                 }
 
                 // 2. Fetch Chat Messages strictly using messages schema:
@@ -201,6 +318,14 @@ namespace SkillLinksX.User
 
             try
             {
+                // Verify conversation authorization (peer connection, recruiter, or message history)
+                if (!CanChatWithContact(CurrentUserId, ActiveContactId))
+                {
+                    txtMessageInput.Text = string.Empty;
+                    LoadActiveConversation(ActiveContactId);
+                    return;
+                }
+
                 string senderName = Session["UserName"]?.ToString();
                 if (string.IsNullOrEmpty(senderName))
                 {
@@ -217,6 +342,49 @@ namespace SkillLinksX.User
                 LoadContactThreads();
             }
             catch { }
+        }
+
+        private bool CanChatWithContact(int currentUserId, int contactId)
+        {
+            if (currentUserId <= 0 || contactId <= 0 || currentUserId == contactId) return false;
+
+            try
+            {
+                // 1. Accepted peer connection in connections table
+                object isConn = DBHelper.ExecuteScalar(@"
+                    SELECT COUNT(*) FROM connections 
+                    WHERE ((sender_id = @uid AND receiver_id = @cid) OR (sender_id = @cid AND receiver_id = @uid))
+                      AND status = 'Accepted'",
+                    new SqlParameter("@uid", currentUserId),
+                    new SqlParameter("@cid", contactId));
+                if (isConn != null && Convert.ToInt32(isConn) > 0) return true;
+
+                // 2. Existing message history between these two users
+                object hasMsg = DBHelper.ExecuteScalar(@"
+                    SELECT COUNT(*) FROM messages 
+                    WHERE (sender_id = @uid AND receiver_id = @cid) OR (sender_id = @cid AND receiver_id = @uid)",
+                    new SqlParameter("@uid", currentUserId),
+                    new SqlParameter("@cid", contactId));
+                if (hasMsg != null && Convert.ToInt32(hasMsg) > 0) return true;
+
+                // 3. Contact is a recruiter / company or student applied to company
+                object isRecruiter = DBHelper.ExecuteScalar(@"
+                    SELECT COUNT(*) FROM (
+                        SELECT 1 AS ok FROM company_table WHERE user_id = @cid
+                        UNION
+                        SELECT 1 AS ok FROM user_auth WHERE user_id = @cid AND role_id = 3
+                        UNION
+                        SELECT 1 AS ok FROM applications a 
+                        INNER JOIN company_table c ON a.company_id = c.company_id 
+                        WHERE a.user_id = @uid AND c.user_id = @cid
+                    ) x",
+                    new SqlParameter("@uid", currentUserId),
+                    new SqlParameter("@cid", contactId));
+                if (isRecruiter != null && Convert.ToInt32(isRecruiter) > 0) return true;
+            }
+            catch { }
+
+            return false;
         }
 
         public string GetInitials(string name)

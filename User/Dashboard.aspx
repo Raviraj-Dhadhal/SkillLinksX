@@ -255,9 +255,9 @@
                             <ItemTemplate>
                                 <div class="connection-item">
                                     <div class="connection-left">
-                                        <div style="width:36px; height:36px; border-radius:50%; background:#0040A2; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; margin-right:10px;">
-                                            <%# Eval("Initial") %>
-                                        </div>
+                                        <%# (!string.IsNullOrEmpty(Eval("ProfilePhoto") as string)) 
+                                            ? "<img src='" + ResolveUrl(Eval("ProfilePhoto").ToString()) + "' alt='Avatar' style='width:36px; height:36px; border-radius:50%; object-fit:cover; margin-right:10px; border:1px solid #e2e8f0;' />"
+                                            : "<div style='width:36px; height:36px; border-radius:50%; background:#f1f5f9; color:#64748b; display:flex; align-items:center; justify-content:center; font-size:15px; border:1px solid #cbd5e1; margin-right:10px;'><i class=\"fa-regular fa-user\"></i></div>" %>
                                         <div class="connection-details">
                                             <div class="connection-name"><%# Eval("FullName") %></div>
                                             <div class="connection-role"><%# Eval("Subtitle") %></div>
