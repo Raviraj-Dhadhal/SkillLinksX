@@ -11,10 +11,10 @@
         <div class="ai-assistant-grid">
 
             <!-- LEFT COLUMN: AI Assistant Chat Area -->
-            <div class="ai-chat-card">
+            <div class="ai-chat-card" style="display:flex; flex-direction:column; overflow:hidden;">
 
                 <!-- Chat Header -->
-                <div class="ai-chat-header flex-between">
+                <div class="ai-chat-header flex-between" style="flex-shrink:0;">
                     <div class="ai-assistant-brand-info">
                         <div class="ai-assistant-avatar-badge">
                             <i class="fa-solid fa-robot"></i>
@@ -28,7 +28,7 @@
                 </div>
 
                 <!-- Chat Messages Scroll Area -->
-                <div class="ai-chat-messages-area" id="aiChatMessages">
+                <div class="ai-chat-messages-area" id="aiChatMessages" style="flex:1 1 auto; min-height:0; overflow-y:auto;">
 
                     <!-- Message 1: AI Greeting -->
                     <div class="ai-msg-group assistant">
@@ -36,58 +36,61 @@
                             <i class="fa-solid fa-robot"></i>
                         </div>
                         <div class="ai-msg-body">
-                            <div class="ai-msg-sender-meta">AI Assistant &bull; 10:42 AM</div>
+                            <div class="ai-msg-sender-meta">AI Assistant &bull; Online</div>
                             <div class="ai-msg-bubble assistant-bubble">
-                                Hi Raviraj! I'm your SkillLinkX Career Assistant. How can I help you accelerate your career today? I can help analyze your profile, find matching jobs, or prepare for interviews.
+                                Hi <%= (Session["UserName"] != null ? Session["UserName"].ToString() : "there") %>! I'm your SkillLinkX Career Assistant. Ask me anything about your career, interview preparation, or upload your resume (PDF, DOCX, JPG, PNG) using the clip button to get instant skill analysis!
                             </div>
                         </div>
                     </div>
 
-                    <!-- Message 2: User Prompt -->
-                    <div class="ai-msg-group user">
-                        <div class="ai-msg-body">
-                            <div class="ai-msg-sender-meta text-right">You &bull; 10:45 AM</div>
-                            <div class="ai-msg-bubble user-bubble">
-                                I'd like to analyze my skill gaps for Software Developer roles.
-                            </div>
-                        </div>
-                        <div class="ai-msg-avatar user-avatar">
-                            <img src="<%= ResolveUrl("~/assets/images/user-male-logo.png") %>" alt="Raviraj Dhadhal" />
-                        </div>
-                    </div>
-
-                    <!-- Message 3: AI Analysis Response with Pill Buttons -->
-                    <div class="ai-msg-group assistant">
-                        <div class="ai-msg-avatar">
-                            <i class="fa-solid fa-robot"></i>
-                        </div>
-                        <div class="ai-msg-body">
-                            <div class="ai-msg-sender-meta">AI Assistant &bull; 10:46 AM</div>
-                            <div class="ai-msg-bubble assistant-bubble">
-                                <p class="mb-3">Great choice! Based on your profile and target roles in Bengaluru, here is your skill gap analysis for Software Developer positions.</p>
-                                <p class="mb-3">I've noticed you have a strong foundation in frontend, but could improve your backend knowledge to increase your match rate. I've updated the Insights panel on the right with specific metrics and learning paths.</p>
-                                
-                                <div class="ai-chip-actions-row">
-                                    <button type="button" class="btn-ai-action-chip">Show me courses for Node.js</button>
-                                    <button type="button" class="btn-ai-action-chip">Update my resume</button>
+                    <!-- Dynamic Chat History Repeater -->
+                    <asp:Repeater ID="rptChatHistory" runat="server">
+                        <ItemTemplate>
+                            <div class='<%# "ai-msg-group " + (Eval("Sender").ToString() == "user" ? "user" : "assistant") %>'>
+                                <asp:Panel runat="server" Visible='<%# Eval("Sender").ToString() == "assistant" %>' CssClass="ai-msg-avatar">
+                                    <i class="fa-solid fa-robot"></i>
+                                </asp:Panel>
+                                <div class="ai-msg-body">
+                                    <div class='<%# "ai-msg-sender-meta " + (Eval("Sender").ToString() == "user" ? "text-right" : "") %>'>
+                                        <%# Eval("Sender").ToString() == "user" ? "You" : "AI Assistant" %> &bull; <%# Eval("Timestamp") %>
+                                    </div>
+                                    <div class='<%# "ai-msg-bubble " + (Eval("Sender").ToString() == "user" ? "user-bubble" : "assistant-bubble") %>'>
+                                        <%# Eval("Message") %>
+                                    </div>
                                 </div>
+                                <asp:Panel runat="server" Visible='<%# Eval("Sender").ToString() == "user" %>' CssClass="ai-msg-avatar user-avatar">
+                                    <img src="<%= ResolveUrl("~/assets/images/user-male-logo.png") %>" alt="User" />
+                                </asp:Panel>
                             </div>
-                        </div>
-                    </div>
+                        </ItemTemplate>
+                    </asp:Repeater>
 
                 </div>
 
                 <!-- Chat Input Footer -->
-                <div class="ai-chat-input-wrapper">
+                <div class="ai-chat-input-wrapper" style="flex-shrink:0; margin-top:auto;">
+                    <!-- File Format Support Warning/Notice -->
+                    <div class="ai-format-notice" style="font-size:11.5px; color:#6b7280; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-circle-info text-blue"></i>
+                        <span>Attach Resume: Supported formats: <strong>.pdf</strong>, <strong>.docx</strong>, <strong>.jpg</strong>, <strong>.png</strong> (Max 5MB)</span>
+                    </div>
+
                     <div class="ai-chat-input-pill">
-                        <button type="button" class="btn-ai-attach" aria-label="Attach File">
+                        <!-- Hidden FileUpload triggered by paperclip -->
+                        <asp:FileUpload ID="fileResume" runat="server" accept=".pdf,.docx,.jpg,.jpeg,.png" style="display:none;" onchange="this.form.submit();" />
+                        <button type="button" class="btn-ai-attach" aria-label="Attach File" onclick="document.getElementById('<%= fileResume.ClientID %>').click();" title="Upload Resume (.pdf, .docx, .jpg, .png)">
                             <i class="fa-solid fa-paperclip"></i>
                         </button>
-                        <input type="text" class="ai-chat-text-input" placeholder="Write a message..." id="aiChatInput" />
-                        <button type="button" class="btn-ai-send" aria-label="Send prompt" id="btnAiSend">
+
+                        <asp:TextBox ID="txtMessage" runat="server" CssClass="ai-chat-text-input" placeholder="Ask AI about skills, interview prep, career roadmap..." AutoPostBack="false"></asp:TextBox>
+
+                        <asp:LinkButton ID="btnSend" runat="server" CssClass="btn-ai-send" OnClick="btnSend_Click" aria-label="Send prompt">
                             <i class="fa-solid fa-paper-plane"></i>
-                        </button>
+                        </asp:LinkButton>
                     </div>
+
+                    <asp:Label ID="lblUploadAlert" runat="server" CssClass="text-danger" style="font-size:12px; display:block; margin-top:4px;" EnableViewState="true"></asp:Label>
+
                     <div class="ai-chat-disclaimer">
                         AI responses may not be 100% accurate. Verify important career advice.
                     </div>
@@ -108,15 +111,15 @@
                 <div class="ai-metrics-3grid">
                     <div class="ai-metric-stat-card">
                         <span class="ai-metric-label">Overall Match</span>
-                        <span class="ai-metric-num text-blue">87%</span>
+                        <span class="ai-metric-num text-blue"><%= OverallMatchPct %>%</span>
                     </div>
                     <div class="ai-metric-stat-card">
                         <span class="ai-metric-label">Profile Strength</span>
-                        <span class="ai-metric-num text-green">82%</span>
+                        <span class="ai-metric-num text-green"><%= ProfileStrengthPct %>%</span>
                     </div>
                     <div class="ai-metric-stat-card">
                         <span class="ai-metric-label">Resume Score</span>
-                        <span class="ai-metric-num text-indigo">88%</span>
+                        <span class="ai-metric-num text-indigo"><%= ResumeScorePct %>%</span>
                     </div>
                 </div>
 
@@ -128,55 +131,22 @@
                     </div>
 
                     <div class="ai-skill-bars-list">
-                        <!-- Skill 1: React.js -->
-                        <div class="ai-skill-item">
-                            <div class="ai-skill-labels flex-between">
-                                <span class="ai-skill-name">React.js</span>
-                                <span class="ai-skill-tag-status tag-strong">Strong</span>
-                            </div>
-                            <div class="ai-skill-track">
-                                <div class="ai-skill-fill fill-green" style="width: 95%;"></div>
-                            </div>
-                        </div>
-
-                        <!-- Skill 2: Node.js -->
-                        <div class="ai-skill-item">
-                            <div class="ai-skill-labels flex-between">
-                                <span class="ai-skill-name">Node.js</span>
-                                <span class="ai-skill-meta-right">
-                                    <span class="ai-skill-tag-status tag-needs-work">Needs Work</span>
-                                    <a href="javascript:void(0);" class="ai-learn-link">Learn</a>
-                                </span>
-                            </div>
-                            <div class="ai-skill-track">
-                                <div class="ai-skill-fill fill-orange" style="width: 50%;"></div>
-                            </div>
-                        </div>
-
-                        <!-- Skill 3: SQL -->
-                        <div class="ai-skill-item">
-                            <div class="ai-skill-labels flex-between">
-                                <span class="ai-skill-name">SQL</span>
-                                <span class="ai-skill-meta-right">
-                                    <span class="ai-skill-tag-status tag-developing">Developing</span>
-                                    <a href="javascript:void(0);" class="ai-learn-link">Learn</a>
-                                </span>
-                            </div>
-                            <div class="ai-skill-track">
-                                <div class="ai-skill-fill fill-blue" style="width: 65%;"></div>
-                            </div>
-                        </div>
-
-                        <!-- Skill 4: Git -->
-                        <div class="ai-skill-item">
-                            <div class="ai-skill-labels flex-between">
-                                <span class="ai-skill-name">Git</span>
-                                <span class="ai-skill-tag-status tag-strong">Strong</span>
-                            </div>
-                            <div class="ai-skill-track">
-                                <div class="ai-skill-fill fill-green" style="width: 90%;"></div>
-                            </div>
-                        </div>
+                        <asp:Repeater ID="rptSkillGap" runat="server">
+                            <ItemTemplate>
+                                <div class="ai-skill-item">
+                                    <div class="ai-skill-labels flex-between">
+                                        <span class="ai-skill-name"><%# Eval("SkillName") %></span>
+                                        <span class="ai-skill-meta-right">
+                                            <span class='<%# "ai-skill-tag-status " + Eval("TagClass") %>'><%# Eval("StatusText") %></span>
+                                            <%# (bool)Eval("ShowLearn") ? "<a href=\"javascript:void(0);\" class=\"ai-learn-link\">Learn</a>" : "" %>
+                                        </span>
+                                    </div>
+                                    <div class="ai-skill-track">
+                                        <div class='<%# "ai-skill-fill " + Eval("FillClass") %>' style='<%# "width: " + Eval("Percentage") + "%;" %>'></div>
+                                    </div>
+                                </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
                     </div>
                 </div>
 
@@ -184,35 +154,27 @@
                 <div class="ai-card-panel">
                     <div class="ai-panel-header flex-between">
                         <h3 class="ai-panel-title">Recommended Roles</h3>
-                        <a href="<%= ResolveUrl("~/User/Jobs.aspx") %>" class="ai-view-all-link">View All</a>
+                        <a href='<%= ResolveUrl("~/User/Jobs.aspx") %>' class="ai-view-all-link">View All</a>
                     </div>
 
                     <div class="ai-roles-list">
-                        <!-- Role 1: Software Developer (Fresher) -->
-                        <div class="ai-role-item-card">
-                            <div class="ai-role-top flex-between">
-                                <h4 class="ai-role-name">Software Developer (Fresher)</h4>
-                                <span class="badge-role-match">92% Match</span>
-                            </div>
-                            <div class="ai-role-subline">TechFlow &bull; Bengaluru, KA</div>
-                            <div class="ai-role-bottom flex-between">
-                                <span class="ai-role-salary">&#8377;6L - &#8377;8L / yr</span>
-                                <span class="ai-role-posted">Posted 2d ago</span>
-                            </div>
-                        </div>
-
-                        <!-- Role 2: Frontend Intern -->
-                        <div class="ai-role-item-card">
-                            <div class="ai-role-top flex-between">
-                                <h4 class="ai-role-name">Frontend Intern</h4>
-                                <span class="badge-role-match">89% Match</span>
-                            </div>
-                            <div class="ai-role-subline">Zomato &bull; Mumbai, MH</div>
-                            <div class="ai-role-bottom flex-between">
-                                <span class="ai-role-salary">&#8377;25k - &#8377;30k / mo</span>
-                                <span class="ai-role-posted">Posted 5h ago</span>
-                            </div>
-                        </div>
+                        <asp:Repeater ID="rptRecommendedRoles" runat="server">
+                            <ItemTemplate>
+                                <div class="ai-role-item-card">
+                                    <div class="ai-role-top flex-between">
+                                        <h4 class="ai-role-name"><%# Eval("Title") %></h4>
+                                        <span class="badge-role-match"><%# Eval("MatchScore") %>% Match</span>
+                                    </div>
+                                    <div class="ai-role-subline">
+                                        <%# Eval("Company") %> &bull; <%# Eval("Location") %>
+                                    </div>
+                                    <div class="ai-role-bottom flex-between">
+                                        <span class="ai-role-salary">&#8377;<%# Eval("Salary") %></span>
+                                        <span class="ai-role-posted">Posted <%# Eval("PostedAgo") %></span>
+                                    </div>
+                                </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
                     </div>
                 </div>
 
@@ -220,15 +182,15 @@
                 <div class="ai-quick-actions-block">
                     <div class="ai-quick-actions-title">Quick Actions</div>
                     <div class="ai-quick-actions-row">
-                        <a href="<%= ResolveUrl("~/User/Jobs.aspx") %>" class="btn-ai-quick-action">
+                        <a href='<%= ResolveUrl("~/User/Jobs.aspx") %>' class="btn-ai-quick-action">
                             <i class="fa-solid fa-magnifying-glass"></i> Find Matching Jobs
                         </a>
-                        <a href="#" class="btn-ai-quick-action">
-                            <i class="fa-solid fa-user-tie"></i> Prepare for Interview
+                        <a href='<%= ResolveUrl("~/User/Notifications.aspx") %>' class="btn-ai-quick-action">
+                            <i class="fa-solid fa-bell"></i> Interview Notifications
                         </a>
                     </div>
-                    <a href="<%= ResolveUrl("~/User/Portfolio.aspx") %>" class="btn-ai-quick-action full-width">
-                        <i class="fa-regular fa-file-lines"></i> Improve Profile & Resume
+                    <a href='<%= ResolveUrl("~/User/Portfolio.aspx") %>' class="btn-ai-quick-action full-width">
+                        <i class="fa-regular fa-file-lines"></i> Improve Profile &amp; Resume
                     </a>
                 </div>
 
@@ -237,4 +199,14 @@
         </div>
 
     </div>
+
+    <script type="text/javascript">
+        // Auto-scroll chat to latest message on page load and postback
+        window.addEventListener('DOMContentLoaded', function () {
+            var chatBox = document.getElementById('aiChatMessages');
+            if (chatBox) {
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        });
+    </script>
 </asp:Content>

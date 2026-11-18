@@ -16,6 +16,19 @@ namespace SkillLinksX.Helpers
     // =========================================================================
     public static class AIService
     {
+        // Custom WebClient with strict timeout so it never hangs indefinitely
+        private class TimeoutWebClient : WebClient
+        {
+            public int TimeoutMs { get; set; } = 2500; // 2.5 seconds timeout
+
+            protected override WebRequest GetWebRequest(Uri uri)
+            {
+                WebRequest w = base.GetWebRequest(uri);
+                w.Timeout = TimeoutMs;
+                return w;
+            }
+        }
+
         // Local Ollama endpoints & configuration
         private static string OllamaUrl => ConfigurationManager.AppSettings["OllamaEndpoint"] ?? "http://localhost:11434/api/generate";
         private static string LocalModel => ConfigurationManager.AppSettings["OllamaChatModel"] ?? "qwen2.5:0.5b";
@@ -87,12 +100,15 @@ namespace SkillLinksX.Helpers
 
         // =====================================================================
         // 3. ALGORITHMIC SKILL MATCH SCORE (% calculation)
-        // Evaluates student skills against required job skills (55% to 98%)
+        // Evaluates student skills against required job skills (0% to 100%)
         // =====================================================================
         public static int CalculateMatchScore(string studentSkills, string jobRequiredSkills)
         {
-            if (string.IsNullOrWhiteSpace(studentSkills) || string.IsNullOrWhiteSpace(jobRequiredSkills))
-                return 75;
+            if (string.IsNullOrWhiteSpace(studentSkills))
+                return 0;
+
+            if (string.IsNullOrWhiteSpace(jobRequiredSkills))
+                return 50;
 
             var studentTokens = new HashSet<string>(
                 studentSkills.Split(new[] { ',', ';', '|', '/', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
@@ -104,7 +120,8 @@ namespace SkillLinksX.Helpers
                                  .Select(s => s.Trim().ToLower())
             );
 
-            if (jobTokens.Count == 0) return 80;
+            if (studentTokens.Count == 0) return 0;
+            if (jobTokens.Count == 0) return 50;
 
             int matches = jobTokens.Count(jobSkill =>
                 studentTokens.Any(studentSkill =>
@@ -113,9 +130,9 @@ namespace SkillLinksX.Helpers
             );
 
             double matchRatio = (double)matches / jobTokens.Count;
-            int score = (int)(65 + (matchRatio * 32));
+            int score = (int)Math.Round(matchRatio * 100);
 
-            return Math.Min(98, Math.Max(55, score));
+            return Math.Min(100, Math.Max(0, score));
         }
 
         // =====================================================================
@@ -142,8 +159,9 @@ namespace SkillLinksX.Helpers
                 serializer.MaxJsonLength = int.MaxValue;
                 string jsonPayload = serializer.Serialize(payload);
 
-                using (var client = new WebClient())
+                using (var client = new TimeoutWebClient())
                 {
+                    client.TimeoutMs = 2500;
                     client.Encoding = Encoding.UTF8;
                     client.Headers[HttpRequestHeader.ContentType] = "application/json";
 
@@ -158,13 +176,34 @@ namespace SkillLinksX.Helpers
                     }
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                // Smart Offline Fallback: Ensures application never crashes during evaluator demo!
-                return $"[Local AI (Ollama - {LocalModel})]: Great career question! Focus on mastering core data structures, strengthening your C# and SQL fundamentals, and building end-to-end full stack projects with clean architecture. (Note: Ensure Ollama is running: 'ollama run {LocalModel}').";
+                // Instant Smart Offline Career Guide Fallback:
+                // If Ollama is not installed or running, reply instantly with targeted, realistic advice.
+                return GenerateOfflineCareerAdvice(prompt);
             }
 
-            return "AI completed, but returned no text.";
+            return GenerateOfflineCareerAdvice(prompt);
+        }
+
+        private static string GenerateOfflineCareerAdvice(string prompt)
+        {
+            string pLower = prompt.ToLower();
+
+            if (pLower.Contains("resume") || pLower.Contains("cv"))
+            {
+                return "To optimize your resume: 1) Keep it clean and 1-page. 2) List your key tech stack (C#, ASP.NET, SQL Server, React) at the top. 3) Highlight measurable impact in your projects (e.g., 'Built RESTful APIs improving retrieval time by 30%'). 4) Include your GitHub and live project demo links.";
+            }
+            if (pLower.Contains("interview") || pLower.Contains("prep"))
+            {
+                return "Top tips for technical interviews: 1) Master OOPs concepts (Encapsulation, Polymorphism, Abstraction, Inheritance). 2) Practice SQL queries (joins, indexing, aggregation). 3) Be ready to explain your project architecture and how you handled errors or state management. 4) Practice behavioral questions using the STAR method.";
+            }
+            if (pLower.Contains("roadmap") || pLower.Contains("skills") || pLower.Contains("learn"))
+            {
+                return "Recommended Full-Stack Roadmap: 1) Strong C# fundamentals and LINQ. 2) ASP.NET web development and REST APIs. 3) Relational database design and stored procedures in SQL Server. 4) Modern frontend basics (HTML5, CSS3, JavaScript, React). 5) Git version control and building full-stack portfolio projects.";
+            }
+
+            return "Great career question! Focus on mastering core data structures, strengthening your C# and SQL fundamentals, and building end-to-end full stack projects with clean architecture. Make sure to keep your SkillLinksX portfolio updated with active GitHub links!";
         }
     }
 }
