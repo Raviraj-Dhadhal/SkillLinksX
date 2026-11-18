@@ -13,8 +13,28 @@ namespace SkillLinksX.Public
     {
         protected global::System.Web.UI.WebControls.Label lblRegisterStatus;
         protected global::System.Web.UI.WebControls.ValidationSummary valSummaryRegister;
+
+        // Student controls
         protected global::System.Web.UI.WebControls.TextBox txtRegFullName;
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvRegFullName;
+        protected global::System.Web.UI.WebControls.TextBox txtRegCollege;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvRegCollege;
+        protected global::System.Web.UI.WebControls.DropDownList ddlGradYear;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvGradYear;
+        protected global::System.Web.UI.WebControls.TextBox txtRegSkills;
+
+        // Company controls
+        protected global::System.Web.UI.WebControls.TextBox txtRegCompName;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvRegCompName;
+        protected global::System.Web.UI.WebControls.TextBox txtRegRecruiterName;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvRegRecruiterName;
+        protected global::System.Web.UI.WebControls.DropDownList ddlRegIndustry;
+        protected global::System.Web.UI.WebControls.DropDownList ddlRegEmployeeCount;
+        protected global::System.Web.UI.WebControls.TextBox txtRegCompAddress;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvRegCompAddress;
+        protected global::System.Web.UI.WebControls.TextBox txtRegWebsite;
+
+        // Common credentials & contact
         protected global::System.Web.UI.WebControls.TextBox txtRegEmail;
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvRegEmail;
         protected global::System.Web.UI.WebControls.RegularExpressionValidator revRegEmail;
@@ -27,11 +47,7 @@ namespace SkillLinksX.Public
         protected global::System.Web.UI.WebControls.TextBox txtRegCity;
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvRegCity;
         protected global::System.Web.UI.WebControls.DropDownList ddlRegState;
-        protected global::System.Web.UI.WebControls.TextBox txtRegCollege;
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvRegCollege;
-        protected global::System.Web.UI.WebControls.DropDownList ddlGradYear;
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvGradYear;
-        protected global::System.Web.UI.WebControls.TextBox txtRegSkills;
+
         protected global::System.Web.UI.WebControls.Button btnCreateAccount;
     }
 }
