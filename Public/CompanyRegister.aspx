@@ -169,7 +169,7 @@
 
                 <div class="contact-input-group">
                     <label class="contact-label" for="txtRegWebsite">Company Website</label>
-                    <asp:TextBox ID="txtRegWebsite" runat="server" CssClass="contact-text-box" placeholder="https://www.technova.in"></asp:TextBox>
+                    <asp:TextBox ID="txtRegWebsite" runat="server" CssClass="contact-text-box" placeholder="https://www.company.com"></asp:TextBox>
                 </div>
             </div>
 

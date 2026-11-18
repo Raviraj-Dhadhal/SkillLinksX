@@ -1645,10 +1645,18 @@
     font-size: 13px;
     cursor: pointer;
     padding: 4px;
+    transition: all 0.2s ease;
 }
 
-.pagination-nav-btn:hover {
+.pagination-nav-btn:hover:not(:disabled):not(.disabled) {
     color: #0F172A;
+}
+
+.pagination-nav-btn:disabled,
+.pagination-nav-btn.disabled {
+    opacity: 0.35 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
 }
 
 /* Manage Jobs Footer Brand Block (Figma style) */

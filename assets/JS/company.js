@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /* ----------------------------------------------------------------------
-       3. Applications Overview ApexCharts (Analytics Page)
+       3. Applications & Recruitment Activity ApexCharts (Analytics Page)
        ---------------------------------------------------------------------- */
     function renderOverviewChart() {
         const chartContainer = document.querySelector("#applicationsOverviewChart");
@@ -105,37 +105,61 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // =========================================================================
         // [DATABASE DYNAMIC INJECTION]:
-        // Read database-fed monthly application counts from Company/Analytics.aspx.cs
+        // Read database-fed monthly categories and counts from Company/Analytics.aspx.cs
         // =========================================================================
+        const categories = (typeof window.dbCompanyChartCategories !== "undefined" && Array.isArray(window.dbCompanyChartCategories) && window.dbCompanyChartCategories.length > 0)
+            ? window.dbCompanyChartCategories
+            : ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
+
         const liveAppData = (typeof window.dbCompanyAppMonthly !== "undefined" && Array.isArray(window.dbCompanyAppMonthly))
             ? window.dbCompanyAppMonthly
-            : [180, 290, 240, 420, 380, 520, 520, 490];
+            : [0, 0, 0, 0, 0, 0];
+
+        const liveIntData = (typeof window.dbCompanyInterviewMonthly !== "undefined" && Array.isArray(window.dbCompanyInterviewMonthly))
+            ? window.dbCompanyInterviewMonthly
+            : [0, 0, 0, 0, 0, 0];
 
         // Options configuring the ApexCharts bar graph
         const chartOptions = {
-            series: [{
-                name: 'Applications',
-                data: liveAppData // Live dynamic series queried from SQL Server applications table
-            }],
+            series: [
+                {
+                    name: 'Applications',
+                    data: liveAppData
+                },
+                {
+                    name: 'Interviews Scheduled',
+                    data: liveIntData
+                }
+            ],
             chart: {
                 type: 'bar',
                 height: 290,
-                toolbar: { show: false }, // Hide chart download/zoom tools
-                fontFamily: 'inherit'
+                toolbar: { show: false },
+                fontFamily: 'inherit',
+                animations: {
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 600
+                }
             },
             plotOptions: {
                 bar: {
-                    borderRadius: 6,      // Rounded top edges on bars
-                    columnWidth: '60%',   // Bar thickness
+                    borderRadius: 4,
+                    columnWidth: '50%',
                     distributed: false
                 }
             },
             dataLabels: {
-                enabled: false            // Hide values on top of bars
+                enabled: false
             },
-            colors: ['#2563EB'],          // SkillLinkX Blue branding color
+            stroke: {
+                show: true,
+                width: 2,
+                colors: ['transparent']
+            },
+            colors: ['#2563EB', '#10B981'],
             xaxis: {
-                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                categories: categories,
                 axisBorder: { show: false },
                 axisTicks: { show: false },
                 labels: {
@@ -146,18 +170,51 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             },
             yaxis: {
-                show: false               // Clean borderless look matching Figma
+                show: true,
+                min: 0,
+                forceNiceScale: true,
+                labels: {
+                    style: {
+                        colors: '#94A3B8',
+                        fontSize: '11px'
+                    },
+                    formatter: function (val) {
+                        return Math.round(val);
+                    }
+                }
             },
             grid: {
-                show: false,
-                padding: { left: 0, right: 0 }
+                borderColor: '#F1F5F9',
+                strokeDashArray: 4,
+                yaxis: {
+                    lines: { show: true }
+                },
+                padding: { left: 8, right: 8 }
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'right',
+                fontSize: '12px',
+                fontWeight: 600,
+                markers: {
+                    radius: 3
+                }
             },
             tooltip: {
                 theme: 'light',
                 y: {
                     formatter: function (val) {
-                        return val + " candidates"; // Display count on hover
+                        return val + " candidates";
                     }
+                }
+            },
+            noData: {
+                text: 'No recruitment activity recorded yet',
+                align: 'center',
+                verticalAlign: 'middle',
+                style: {
+                    color: '#94A3B8',
+                    fontSize: '13px'
                 }
             }
         };

@@ -136,27 +136,135 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     /* ----------------------------------------------------------------------
-       6. Help Center Search Button Handler
+       6. Help Center Real-time Keyword Search & Filtering (No dialogue)
        ---------------------------------------------------------------------- */
+    const helpSearchInput = document.querySelector(".help-search-input");
     const helpSearchBtn = document.querySelector(".help-search-container a.btn-search-submit");
-    if (helpSearchBtn) {
-        helpSearchBtn.addEventListener("click", function (e) {
-            e.preventDefault();
-            const searchInput = document.querySelector(".help-search-input");
-            const term = searchInput ? searchInput.value.trim() : "";
-            if (term) {
-                alert("Searching help articles for: \"" + term + "\"");
+    const helpCards = document.querySelectorAll(".help-categories-grid .help-cat-card");
+    const helpFaqItems = document.querySelectorAll("#helpFaqList .help-faq-item");
+    const helpFaqSection = document.getElementById("helpFaqSection");
+    const helpStatus = document.getElementById("helpSearchStatus");
+    const helpResultCount = document.getElementById("helpSearchResultCount");
+    const helpQueryDisplay = document.getElementById("helpSearchQueryDisplay");
+    const helpNoResults = document.getElementById("helpNoResults");
+    const noResultsTerm = document.getElementById("noResultsTerm");
+    const btnResetHelp = document.getElementById("btnResetHelpSearch");
+    const btnClearHelp = document.getElementById("btnClearHelpSearchBtn");
+    const popularTagBtns = document.querySelectorAll(".help-popular-tags a.popular-tag-btn");
+
+    function executeHelpSearch(query) {
+        const term = (query || "").trim().toLowerCase();
+
+        if (!term) {
+            // Restore all category cards and FAQs
+            helpCards.forEach(function (card) {
+                card.style.display = "";
+            });
+            helpFaqItems.forEach(function (item) {
+                item.style.display = "";
+            });
+            if (helpFaqSection) helpFaqSection.style.display = "";
+            if (helpStatus) helpStatus.style.display = "none";
+            if (helpNoResults) helpNoResults.style.display = "none";
+            return;
+        }
+
+        let matchCount = 0;
+
+        // Match help categories
+        helpCards.forEach(function (card) {
+            const title = (card.querySelector(".help-cat-title")?.textContent || "").toLowerCase();
+            const desc = (card.querySelector(".help-cat-desc")?.textContent || "").toLowerCase();
+            const keywords = (card.getAttribute("data-keywords") || "").toLowerCase();
+
+            const isMatch = title.includes(term) || desc.includes(term) || keywords.includes(term);
+            card.style.display = isMatch ? "" : "none";
+            if (isMatch) matchCount++;
+        });
+
+        // Match FAQ items
+        let faqMatchCount = 0;
+        helpFaqItems.forEach(function (item) {
+            const text = item.textContent.toLowerCase();
+            const keywords = (item.getAttribute("data-keywords") || "").toLowerCase();
+
+            const isMatch = text.includes(term) || keywords.includes(term);
+            item.style.display = isMatch ? "" : "none";
+            if (isMatch) {
+                faqMatchCount++;
+                matchCount++;
+            }
+        });
+
+        if (helpFaqSection) {
+            helpFaqSection.style.display = faqMatchCount > 0 ? "" : "none";
+        }
+
+        // Show live status indicator
+        if (helpStatus && helpResultCount && helpQueryDisplay) {
+            helpStatus.style.display = "flex";
+            helpResultCount.textContent = matchCount;
+            helpQueryDisplay.textContent = query.trim();
+        }
+
+        // Show/hide no results banner
+        if (helpNoResults && noResultsTerm) {
+            if (matchCount === 0) {
+                helpNoResults.style.display = "block";
+                noResultsTerm.textContent = query.trim();
+            } else {
+                helpNoResults.style.display = "none";
+            }
+        }
+    }
+
+    if (helpSearchInput) {
+        // Live search on typing
+        helpSearchInput.addEventListener("input", function () {
+            executeHelpSearch(this.value);
+        });
+
+        // Search on Enter key without form submission
+        helpSearchInput.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                executeHelpSearch(this.value);
             }
         });
     }
 
-    const popularTags = document.querySelectorAll(".help-popular-tags a.popular-tag-btn, .help-categories-grid a.help-cat-card");
-    popularTags.forEach(function (tag) {
+    if (helpSearchBtn) {
+        helpSearchBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            if (helpSearchInput) {
+                executeHelpSearch(helpSearchInput.value);
+            }
+        });
+    }
+
+    // Popular tags click triggers search immediately
+    popularTagBtns.forEach(function (tag) {
         tag.addEventListener("click", function (e) {
-            if (tag.getAttribute("href") === "#") {
-                e.preventDefault();
+            e.preventDefault();
+            const tagText = tag.textContent.trim();
+            if (helpSearchInput) {
+                helpSearchInput.value = tagText;
+                executeHelpSearch(tagText);
+                helpSearchInput.focus();
             }
         });
     });
+
+    // Reset search buttons
+    function clearHelpSearch() {
+        if (helpSearchInput) {
+            helpSearchInput.value = "";
+            executeHelpSearch("");
+            helpSearchInput.focus();
+        }
+    }
+
+    if (btnResetHelp) btnResetHelp.addEventListener("click", clearHelpSearch);
+    if (btnClearHelp) btnClearHelp.addEventListener("click", clearHelpSearch);
 
 });
