@@ -29,7 +29,7 @@ namespace SkillLinksX.Company
 
             if (!IsPostBack)
             {
-                int companyId = Session["CompanyId"] != null ? Convert.ToInt32(Session["CompanyId"]) : 1;
+                int companyId = DBHelper.GetCurrentCompanyId(Convert.ToInt32(Session["UserId"]), Session);
                 LoadCompanyJobs(companyId);
             }
         }
@@ -93,7 +93,7 @@ namespace SkillLinksX.Company
         // =========================================================================
         protected void rptCompanyJobs_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
-            int companyId = Session["CompanyId"] != null ? Convert.ToInt32(Session["CompanyId"]) : 1;
+            int companyId = DBHelper.GetCurrentCompanyId(Convert.ToInt32(Session["UserId"]), Session);
 
             if (e.CommandName == "ToggleStatus")
             {
@@ -119,11 +119,31 @@ namespace SkillLinksX.Company
 
                 try
                 {
-                    // Clean deletion (remove applications first if needed, then job)
-                    DBHelper.ExecuteNonQuery(
-                        "DELETE FROM applications WHERE job_id = @id",
-                        new SqlParameter("@id", jobId)
-                    );
+                    // Clean cascade deletion
+                    try
+                    {
+                        DBHelper.ExecuteNonQuery(@"
+                            DELETE FROM interviews 
+                            WHERE application_id IN (SELECT application_id FROM applications WHERE job_id = @id)",
+                            new SqlParameter("@id", jobId));
+                    }
+                    catch { }
+
+                    try
+                    {
+                        DBHelper.ExecuteNonQuery(
+                            "DELETE FROM applications WHERE job_id = @id",
+                            new SqlParameter("@id", jobId));
+                    }
+                    catch { }
+
+                    try
+                    {
+                        DBHelper.ExecuteNonQuery(
+                            "DELETE FROM saved_jobs WHERE job_id = @id",
+                            new SqlParameter("@id", jobId));
+                    }
+                    catch { }
 
                     DBHelper.ExecuteNonQuery(
                         "DELETE FROM jobs WHERE job_id = @id AND company_id = @cid",
@@ -131,6 +151,7 @@ namespace SkillLinksX.Company
                         new SqlParameter("@cid", companyId)
                     );
 
+                    lblActionMessage.ForeColor = System.Drawing.Color.Green;
                     lblActionMessage.Text = $"Job #{jobId} deleted successfully.";
                     LoadCompanyJobs(companyId);
                 }

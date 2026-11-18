@@ -23,7 +23,7 @@ namespace SkillLinksX.Company
                 return;
             }
 
-            int companyId = Session["CompanyId"] != null ? Convert.ToInt32(Session["CompanyId"]) : 1;
+            int companyId = DBHelper.GetCurrentCompanyId(Convert.ToInt32(Session["UserId"]), Session);
 
             if (!IsPostBack)
             {
@@ -90,28 +90,78 @@ namespace SkillLinksX.Company
 
         protected void rptInternships_ItemCommand(object source, RepeaterCommandEventArgs e)
         {
-            int companyId = Session["CompanyId"] != null ? Convert.ToInt32(Session["CompanyId"]) : 1;
+            int companyId = DBHelper.GetCurrentCompanyId(Convert.ToInt32(Session["UserId"]), Session);
             int internshipId = Convert.ToInt32(e.CommandArgument);
 
             if (e.CommandName == "ToggleStatus")
             {
-                DBHelper.ExecuteNonQuery(@"
-                    UPDATE internships 
-                    SET status = CASE WHEN status = 'Active' THEN 'Closed' ELSE 'Active' END 
-                    WHERE internship_id = @id AND company_id = @cid",
-                    new SqlParameter("@id", internshipId),
-                    new SqlParameter("@cid", companyId)
-                );
-                LoadCompanyInternships(companyId);
+                try
+                {
+                    DBHelper.ExecuteNonQuery(@"
+                        UPDATE internships 
+                        SET status = CASE WHEN status = 'Active' THEN 'Closed' ELSE 'Active' END 
+                        WHERE internship_id = @id AND company_id = @cid",
+                        new SqlParameter("@id", internshipId),
+                        new SqlParameter("@cid", companyId)
+                    );
+                    lblActionMessage.ForeColor = System.Drawing.Color.Green;
+                    lblActionMessage.Text = "Internship status toggled successfully.";
+                    LoadCompanyInternships(companyId);
+                }
+                catch (Exception ex)
+                {
+                    lblActionMessage.ForeColor = System.Drawing.Color.Red;
+                    lblActionMessage.Text = "Status update error: " + ex.Message;
+                }
             }
             else if (e.CommandName == "DeleteInternship")
             {
-                DBHelper.ExecuteNonQuery(@"
-                    DELETE FROM internships WHERE internship_id = @id AND company_id = @cid",
-                    new SqlParameter("@id", internshipId),
-                    new SqlParameter("@cid", companyId)
-                );
-                LoadCompanyInternships(companyId);
+                try
+                {
+                    // 1. Delete linked interviews first
+                    try
+                    {
+                        DBHelper.ExecuteNonQuery(@"
+                            DELETE FROM interviews 
+                            WHERE application_id IN (SELECT application_id FROM applications WHERE internship_id = @id)",
+                            new SqlParameter("@id", internshipId));
+                    }
+                    catch { }
+
+                    // 2. Delete linked student applications
+                    try
+                    {
+                        DBHelper.ExecuteNonQuery(
+                            "DELETE FROM applications WHERE internship_id = @id",
+                            new SqlParameter("@id", internshipId));
+                    }
+                    catch { }
+
+                    // 3. Delete from saved_jobs (resolves FK_saved_jobs_internship)
+                    try
+                    {
+                        DBHelper.ExecuteNonQuery(
+                            "DELETE FROM saved_jobs WHERE internship_id = @id",
+                            new SqlParameter("@id", internshipId));
+                    }
+                    catch { }
+
+                    // 4. Delete the internship record itself
+                    int rows = DBHelper.ExecuteNonQuery(@"
+                        DELETE FROM internships WHERE internship_id = @id AND company_id = @cid",
+                        new SqlParameter("@id", internshipId),
+                        new SqlParameter("@cid", companyId)
+                    );
+
+                    lblActionMessage.ForeColor = System.Drawing.Color.Green;
+                    lblActionMessage.Text = "Internship deleted successfully.";
+                    LoadCompanyInternships(companyId);
+                }
+                catch (Exception ex)
+                {
+                    lblActionMessage.ForeColor = System.Drawing.Color.Red;
+                    lblActionMessage.Text = "Delete error: " + ex.Message;
+                }
             }
         }
     }

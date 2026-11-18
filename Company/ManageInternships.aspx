@@ -79,6 +79,8 @@
                 </div>
             </div>
 
+            <asp:Label ID="lblActionMessage" runat="server" style="display:block; margin:8px 12px; font-size:13px; font-weight:600;" EnableViewState="false" />
+
             <!-- Data Table -->
             <div class="table-responsive-box" style="overflow-x: auto;">
                 <table class="jobs-data-table">
@@ -143,24 +145,94 @@
             <div class="table-pagination-row">
                 <div>
                     <span>Rows per page:</span>
-                    <select class="pagination-rows-select">
-                        <option selected="selected">10</option>
-                        <option>25</option>
-                        <option>50</option>
+                    <select id="ddlInternPageSize" class="pagination-rows-select" onchange="onInternPageSizeChange(this.value);">
+                        <option value="10" selected="selected">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
                     </select>
                 </div>
                 <div class="pagination-controls">
-                    <span>1-10 of 24</span>
-                    <a href="#" class="pagination-nav-btn" aria-label="Previous Page">
+                    <span id="lblInternPagination"><%= TotalInternshipsCount > 0 ? $"1-{Math.Min(10, TotalInternshipsCount)} of {TotalInternshipsCount}" : "0 of 0" %></span>
+                    <button type="button" id="btnInternPrev" class="pagination-nav-btn" aria-label="Previous Page" onclick="changeInternPage(-1);" <%= TotalInternshipsCount <= 10 ? "disabled" : "" %>>
                         <i class="fa-solid fa-chevron-left"></i>
-                    </a>
-                    <a href="#" class="pagination-nav-btn" aria-label="Next Page">
+                    </button>
+                    <button type="button" id="btnInternNext" class="pagination-nav-btn" aria-label="Next Page" onclick="changeInternPage(1);" <%= TotalInternshipsCount <= 10 ? "disabled" : "" %>>
                         <i class="fa-solid fa-chevron-right"></i>
-                    </a>
+                    </button>
                 </div>
             </div>
 
         </div>
 
     </div>
+
+    <!-- Dynamic Pagination & Filtering Script -->
+    <script type="text/javascript">
+        var internCurrentPage = 1;
+        var internPageSize = 10;
+
+        function getInternRows() {
+            var table = document.querySelector(".jobs-data-table tbody");
+            if (!table) return [];
+            return Array.from(table.querySelectorAll("tr"));
+        }
+
+        function renderInternPagination() {
+            var rows = getInternRows();
+            var total = rows.length;
+            var totalPages = Math.ceil(total / internPageSize) || 1;
+
+            if (internCurrentPage < 1) internCurrentPage = 1;
+            if (internCurrentPage > totalPages) internCurrentPage = totalPages;
+
+            var start = (internCurrentPage - 1) * internPageSize;
+            var end = Math.min(start + internPageSize, total);
+
+            rows.forEach(function (row, idx) {
+                if (idx >= start && idx < end) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            var lbl = document.getElementById("lblInternPagination");
+            if (lbl) {
+                if (total === 0) {
+                    lbl.innerText = "0 of 0";
+                } else {
+                    lbl.innerText = (start + 1) + "-" + end + " of " + total;
+                }
+            }
+
+            var btnPrev = document.getElementById("btnInternPrev");
+            var btnNext = document.getElementById("btnInternNext");
+
+            if (btnPrev) {
+                btnPrev.disabled = (internCurrentPage <= 1);
+                if (btnPrev.disabled) btnPrev.classList.add("disabled");
+                else btnPrev.classList.remove("disabled");
+            }
+            if (btnNext) {
+                btnNext.disabled = (internCurrentPage >= totalPages || total === 0);
+                if (btnNext.disabled) btnNext.classList.add("disabled");
+                else btnNext.classList.remove("disabled");
+            }
+        }
+
+        function changeInternPage(delta) {
+            internCurrentPage += delta;
+            renderInternPagination();
+        }
+
+        function onInternPageSizeChange(val) {
+            internPageSize = parseInt(val, 10) || 10;
+            internCurrentPage = 1;
+            renderInternPagination();
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            renderInternPagination();
+        });
+    </script>
 </asp:Content>

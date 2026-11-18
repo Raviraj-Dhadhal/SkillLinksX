@@ -153,28 +153,107 @@
                 </table>
             </div>
 
+            <% if (TotalJobsCount == 0) { %>
+                <div style="padding:32px 16px; text-align:center; color:#64748b;">
+                    <i class="fa-solid fa-briefcase" style="font-size:32px; color:#cbd5e1; margin-bottom:8px; display:block;"></i>
+                    <h4 style="font-size:15px; font-weight:600; color:#334155; margin-bottom:4px;">No Jobs Posted Yet</h4>
+                    <p style="font-size:13px; margin:0 0 12px;">Create a job opportunity to start receiving candidate applications.</p>
+                    <a href="<%= ResolveUrl("~/Company/PostJob.aspx") %>" class="btn-post-new-job-blue" style="display:inline-block;">Post New Job</a>
+                </div>
+            <% } %>
+
             <!-- Table Pagination -->
             <div class="table-pagination-row">
                 <div>
                     <span>Rows per page:</span>
-                    <select class="pagination-rows-select">
-                        <option selected="selected">10</option>
-                        <option>25</option>
-                        <option>50</option>
+                    <select id="ddlJobsPageSize" class="pagination-rows-select" onchange="onJobsPageSizeChange(this.value);">
+                        <option value="10" selected="selected">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
                     </select>
                 </div>
                 <div class="pagination-controls">
-                    <span>1-10 of 24</span>
-                    <a href="#" class="pagination-nav-btn" aria-label="Previous Page">
+                    <span id="lblJobsPagination"><%= TotalJobsCount > 0 ? $"1-{Math.Min(10, TotalJobsCount)} of {TotalJobsCount}" : "0 of 0" %></span>
+                    <button type="button" id="btnJobsPrev" class="pagination-nav-btn" aria-label="Previous Page" onclick="changeJobsPage(-1);" <%= TotalJobsCount <= 10 ? "disabled" : "" %>>
                         <i class="fa-solid fa-chevron-left"></i>
-                    </a>
-                    <a href="#" class="pagination-nav-btn" aria-label="Next Page">
+                    </button>
+                    <button type="button" id="btnJobsNext" class="pagination-nav-btn" aria-label="Next Page" onclick="changeJobsPage(1);" <%= TotalJobsCount <= 10 ? "disabled" : "" %>>
                         <i class="fa-solid fa-chevron-right"></i>
-                    </a>
+                    </button>
                 </div>
             </div>
 
         </div>
 
     </div>
+
+    <!-- Dynamic Pagination & Filtering Script -->
+    <script type="text/javascript">
+        var jobsCurrentPage = 1;
+        var jobsPageSize = 10;
+
+        function getJobsRows() {
+            var table = document.querySelector(".jobs-data-table tbody");
+            if (!table) return [];
+            return Array.from(table.querySelectorAll("tr"));
+        }
+
+        function renderJobsPagination() {
+            var rows = getJobsRows();
+            var total = rows.length;
+            var totalPages = Math.ceil(total / jobsPageSize) || 1;
+
+            if (jobsCurrentPage < 1) jobsCurrentPage = 1;
+            if (jobsCurrentPage > totalPages) jobsCurrentPage = totalPages;
+
+            var start = (jobsCurrentPage - 1) * jobsPageSize;
+            var end = Math.min(start + jobsPageSize, total);
+
+            rows.forEach(function (row, idx) {
+                if (idx >= start && idx < end) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            var lbl = document.getElementById("lblJobsPagination");
+            if (lbl) {
+                if (total === 0) {
+                    lbl.innerText = "0 of 0";
+                } else {
+                    lbl.innerText = (start + 1) + "-" + end + " of " + total;
+                }
+            }
+
+            var btnPrev = document.getElementById("btnJobsPrev");
+            var btnNext = document.getElementById("btnJobsNext");
+
+            if (btnPrev) {
+                btnPrev.disabled = (jobsCurrentPage <= 1);
+                if (btnPrev.disabled) btnPrev.classList.add("disabled");
+                else btnPrev.classList.remove("disabled");
+            }
+            if (btnNext) {
+                btnNext.disabled = (jobsCurrentPage >= totalPages || total === 0);
+                if (btnNext.disabled) btnNext.classList.add("disabled");
+                else btnNext.classList.remove("disabled");
+            }
+        }
+
+        function changeJobsPage(delta) {
+            jobsCurrentPage += delta;
+            renderJobsPagination();
+        }
+
+        function onJobsPageSizeChange(val) {
+            jobsPageSize = parseInt(val, 10) || 10;
+            jobsCurrentPage = 1;
+            renderJobsPagination();
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            renderJobsPagination();
+        });
+    </script>
 </asp:Content>

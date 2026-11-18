@@ -8,6 +8,7 @@ namespace SkillLinksX.Company
 {
     public partial class ManageInternships
     {
+        protected global::System.Web.UI.WebControls.Label lblActionMessage;
         protected global::System.Web.UI.WebControls.Repeater rptInternships;
     }
 }
