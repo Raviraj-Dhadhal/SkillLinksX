@@ -18,6 +18,7 @@ namespace SkillLinksX.User
         public string StudentName { get; set; } = "Student";
         public string StudentEmail { get; set; } = "";
         public string StudentCity { get; set; } = "India";
+        public string ProfilePhotoUrl { get; set; } = "";
         public string StudentCollege { get; set; } = "";
         public string StudentDegree { get; set; } = "";
         public string StudentGradYear { get; set; } = "";
@@ -280,6 +281,16 @@ namespace SkillLinksX.User
                     DataRow r = dt.Rows[0];
                     StudentName = r["full_name"] != DBNull.Value ? r["full_name"].ToString().Trim() : "Student";
                     IsRavirajProfile = StudentName.IndexOf("Raviraj", StringComparison.OrdinalIgnoreCase) >= 0;
+
+                    if (r.Table.Columns.Contains("profile_photo") && r["profile_photo"] != DBNull.Value)
+                    {
+                        string p = r["profile_photo"].ToString().Trim();
+                        if (!string.IsNullOrEmpty(p)) ProfilePhotoUrl = p;
+                    }
+                    else if (Session["UserProfilePhoto"] != null)
+                    {
+                        ProfilePhotoUrl = Session["UserProfilePhoto"].ToString();
+                    }
 
                     StudentEmail = r["email_add"] != DBNull.Value ? r["email_add"].ToString().Trim() : "";
 

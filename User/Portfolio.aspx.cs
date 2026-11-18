@@ -28,6 +28,7 @@ namespace SkillLinksX.User
     public partial class Portfolio : Page
     {
         public bool IsRavirajProfile { get; set; } = false;
+        public string ProfilePhotoUrl { get; set; } = "";
         public string StudentFullName { get; set; } = "Student";
         public string StudentHeadline { get; set; } = "Aspiring Software Engineer";
         public string StudentLocation { get; set; } = "India";
@@ -39,6 +40,10 @@ namespace SkillLinksX.User
         public System.Collections.Generic.List<string> StudentSkillsList { get; set; } = new System.Collections.Generic.List<string>();
         public System.Collections.Generic.List<PortfolioProjectItem> UserProjectsList { get; set; } = new System.Collections.Generic.List<PortfolioProjectItem>();
         public System.Collections.Generic.List<PortfolioCertItem> UserCertsList { get; set; } = new System.Collections.Generic.List<PortfolioCertItem>();
+        public int ProfileViews { get; set; } = 1;
+        public int ResumeDownloads { get; set; } = 0;
+        public int ProjectViews { get; set; } = 0;
+        public int RecruiterSaves { get; set; } = 0;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -84,14 +89,33 @@ namespace SkillLinksX.User
             try
             {
                 StudentSkillsList.Clear();
-                string sql = "SELECT full_name, clg_name, city, state, degree, grad_year, cgpa, skills, about_text, tagline FROM member_master_table WHERE id = @id";
-                DataTable dt = DBHelper.ExecuteQuery(sql, new SqlParameter("@id", studentId));
+                string sql = "SELECT full_name, clg_name, city, state, degree, grad_year, cgpa, skills, about_text, tagline, profile_photo FROM member_master_table WHERE id = @id";
+                DataTable dt = null;
+                try
+                {
+                    dt = DBHelper.ExecuteQuery(sql, new SqlParameter("@id", studentId));
+                }
+                catch
+                {
+                    // Fallback if profile_photo column is not yet queried
+                    dt = DBHelper.ExecuteQuery("SELECT full_name, clg_name, city, state, degree, grad_year, cgpa, skills, about_text, tagline FROM member_master_table WHERE id = @id", new SqlParameter("@id", studentId));
+                }
 
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     DataRow r = dt.Rows[0];
                     string name = r["full_name"] != DBNull.Value ? r["full_name"].ToString().Trim() : "Student";
                     StudentFullName = name;
+
+                    if (r.Table.Columns.Contains("profile_photo") && r["profile_photo"] != DBNull.Value)
+                    {
+                        string p = r["profile_photo"].ToString().Trim();
+                        if (!string.IsNullOrEmpty(p)) ProfilePhotoUrl = p;
+                    }
+                    else if (Session["UserProfilePhoto"] != null)
+                    {
+                        ProfilePhotoUrl = Session["UserProfilePhoto"].ToString();
+                    }
 
                     // Only Raviraj Dhadhal gets the pre-built mock portfolio (Featured Projects, 845 views, etc.)
                     IsRavirajProfile = name.IndexOf("Raviraj", StringComparison.OrdinalIgnoreCase) >= 0;
@@ -350,27 +374,54 @@ namespace SkillLinksX.User
         }
         protected void btnDownloadPortfolioResume_Click(object sender, EventArgs e)
         {
+            lblResumeMsg.Text = "";
             int studentId = Convert.ToInt32(Session["UserId"]);
             string folder = Server.MapPath("~/Uploads/Resumes/");
+            string filePath = null;
+
             if (Directory.Exists(folder))
             {
                 var files = Directory.GetFiles(folder, $"Resume_{studentId}.*");
                 if (files.Length > 0)
                 {
-                    string filePath = files[0];
-                    string fileName = Path.GetFileName(filePath);
-
-                    Response.Clear();
-                    Response.ContentType = "application/octet-stream";
-                    Response.AppendHeader("Content-Disposition", $"attachment; filename={fileName}");
-                    Response.TransmitFile(filePath);
-                    Response.End();
-                    return;
+                    filePath = files[0];
                 }
             }
 
+            if (string.IsNullOrEmpty(filePath))
+            {
+                // Check if resume_file has a path in member_master_table
+                try
+                {
+                    object rf = DBHelper.ExecuteScalar("SELECT resume_file FROM member_master_table WHERE id = @id", new SqlParameter("@id", studentId));
+                    if (rf != null && rf != DBNull.Value && !string.IsNullOrEmpty(rf.ToString()))
+                    {
+                        string dbFile = rf.ToString().Trim();
+                        string candPath = Path.Combine(folder, Path.GetFileName(dbFile));
+                        if (File.Exists(candPath)) filePath = candPath;
+                    }
+                }
+                catch { }
+            }
+
+            if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+            {
+                string fileName = Path.GetFileName(filePath);
+                Response.Clear();
+                Response.ClearHeaders();
+                Response.ClearContent();
+                Response.ContentType = "application/octet-stream";
+                Response.AppendHeader("Content-Disposition", $"attachment; filename=\"{fileName}\"");
+                Response.TransmitFile(filePath);
+                Response.Flush();
+                Response.End();
+                return;
+            }
+
             // Alert user if no resume was uploaded yet
-            ClientScript.RegisterStartupScript(this.GetType(), "noResumeAlert", "alert('No resume uploaded yet! Please upload your resume from the Profile page first.');", true);
+            lblResumeMsg.ForeColor = System.Drawing.Color.Red;
+            lblResumeMsg.Text = "<span style='color:#ef4444;'><i class='fa-solid fa-circle-exclamation'></i> No resume found! Please upload your resume from the Profile page first.</span>";
+            ClientScript.RegisterStartupScript(this.GetType(), "noResumeAlert", "alert('No resume found! Please upload your resume from the Profile page first.');", true);
         }
     }
 }

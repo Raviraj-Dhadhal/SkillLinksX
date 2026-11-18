@@ -12,9 +12,13 @@
             <!-- Top Hero Row -->
             <div class="cand-profile-hero-top">
                 <div class="cand-profile-avatar-wrap">
-                    <span class="cand-profile-avatar-circle" style="width:96px; height:96px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#94a3b8; font-size:48px; border:3px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                        <i class="fa-regular fa-user"></i>
-                    </span>
+                    <% if (!string.IsNullOrEmpty(ProfilePhotoUrl)) { %>
+                        <img src="<%= ResolveUrl(ProfilePhotoUrl) %>" alt="<%= StudentName %>" class="cand-profile-avatar-img" />
+                    <% } else { %>
+                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:48px;">
+                            <i class="fa-regular fa-user"></i>
+                        </div>
+                    <% } %>
                 </div>
 
                 <div class="cand-profile-hero-details">

@@ -12,6 +12,7 @@ namespace SkillLinksX.User
     public partial class Portfolio
     {
         protected global::System.Web.UI.WebControls.LinkButton btnDownloadPortfolioResume;
+        protected global::System.Web.UI.WebControls.Label lblResumeMsg;
         protected global::System.Web.UI.WebControls.Label lblProjectStatus;
         protected global::System.Web.UI.WebControls.Label lblProjectModalMsg;
         protected global::System.Web.UI.WebControls.TextBox txtProjectTitle;

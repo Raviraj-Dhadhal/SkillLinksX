@@ -12,9 +12,13 @@
             <div class="portfolio-hero-left">
                 <!-- Avatar with online indicator -->
                 <div class="portfolio-avatar-wrap">
-                    <span class="portfolio-avatar-circle" style="width:72px; height:72px; border-radius:50%; background:#f1f5f9; display:inline-flex; align-items:center; justify-content:center; color:#94a3b8; font-size:36px; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,0.06);">
-                        <i class="fa-regular fa-user"></i>
-                    </span>
+                    <% if (!string.IsNullOrEmpty(ProfilePhotoUrl)) { %>
+                        <img src="<%= ResolveUrl(ProfilePhotoUrl) %>" alt="<%= StudentFullName %>" class="portfolio-avatar-img" />
+                    <% } else { %>
+                        <div style="width:100%; height:100%; border-radius:50%; background:#f1f5f9; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:40px; border:3px solid #fff; box-sizing:border-box;">
+                            <i class="fa-regular fa-user"></i>
+                        </div>
+                    <% } %>
                     <span class="portfolio-status-dot" title="Available for opportunities"></span>
                 </div>
 
@@ -40,6 +44,7 @@
                             <i class="fa-solid fa-download"></i> Download Resume
                         </asp:LinkButton>
                     </div>
+                    <asp:Label ID="lblResumeMsg" runat="server" EnableViewState="false" style="display:block; margin-top:8px; font-size:12.5px; font-weight:600;"></asp:Label>
                 </div>
             </div>
 
@@ -258,7 +263,7 @@
                         <div class="portfolio-stat-icon-wrap">
                             <i class="fa-regular fa-eye"></i>
                         </div>
-                        <div class="portfolio-stat-number"><%= IsRavirajProfile ? "148" : "0" %></div>
+                        <div class="portfolio-stat-number"><%= ProfileViews %></div>
                         <div class="portfolio-stat-title">Profile Views</div>
                     </div>
 
@@ -267,7 +272,7 @@
                         <div class="portfolio-stat-icon-wrap">
                             <i class="fa-solid fa-download"></i>
                         </div>
-                        <div class="portfolio-stat-number"><%= IsRavirajProfile ? "32" : "0" %></div>
+                        <div class="portfolio-stat-number"><%= ResumeDownloads %></div>
                         <div class="portfolio-stat-title">Resume Downloads</div>
                     </div>
 
@@ -276,7 +281,7 @@
                         <div class="portfolio-stat-icon-wrap">
                             <i class="fa-regular fa-hand-pointer"></i>
                         </div>
-                        <div class="portfolio-stat-number"><%= IsRavirajProfile ? "845" : "0" %></div>
+                        <div class="portfolio-stat-number"><%= ProjectViews %></div>
                         <div class="portfolio-stat-title">Project Views</div>
                     </div>
 
@@ -285,7 +290,7 @@
                         <div class="portfolio-stat-icon-wrap">
                             <i class="fa-regular fa-star"></i>
                         </div>
-                        <div class="portfolio-stat-number"><%= IsRavirajProfile ? "12" : "0" %></div>
+                        <div class="portfolio-stat-number"><%= RecruiterSaves %></div>
                         <div class="portfolio-stat-title">Recruiter Saves</div>
                     </div>
                 </div>
