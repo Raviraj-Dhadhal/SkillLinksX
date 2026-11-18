@@ -2,7 +2,41 @@
     AutoEventWireup="true" CodeBehind="Contact.aspx.cs" Inherits="SkillLinksX.Public.Contact" %>
 
     <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
-        <!-- Contact Page Title & Metadata -->
+        <style>
+            .contact-status-banner {
+                display: flex !important;
+                align-items: center !important;
+                gap: 14px !important;
+                padding: 14px 18px !important;
+                border-radius: 8px !important;
+                margin-bottom: 22px !important;
+                font-size: 13.5px !important;
+                line-height: 1.5 !important;
+                font-weight: 500 !important;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+                animation: fadeIn 0.3s ease-in-out !important;
+            }
+            .contact-status-banner.success {
+                background-color: #ECFDF5 !important;
+                border: 1.5px solid #10B981 !important;
+                color: #065F46 !important;
+            }
+            .contact-status-banner.error {
+                background-color: #FEF2F2 !important;
+                border: 1.5px solid #EF4444 !important;
+                color: #991B1B !important;
+            }
+            .contact-status-banner i {
+                font-size: 24px !important;
+                flex-shrink: 0 !important;
+            }
+            .contact-status-banner.success i {
+                color: #10B981 !important;
+            }
+            .contact-status-banner.error i {
+                color: #EF4444 !important;
+            }
+        </style>
     </asp:Content>
 
     <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -110,14 +144,6 @@
                         <asp:RequiredFieldValidator ID="rfvMessage" runat="server" ControlToValidate="txtMessage"
                             ErrorMessage="Message is required." Text="Message is required." ForeColor="#DC2626" Display="Dynamic"
                             ValidationGroup="vgContact" CssClass="field-validation-error-msg"></asp:RequiredFieldValidator>
-                    </div>
-
-                    <!-- Terms Checkbox -->
-                    <div class="contact-checkbox-row">
-                        <asp:CheckBox ID="chkAgreeTerms" runat="server" Text="" />
-                        <label for="chkAgreeTerms" class="checkbox-text-label">
-                            I agree to the <a href="<%= ResolveUrl("~/Public/Privacy.aspx") %>" class="legal-blue-link">Privacy Policy</a> and <a href="<%= ResolveUrl("~/Public/Terms.aspx") %>" class="legal-blue-link">Terms of Service</a>.
-                        </label>
                     </div>
 
                     <!-- Submit Button -->
@@ -260,9 +286,9 @@
                 </div>
                 <div class="career-social-text">Follow SkillLinkX</div>
                 <div class="career-social-icons">
-                    <a href="#" class="social-box-icon"><i class="fa-brands fa-linkedin-in"></i></a>
-                    <a href="#" class="social-box-icon"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#" class="social-box-icon"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" class="social-box-icon" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                    <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" class="social-box-icon" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.x.com" target="_blank" rel="noopener noreferrer" class="social-box-icon" title="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
                 </div>
             </div>
 

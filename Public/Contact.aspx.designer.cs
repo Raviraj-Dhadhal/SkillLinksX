@@ -123,15 +123,6 @@ namespace SkillLinksX.Public
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvMessage;
 
         /// <summary>
-        /// chkAgreeTerms control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox chkAgreeTerms;
-
-        /// <summary>
         /// btnSendMessage control.
         /// </summary>
         /// <remarks>
