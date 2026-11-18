@@ -140,7 +140,7 @@
                                             </div>
                                             <div class="opp-listing-info">
                                                 <h3 class="opp-card-heading">
-                                                    <a href='<%# ResolveUrl("~/User/JobDetails.aspx?id=" + Eval("JobId")) %>'>
+                                                    <a href='<%# ResolveUrl("~/User/InternshipDetails.aspx?id=" + Eval("JobId")) %>'>
                                                         <%# Eval("Title") %>
                                                     </a>
                                                 </h3>
@@ -161,7 +161,7 @@
                                         <span style="font-size:12px; color:#64748b;"><strong>Skills:</strong> <%# Eval("RequiredSkills") %></span>
                                         <%# Convert.ToBoolean(Eval("HasApplied")) 
                                             ? "<span style='padding:5px 12px; font-size:12px; font-weight:600; border-radius:6px; background:#dcfce7; color:#15803d; display:inline-flex; align-items:center; gap:4px;'><i class=\"fa-solid fa-check\"></i> Applied</span>" 
-                                            : "<a href='" + ResolveUrl("~/User/JobDetails.aspx?id=" + Eval("JobId")) + "' class='btn-rec-apply' style='padding:4px 12px; font-size:12px; text-decoration:none;'>Apply Now</a>" %>
+                                            : "<a href='" + ResolveUrl("~/User/InternshipDetails.aspx?id=" + Eval("JobId")) + "' class='btn-rec-apply' style='padding:4px 12px; font-size:12px; text-decoration:none;'>Apply Now</a>" %>
                                     </div>
                                 </div>
                             </ItemTemplate>

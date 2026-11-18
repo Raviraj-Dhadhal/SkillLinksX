@@ -8,6 +8,19 @@ using SkillLinksX.Helpers;
 
 namespace SkillLinksX.User
 {
+    public class JobDisplayItem
+    {
+        public int JobId { get; set; }
+        public string Title { get; set; }
+        public string CompanyName { get; set; }
+        public string Location { get; set; }
+        public string JobType { get; set; }
+        public string SalaryRange { get; set; }
+        public string RequiredSkills { get; set; }
+        public int AiMatchScore { get; set; }
+        public bool HasApplied { get; set; }
+    }
+
     public partial class Jobs : Page
     {
         public int RecommendedScore { get; set; } = 92;
@@ -33,7 +46,7 @@ namespace SkillLinksX.User
 
         // =========================================================================
         // [DATABASE & BACKEND CONNECTION]: Load Opportunities with AI Ranking
-        // Queries 'jobs' & 'companies' tables, compares student skills from
+        // Queries 'jobs' & 'company_table' tables, compares student skills from
         // 'member_master_table' using AIService, and picks the #1 top match.
         // =========================================================================
         private void LoadOpportunities(int studentId)
@@ -59,7 +72,7 @@ namespace SkillLinksX.User
             // ---------------------------------------------------------------------
             DataTable dtJobs = DBHelper.ExecuteQuery(
                 @"SELECT j.job_id, j.job_title AS title, j.location, j.job_type, 
-                         ('₹' + CAST(CAST(j.salary_min AS INT) AS NVARCHAR) + ' - ₹' + CAST(CAST(j.salary_max AS INT) AS NVARCHAR)) AS salary_range, 
+                         j.salary_min, j.salary_max,
                          j.requirements AS required_skills, c.comp_name AS company_name 
                   FROM jobs j 
                   INNER JOIN company_table c ON j.company_id = c.company_id 
@@ -67,25 +80,48 @@ namespace SkillLinksX.User
                   ORDER BY j.created_at DESC"
             );
 
-            var rankedList = new List<dynamic>();
+            // Check applied jobs for this student
+            var appliedJobIds = new HashSet<int>();
+            try
+            {
+                string appSql = "SELECT job_id FROM applications WHERE user_id = @uid AND job_id IS NOT NULL";
+                DataTable dtApp = DBHelper.ExecuteQuery(appSql, new SqlParameter("@uid", studentId));
+                foreach (DataRow appRow in dtApp.Rows)
+                {
+                    appliedJobIds.Add(Convert.ToInt32(appRow["job_id"]));
+                }
+            }
+            catch { }
+
+            var rankedList = new List<JobDisplayItem>();
 
             // ---------------------------------------------------------------------
             // Step 3: Calculate AI Match Score (%) for every active job
             // ---------------------------------------------------------------------
             foreach (DataRow r in dtJobs.Rows)
             {
+                int jId = Convert.ToInt32(r["job_id"]);
                 string reqSkills = r["required_skills"] != DBNull.Value ? r["required_skills"].ToString() : "";
                 int match = AIService.CalculateMatchScore(studentSkills, reqSkills);
 
-                rankedList.Add(new
+                string salaryDisplay = "Best in Industry";
+                if (r["salary_min"] != DBNull.Value && decimal.TryParse(r["salary_min"].ToString(), out decimal sMin))
                 {
-                    JobId = Convert.ToInt32(r["job_id"]),
+                    decimal sMax = (r["salary_max"] != DBNull.Value && decimal.TryParse(r["salary_max"].ToString(), out decimal maxVal)) ? maxVal : sMin;
+                    salaryDisplay = $"₹{sMin:N0} - ₹{sMax:N0}";
+                }
+
+                rankedList.Add(new JobDisplayItem
+                {
+                    JobId = jId,
                     Title = r["title"].ToString(),
                     CompanyName = r["company_name"].ToString(),
-                    Location = r["location"].ToString(),
-                    SalaryRange = r["salary_range"] != DBNull.Value ? r["salary_range"].ToString() : "Best in Industry",
+                    Location = r["location"] != DBNull.Value ? r["location"].ToString() : "Remote",
+                    JobType = r["job_type"] != DBNull.Value ? r["job_type"].ToString() : "Full-time",
+                    SalaryRange = salaryDisplay,
                     RequiredSkills = reqSkills,
-                    AiMatchScore = match
+                    AiMatchScore = match,
+                    HasApplied = appliedJobIds.Contains(jId)
                 });
             }
 
@@ -104,17 +140,17 @@ namespace SkillLinksX.User
                 RecommendedLocation = top.Location;
                 RecommendedScore = top.AiMatchScore;
 
-                // Split skills into individual tags for the banner
-                string topReq = top.RequiredSkills;
-                var pillSkills = topReq.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
-                                       .Select(s => s.Trim()).Take(4).ToList();
-
-                rptRecommendedSkills.DataSource = pillSkills;
+                var reqTokens = top.RequiredSkills.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+                                                  .Select(x => x.Trim())
+                                                  .Where(x => !string.IsNullOrEmpty(x))
+                                                  .Take(4)
+                                                  .ToList();
+                rptRecommendedSkills.DataSource = reqTokens;
                 rptRecommendedSkills.DataBind();
             }
 
             // ---------------------------------------------------------------------
-            // Step 5: Bind the remaining ranked jobs to the listings repeater
+            // Step 5: Bind the Full Dynamic List
             // ---------------------------------------------------------------------
             rptJobsList.DataSource = sortedJobs;
             rptJobsList.DataBind();

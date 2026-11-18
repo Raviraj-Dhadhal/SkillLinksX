@@ -28,7 +28,7 @@ namespace SkillLinksX.User
         public string JobRequirements { get; set; } = "";
         public string JobBenefits { get; set; } = "";
         public string Deadline { get; set; } = "Open";
-        public int AiMatchScore { get; set; } = 75;
+        public int AiMatchScore { get; set; } = 0;
         public string AiMatchBlurb { get; set; } = "";
         public System.Collections.Generic.List<string> MatchingSkills { get; set; } = new System.Collections.Generic.List<string>();
         public System.Collections.Generic.List<string> MissingSkills { get; set; } = new System.Collections.Generic.List<string>();
@@ -53,9 +53,10 @@ namespace SkillLinksX.User
                 }
             }
 
+            LoadJobDetails();
+
             if (!IsPostBack)
             {
-                LoadJobDetails();
                 CheckExistingApplication();
             }
         }
@@ -157,7 +158,7 @@ namespace SkillLinksX.User
                         }
                         else
                         {
-                            AiMatchScore = 75;
+                            AiMatchScore = 0;
                         }
 
                         if (AiMatchScore >= 80)
@@ -185,6 +186,25 @@ namespace SkillLinksX.User
         private void CheckExistingApplication()
         {
             int studentId = Convert.ToInt32(Session["UserId"]);
+
+            // Check if candidate is currently hired / an active team member at any company
+            object hiredObj = DBHelper.ExecuteScalar(@"
+                SELECT TOP 1 c.comp_name 
+                FROM applications a 
+                INNER JOIN company_table c ON a.company_id = c.company_id 
+                WHERE a.user_id = @sid AND a.status = 'Selected'",
+                new SqlParameter("@sid", studentId));
+
+            if (hiredObj != null && hiredObj != DBNull.Value)
+            {
+                btnApplyNow.Enabled = false;
+                btnApplyNow.Text = "Employed at " + hiredObj.ToString();
+                btnApplyNow.CssClass += " btn-disabled";
+                lblFeedback.ForeColor = System.Drawing.Color.DarkOrange;
+                lblFeedback.Text = $"You are currently an active team member at {hiredObj}. You cannot apply for other opportunities until your employer releases you from your current role.";
+                return;
+            }
+
             object existing = DBHelper.ExecuteScalar(
                 "SELECT COUNT(*) FROM applications WHERE user_id = @sid AND job_id = @jid",
                 new SqlParameter("@sid", studentId),
@@ -208,6 +228,21 @@ namespace SkillLinksX.User
         protected void btnApplyNow_Click(object sender, EventArgs e)
         {
             int studentId = Convert.ToInt32(Session["UserId"]);
+
+            // Guard: active employment check
+            object hiredObj = DBHelper.ExecuteScalar(@"
+                SELECT TOP 1 c.comp_name 
+                FROM applications a 
+                INNER JOIN company_table c ON a.company_id = c.company_id 
+                WHERE a.user_id = @sid AND a.status = 'Selected'",
+                new SqlParameter("@sid", studentId));
+
+            if (hiredObj != null && hiredObj != DBNull.Value)
+            {
+                lblFeedback.ForeColor = System.Drawing.Color.DarkOrange;
+                lblFeedback.Text = $"You are currently an active team member at {hiredObj} and cannot submit new applications.";
+                return;
+            }
 
             try
             {
@@ -235,34 +270,23 @@ namespace SkillLinksX.User
                     lblFeedback.Text = "Application submitted successfully! Track your status under Applications.";
 
                     // Send notification to Candidate
-                    try
-                    {
-                        string candNotifSql = @"
-                            INSERT INTO notifications (user_id, title, message, category, link_url, is_read, created_at)
-                            VALUES (@uid, 'Application Submitted', @msg, 'Applications', '~/User/Applications.aspx', 0, GETDATE())";
-                        string candMsg = $"You successfully applied for {JobTitle} at {CompanyName}.";
-                        DBHelper.ExecuteNonQuery(candNotifSql,
-                            new SqlParameter("@uid", studentId),
-                            new SqlParameter("@msg", candMsg));
-                    }
-                    catch { }
+                    // 1. Send confirmation notification to Candidate
+                    DBHelper.SendNotification(studentId, 
+                        "Application Submitted 📄", 
+                        $"You successfully applied for {JobTitle} at {CompanyName}.", 
+                        "~/User/Applications.aspx");
 
-                    // Send notification to Company
+                    // 2. Send applicant notification to Company recruiter
                     try
                     {
                         object sNameObj = DBHelper.ExecuteScalar("SELECT full_name FROM member_master_table WHERE id = @id", new SqlParameter("@id", studentId));
                         string sName = (sNameObj != null && sNameObj != DBNull.Value) ? sNameObj.ToString() : "A candidate";
+                        int compUserId = DBHelper.GetCompanyUserId(companyId);
 
-                        string compNotifSql = @"
-                            INSERT INTO notifications (user_id, title, message, category, link_url, is_read, created_at)
-                            SELECT user_id, 'New Applicant: ' + @sname, @sname + ' applied for ' + @jtitle + '.', 'Applications', '~/Company/Applicants.aspx', 0, GETDATE()
-                            FROM company_table 
-                            WHERE company_id = @cid AND user_id IS NOT NULL";
-
-                        DBHelper.ExecuteNonQuery(compNotifSql,
-                            new SqlParameter("@sname", sName),
-                            new SqlParameter("@jtitle", JobTitle),
-                            new SqlParameter("@cid", companyId));
+                        DBHelper.SendNotification(compUserId, 
+                            $"New Applicant: {sName}", 
+                            $"{sName} applied for the position of {JobTitle}.", 
+                            "~/Company/Applicants.aspx");
                     }
                     catch { }
                 }

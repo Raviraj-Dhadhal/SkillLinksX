@@ -11,5 +11,7 @@ namespace SkillLinksX.User
 {
     public partial class Jobs
     {
+        protected global::System.Web.UI.WebControls.Repeater rptRecommendedSkills;
+        protected global::System.Web.UI.WebControls.Repeater rptJobsList;
     }
 }

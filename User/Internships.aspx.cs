@@ -62,7 +62,7 @@ namespace SkillLinksX.User
             // 2. Fetch Active Internships
             string sql = @"
                 SELECT i.internship_id AS job_id, i.internship_title AS title, i.location_type AS location, 'Internship' AS job_type, 
-                       ('₹' + CAST(CAST(i.stipend_amount AS INT) AS NVARCHAR) + ' / mo') AS salary_range, 
+                       i.stipend_amount,
                        i.skills_required AS required_skills,
                        c.comp_name AS company_name
                 FROM internships i
@@ -77,7 +77,7 @@ namespace SkillLinksX.User
             {
                 sql = @"
                     SELECT j.job_id, j.job_title AS title, j.location, j.job_type, 
-                           ('₹' + CAST(CAST(j.salary_min AS INT) AS NVARCHAR) + ' - ₹' + CAST(CAST(j.salary_max AS INT) AS NVARCHAR)) AS salary_range, 
+                           j.salary_min, j.salary_max,
                            j.requirements AS required_skills,
                            c.comp_name AS company_name
                     FROM jobs j
@@ -111,6 +111,17 @@ namespace SkillLinksX.User
                     string req = r["required_skills"] != DBNull.Value ? r["required_skills"].ToString() : "";
                     int match = AIService.CalculateMatchScore(studentSkills, req);
 
+                    string stipendDisplay = "₹20,000 / mo";
+                    if (r.Table.Columns.Contains("stipend_amount") && r["stipend_amount"] != DBNull.Value && decimal.TryParse(r["stipend_amount"].ToString(), out decimal stp))
+                    {
+                        stipendDisplay = $"₹{stp:N0} / mo";
+                    }
+                    else if (r.Table.Columns.Contains("salary_min") && r["salary_min"] != DBNull.Value && decimal.TryParse(r["salary_min"].ToString(), out decimal sMin))
+                    {
+                        decimal sMax = (r["salary_max"] != DBNull.Value && decimal.TryParse(r["salary_max"].ToString(), out decimal maxVal)) ? maxVal : sMin;
+                        stipendDisplay = $"₹{sMin:N0} - ₹{sMax:N0} / mo";
+                    }
+
                     rankedList.Add(new InternshipDisplayItem
                     {
                         JobId = jobId,
@@ -118,7 +129,7 @@ namespace SkillLinksX.User
                         CompanyName = r["company_name"].ToString(),
                         Location = r["location"] != DBNull.Value ? r["location"].ToString() : "Remote",
                         JobType = r["job_type"] != DBNull.Value ? r["job_type"].ToString() : "Internship",
-                        SalaryRange = r["salary_range"] != DBNull.Value ? r["salary_range"].ToString() : "Stipend Provided",
+                        SalaryRange = stipendDisplay,
                         RequiredSkills = req,
                         AiMatchScore = match,
                         HasApplied = appliedIds.Contains(jobId)

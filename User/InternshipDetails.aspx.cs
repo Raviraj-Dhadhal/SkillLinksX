@@ -19,7 +19,7 @@ namespace SkillLinksX.User
         public string Location { get; set; } = "Bengaluru";
         public string JobType { get; set; } = "Internship";
         public string SalaryRange { get; set; } = "₹20,000 / month";
-        public int AiMatchScore { get; set; } = 92;
+        public int AiMatchScore { get; set; } = 0;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -39,9 +39,10 @@ namespace SkillLinksX.User
                 }
             }
 
+            LoadInternshipDetails();
+
             if (!IsPostBack)
             {
-                LoadInternshipDetails();
                 CheckAlreadyApplied();
             }
         }
@@ -53,7 +54,7 @@ namespace SkillLinksX.User
         {
             string sql = @"
                 SELECT i.internship_id AS job_id, i.internship_title AS title, i.location_type AS location, 'Internship' AS job_type, 
-                       ('₹' + CAST(CAST(i.stipend_amount AS INT) AS NVARCHAR) + ' / mo') AS salary_range, 
+                       i.stipend_amount,
                        i.skills_required AS required_skills,
                        c.comp_name AS company_name
                 FROM internships i
@@ -69,7 +70,15 @@ namespace SkillLinksX.User
                 CompanyName = r["company_name"].ToString();
                 Location = r["location"].ToString();
                 JobType = r["job_type"].ToString();
-                SalaryRange = r["salary_range"] != DBNull.Value ? r["salary_range"].ToString() : "Stipend Provided";
+
+                if (r["stipend_amount"] != DBNull.Value && decimal.TryParse(r["stipend_amount"].ToString(), out decimal stp))
+                {
+                    SalaryRange = $"₹{stp:N0} / month";
+                }
+                else
+                {
+                    SalaryRange = "₹20,000 / month";
+                }
 
                 string reqSkills = r["required_skills"] != DBNull.Value ? r["required_skills"].ToString() : "C#, SQL";
                 var skillsList = reqSkills.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
@@ -90,6 +99,25 @@ namespace SkillLinksX.User
         private void CheckAlreadyApplied()
         {
             int studentId = Convert.ToInt32(Session["UserId"]);
+
+            // Guard: active employment check
+            object hiredObj = DBHelper.ExecuteScalar(@"
+                SELECT TOP 1 c.comp_name 
+                FROM applications a 
+                INNER JOIN company_table c ON a.company_id = c.company_id 
+                WHERE a.user_id = @sid AND a.status = 'Selected'",
+                new SqlParameter("@sid", studentId));
+
+            if (hiredObj != null && hiredObj != DBNull.Value)
+            {
+                btnApplyInternship.Enabled = false;
+                btnApplyInternship.Text = "Employed at " + hiredObj.ToString();
+                btnApplyInternship.CssClass += " btn-disabled";
+                lblApplyFeedback.ForeColor = System.Drawing.Color.DarkOrange;
+                lblApplyFeedback.Text = $"You are currently an active team member at {hiredObj}. You cannot apply for new opportunities until your employer releases you from your current role.";
+                return;
+            }
+
             object existing = DBHelper.ExecuteScalar(
                 "SELECT COUNT(*) FROM applications WHERE user_id = @sid AND (job_id = @jid OR internship_id = @jid)",
                 new SqlParameter("@sid", studentId),
@@ -112,6 +140,21 @@ namespace SkillLinksX.User
         protected void btnApplyInternship_Click(object sender, EventArgs e)
         {
             int studentId = Convert.ToInt32(Session["UserId"]);
+
+            // Guard: active employment check
+            object hiredObj = DBHelper.ExecuteScalar(@"
+                SELECT TOP 1 c.comp_name 
+                FROM applications a 
+                INNER JOIN company_table c ON a.company_id = c.company_id 
+                WHERE a.user_id = @sid AND a.status = 'Selected'",
+                new SqlParameter("@sid", studentId));
+
+            if (hiredObj != null && hiredObj != DBNull.Value)
+            {
+                lblApplyFeedback.ForeColor = System.Drawing.Color.DarkOrange;
+                lblApplyFeedback.Text = $"You are currently an active team member at {hiredObj} and cannot submit new applications.";
+                return;
+            }
 
             try
             {
@@ -138,34 +181,23 @@ namespace SkillLinksX.User
                     lblApplyFeedback.Text = "Internship application submitted! Track progress in Applications.";
 
                     // Send notification to Candidate
-                    try
-                    {
-                        string candNotifSql = @"
-                            INSERT INTO notifications (user_id, title, message, category, link_url, is_read, created_at)
-                            VALUES (@uid, 'Internship Application Submitted', @msg, 'Applications', '~/User/Applications.aspx', 0, GETDATE())";
-                        string candMsg = $"You successfully applied for {InternshipTitle} at {CompanyName}.";
-                        DBHelper.ExecuteNonQuery(candNotifSql,
-                            new SqlParameter("@uid", studentId),
-                            new SqlParameter("@msg", candMsg));
-                    }
-                    catch { }
+                    // 1. Send confirmation notification to Candidate
+                    DBHelper.SendNotification(studentId, 
+                        "Internship Application Submitted 📄", 
+                        $"You successfully applied for {InternshipTitle} at {CompanyName}.", 
+                        "~/User/Applications.aspx");
 
-                    // Send notification to Company
+                    // 2. Send applicant notification to Company recruiter
                     try
                     {
                         object sNameObj = DBHelper.ExecuteScalar("SELECT full_name FROM member_master_table WHERE id = @id", new SqlParameter("@id", studentId));
                         string sName = (sNameObj != null && sNameObj != DBNull.Value) ? sNameObj.ToString() : "A candidate";
+                        int compUserId = DBHelper.GetCompanyUserId(companyId);
 
-                        string compNotifSql = @"
-                            INSERT INTO notifications (user_id, title, message, category, link_url, is_read, created_at)
-                            SELECT user_id, 'New Internship Applicant: ' + @sname, @sname + ' applied for ' + @ititle + '.', 'Applications', '~/Company/Applicants.aspx', 0, GETDATE()
-                            FROM company_table 
-                            WHERE company_id = @cid AND user_id IS NOT NULL";
-
-                        DBHelper.ExecuteNonQuery(compNotifSql,
-                            new SqlParameter("@sname", sName),
-                            new SqlParameter("@ititle", InternshipTitle),
-                            new SqlParameter("@cid", companyId));
+                        DBHelper.SendNotification(compUserId, 
+                            $"New Internship Applicant: {sName}", 
+                            $"{sName} applied for {InternshipTitle}.", 
+                            "~/Company/Applicants.aspx");
                     }
                     catch { }
                 }
