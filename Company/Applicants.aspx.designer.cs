@@ -8,11 +8,20 @@ namespace SkillLinksX.Company
 {
     public partial class Applicants
     {
+        protected global::System.Web.UI.WebControls.LinkButton btnFilterMetricTotal;
+        protected global::System.Web.UI.WebControls.LinkButton btnFilterMetricNew;
+        protected global::System.Web.UI.WebControls.LinkButton btnFilterMetricReview;
+        protected global::System.Web.UI.WebControls.LinkButton btnFilterMetricShortlisted;
+        protected global::System.Web.UI.WebControls.LinkButton btnFilterMetricInterview;
+        protected global::System.Web.UI.WebControls.LinkButton btnFilterMetricSelected;
         protected global::System.Web.UI.WebControls.DropDownList ddlOpportunityFilter;
+        protected global::System.Web.UI.WebControls.DropDownList ddlStatusFilter;
         protected global::System.Web.UI.WebControls.TextBox txtCandidateSearch;
-        protected global::System.Web.UI.WebControls.Button btnShortlist;
-        protected global::System.Web.UI.WebControls.Button btnReject;
+        protected global::System.Web.UI.WebControls.LinkButton btnResetFilter;
         protected global::System.Web.UI.WebControls.Label lblActionMessage;
         protected global::System.Web.UI.WebControls.Repeater rptApplicants;
+        protected global::System.Web.UI.WebControls.LinkButton btnQuickSelect;
+        protected global::System.Web.UI.WebControls.LinkButton btnQuickShortlist;
+        protected global::System.Web.UI.WebControls.LinkButton btnQuickReject;
     }
 }

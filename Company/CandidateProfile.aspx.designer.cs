@@ -9,6 +9,16 @@ namespace SkillLinksX.Company
     public partial class CandidateProfile
     {
         protected global::System.Web.UI.WebControls.Button btnShortlistCandidate;
+        protected global::System.Web.UI.WebControls.LinkButton btnSelectCandidate;
+        protected global::System.Web.UI.WebControls.LinkButton btnRejectCandidate;
         protected global::System.Web.UI.WebControls.Label lblActionStatus;
+        protected global::System.Web.UI.WebControls.LinkButton btnViewResume;
+        protected global::System.Web.UI.WebControls.Repeater rptCandidateSkills;
+        protected global::System.Web.UI.WebControls.Repeater rptCandidateEdu;
+        protected global::System.Web.UI.WebControls.Repeater rptCandidateProjects;
+        protected global::System.Web.UI.WebControls.Repeater rptKeyMatchingSkills;
+        protected global::System.Web.UI.WebControls.Repeater rptMissingSkills;
+        protected global::System.Web.UI.WebControls.TextBox txtCandidateNote;
+        protected global::System.Web.UI.WebControls.Button btnSaveNote;
     }
 }

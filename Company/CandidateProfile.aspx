@@ -10,7 +10,7 @@
         <!-- Top Breadcrumb -->
         <div class="cand-breadcrumb-row">
             <a href="<%= ResolveUrl("~/Company/Applicants.aspx") %>" class="cand-back-link">
-                <i class="fa-solid fa-arrow-left"></i> Back to Search Results
+                <i class="fa-solid fa-arrow-left"></i> Back to Applicants
             </a>
             <span class="cand-bread-sep">/</span>
             <span class="cand-bread-current">Candidate Profile</span>
@@ -20,24 +20,53 @@
         <div class="cand-hero-card">
             <div class="cand-hero-left">
                 <div class="cand-hero-avatar-wrap">
-                    <img src="<%= ResolveUrl("~/assets/images/user-male-logo.png") %>" alt="Raviraj Dhadhal" class="cand-hero-avatar-img" />
-                    <span class="cand-open-badge"><i class="fa-solid fa-circle"></i> Open to Work</span>
+                    <% if (!string.IsNullOrEmpty(CandidatePhotoUrl)) { %>
+                        <img src="<%= ResolveUrl(CandidatePhotoUrl) %>" alt="<%= CandidateName %>" class="cand-hero-avatar-img" style="width:84px; height:84px; border-radius:50%; object-fit:cover; border:3px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,0.08);" />
+                    <% } else { %>
+                        <span class="cand-hero-avatar-img" style="width:84px; height:84px; border-radius:50%; background:#f1f5f9; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:36px; border:3px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                            <i class="fa-regular fa-user"></i>
+                        </span>
+                    <% } %>
+                    <span class="cand-open-badge"><i class="fa-solid fa-circle"></i> <%= ApplicationStatus.Equals("Selected", StringComparison.OrdinalIgnoreCase) ? "Hired / Team" : "Open to Work" %></span>
                 </div>
                 <div class="cand-hero-info">
-                    <h1 class="cand-hero-name"><%= CandidateName %></h1>
+                    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                        <h1 class="cand-hero-name" style="margin:0;"><%= CandidateName %></h1>
+                        <span style="display:inline-flex; align-items:center; padding:3px 10px; border-radius:12px; font-size:12px; font-weight:600; <%= ApplicationStatus.Equals("Shortlisted", StringComparison.OrdinalIgnoreCase) ? "background:#dbeafe; color:#1d4ed8; border:1px solid #bfdbfe;" : (ApplicationStatus.Equals("Selected", StringComparison.OrdinalIgnoreCase) ? "background:#dcfce7; color:#15803d; border:1px solid #bbf7d0;" : (ApplicationStatus.Equals("Rejected", StringComparison.OrdinalIgnoreCase) ? "background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5;" : "background:#f1f5f9; color:#475569; border:1px solid #e2e8f0;")) %>">
+                            Status: <%= ApplicationStatus %>
+                        </span>
+                    </div>
                     <div class="cand-hero-title"><%= CandidateTitle %></div>
                     <div class="cand-hero-meta-row">
                         <span><i class="fa-solid fa-location-dot"></i> <%= CandidateCity %></span>
                         <span><i class="fa-solid fa-envelope"></i> <%= CandidateEmail %></span>
                         <span><i class="fa-solid fa-graduation-cap"></i> <%= CandidateCollege %></span>
                     </div>
-                    <div class="cand-hero-cta-buttons">
-                        <a href="<%= ResolveUrl("~/Company/Applicants.aspx") %>" class="btn-cand-msg" style="text-decoration: none;">
-                            <i class="fa-solid fa-list-check"></i> Manage Application
+                    <div class="cand-hero-cta-buttons" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:12px;">
+                        <a href='<%= ResolveUrl("~/Company/Messages.aspx?cid=" + StudentId) %>' class="btn-cand-msg" style="text-decoration:none; background:#2563eb; color:#fff;">
+                            <i class="fa-regular fa-comment-dots"></i> Message
                         </a>
-                        <asp:Button ID="btnShortlistCandidate" runat="server" Text="Shortlist Candidate" CssClass="btn-cand-schedule" OnClick="btnShortlistCandidate_Click" />
+                        <a href='<%= ResolveUrl("~/Company/Interviews.aspx?candId=" + StudentId + "&name=" + Server.UrlEncode(CandidateName) + "&role=" + Server.UrlEncode(TargetRoleName)) %>' class="btn-cand-schedule" style="text-decoration:none; background:#10b981; color:#fff; border:1px solid #10b981; display:inline-flex; align-items:center; gap:6px;">
+                            <i class="fa-regular fa-calendar-check"></i> Schedule Interview
+                        </a>
+                        <% if (!ApplicationStatus.Equals("Shortlisted", StringComparison.OrdinalIgnoreCase) && !ApplicationStatus.Equals("Selected", StringComparison.OrdinalIgnoreCase)) { %>
+                            <asp:Button ID="btnShortlistCandidate" runat="server" Text="Shortlist Candidate" CssClass="btn-cand-schedule" OnClick="btnShortlistCandidate_Click" />
+                        <% } else { %>
+                            <span style="display:inline-flex; align-items:center; gap:5px; padding:8px 14px; border-radius:6px; font-size:13px; font-weight:600; background:#dbeafe; color:#1d4ed8; border:1px solid #bfdbfe;">
+                                <i class="fa-solid fa-check"></i> Shortlisted
+                            </span>
+                        <% } %>
+                        <asp:LinkButton ID="btnSelectCandidate" runat="server" OnClick="btnSelectCandidate_Click" style="text-decoration:none; display:inline-flex; align-items:center; gap:5px; padding:8px 14px; border-radius:6px; font-size:13px; font-weight:600; background:#dcfce7; color:#15803d; border:1px solid #bbf7d0;" ToolTip="Mark as Selected / Hired into Team">
+                            <i class="fa-solid fa-award"></i> Select
+                        </asp:LinkButton>
+                        <asp:LinkButton ID="btnRejectCandidate" runat="server" OnClick="btnRejectCandidate_Click" style="text-decoration:none; display:inline-flex; align-items:center; gap:5px; padding:8px 12px; border-radius:6px; font-size:13px; font-weight:600; background:#fef2f2; color:#dc2626; border:1px solid #fecaca;" ToolTip="Reject candidate">
+                            Reject
+                        </asp:LinkButton>
+                        <a href="<%= ResolveUrl("~/Company/Applicants.aspx") %>" class="btn-cand-msg" style="text-decoration: none;">
+                            <i class="fa-solid fa-list-check"></i> Manage Applicants
+                        </a>
                     </div>
-                    <asp:Label ID="lblActionStatus" runat="server" ForeColor="Green" style="margin-top: 6px; display:block; font-size:12.5px;" EnableViewState="false" />
+                    <asp:Label ID="lblActionStatus" runat="server" ForeColor="Green" style="margin-top: 8px; display:block; font-size:12.5px; font-weight:600;" EnableViewState="false" />
                 </div>
             </div>
 
@@ -52,9 +81,9 @@
                     </div>
                 </div>
                 <div style="text-align: right; margin-top: 14px;">
-                    <a href="javascript:alert('Resume preview mode active.');" class="cand-download-resume-link">
+                    <asp:LinkButton ID="btnViewResume" runat="server" OnClick="btnViewResume_Click" CssClass="cand-download-resume-link">
                         <i class="fa-solid fa-file-pdf"></i> View Resume
-                    </a>
+                    </asp:LinkButton>
                 </div>
             </div>
         </div>
@@ -71,10 +100,7 @@
                         <i class="fa-regular fa-user"></i> Professional Summary
                     </h2>
                     <p class="cand-summary-text">
-                        Dynamic and results-oriented Software Developer with over 5 years of comprehensive experience in designing, developing, and deploying robust applications. Specializes in building scalable enterprise solutions and modern web applications.
-                    </p>
-                    <p class="cand-summary-text">
-                        Proven track record of collaborating with cross-functional teams to deliver high-quality software within tight deadlines. Passionate about adopting new technologies and optimizing system performance to enhance user experience.
+                        <%= !string.IsNullOrEmpty(CandidateBio) ? CandidateBio : "No professional summary provided by the candidate." %>
                     </p>
                 </div>
 
@@ -84,41 +110,17 @@
                         <h2 class="cand-section-title" style="margin-bottom: 0;">
                             <i class="fa-solid fa-code"></i> Skills Matrix
                         </h2>
-                        <a href="#" class="view-assessment-link">View Assessment Scores</a>
                     </div>
 
                     <div class="skill-category-group">
-                        <div class="skill-group-name">PROGRAMMING LANGUAGES</div>
+                        <div class="skill-group-name">VERIFIED &amp; LISTED SKILLS</div>
                         <div class="skill-tags-flex">
-                            <span class="skill-pill-dot level-expert">C# <span class="dot-indicator"></span></span>
-                            <span class="skill-pill-dot level-expert">Java <span class="dot-indicator"></span></span>
-                            <span class="skill-pill-dot level-intermediate">Python <span class="dot-indicator"></span></span>
-                            <span class="skill-pill-dot level-intermediate">Dart <span class="dot-indicator"></span></span>
+                            <asp:Repeater ID="rptCandidateSkills" runat="server">
+                                <ItemTemplate>
+                                    <span class="skill-pill-dot level-expert"><%# Container.DataItem %> <span class="dot-indicator"></span></span>
+                                </ItemTemplate>
+                            </asp:Repeater>
                         </div>
-                    </div>
-
-                    <div class="skill-category-group">
-                        <div class="skill-group-name">WEB TECHNOLOGIES</div>
-                        <div class="skill-tags-flex">
-                            <span class="skill-pill-dot level-expert">ASP.NET MVC <span class="dot-indicator"></span></span>
-                            <span class="skill-pill-dot level-expert">JavaScript <span class="dot-indicator"></span></span>
-                            <span class="skill-pill-dot level-intermediate">HTML/CSS <span class="dot-indicator"></span></span>
-                        </div>
-                    </div>
-
-                    <div class="skill-category-group">
-                        <div class="skill-group-name">DATABASE &amp; MOBILE</div>
-                        <div class="skill-tags-flex">
-                            <span class="skill-pill-dot level-expert">SQL Server <span class="dot-indicator"></span></span>
-                            <span class="skill-pill-dot level-intermediate">MySQL <span class="dot-indicator"></span></span>
-                            <span class="skill-pill-dot level-intermediate">Flutter <span class="dot-indicator"></span></span>
-                        </div>
-                    </div>
-
-                    <div class="skill-legend-row">
-                        <span><span class="legend-dot color-expert"></span> Expert</span>
-                        <span><span class="legend-dot color-intermediate"></span> Intermediate</span>
-                        <span><span class="legend-dot color-beginner"></span> Beginner</span>
                     </div>
                 </div>
 
@@ -129,51 +131,38 @@
                     </h2>
 
                     <div class="timeline-container">
-                        <!-- Experience Item 1 -->
+                        <% if (!string.IsNullOrEmpty(CandidateExperience)) { %>
                         <div class="timeline-item">
                             <div class="timeline-bullet"></div>
                             <div class="timeline-item-header">
                                 <div>
-                                    <h3 class="timeline-role-title">Senior Software Engineer</h3>
-                                    <div class="timeline-company-name">Infosys Technologies Ltd. &bull; Bengaluru, India</div>
+                                    <h3 class="timeline-role-title">Professional Experience</h3>
+                                    <div class="timeline-company-name"><%= CandidateExperience %></div>
                                 </div>
-                                <span class="timeline-date-badge">Mar 2021 - Present</span>
+                                <span class="timeline-date-badge">Experienced</span>
                             </div>
-                            <ul class="timeline-duties-list">
-                                <li>Architected and developed microservices utilizing ASP.NET Core, resulting in a 30% reduction in system latency.</li>
-                                <li>Mentored junior developers and established code review practices to maintain high code quality standards.</li>
-                                <li>Integrated automated CI/CD pipelines using Azure DevOps.</li>
-                            </ul>
                         </div>
+                        <% } %>
 
-                        <!-- Experience Item 2 -->
-                        <div class="timeline-item">
-                            <div class="timeline-bullet"></div>
-                            <div class="timeline-item-header">
-                                <div>
-                                    <h3 class="timeline-role-title">Software Developer</h3>
-                                    <div class="timeline-company-name">Wipro Limited &bull; Pune, India</div>
+                        <asp:Repeater ID="rptCandidateEdu" runat="server">
+                            <ItemTemplate>
+                                <div class="timeline-item">
+                                    <div class="timeline-bullet bullet-edu"></div>
+                                    <div class="timeline-item-header">
+                                        <div>
+                                            <h3 class="timeline-role-title"><%# Eval("DegreeName") %></h3>
+                                            <div class="timeline-company-name"><%# Eval("SchoolName") %></div>
+                                        </div>
+                                        <span class="timeline-date-badge"><%# Eval("GradYear") %></span>
+                                    </div>
+                                    <%# !string.IsNullOrEmpty(Eval("Cgpa")?.ToString()) ? "<div class=\"timeline-cgpa\">CGPA / Score: " + Eval("Cgpa") + "</div>" : "" %>
                                 </div>
-                                <span class="timeline-date-badge">Jul 2018 - Feb 2021</span>
-                            </div>
-                            <ul class="timeline-duties-list">
-                                <li>Developed responsive front-end interfaces using JavaScript and Bootstrap.</li>
-                                <li>Designed complex SQL queries and stored procedures for data reporting tools.</li>
-                            </ul>
-                        </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
 
-                        <!-- Education Item 3 -->
-                        <div class="timeline-item">
-                            <div class="timeline-bullet bullet-edu"></div>
-                            <div class="timeline-item-header">
-                                <div>
-                                    <h3 class="timeline-role-title">B.Tech in Computer Science and Engineering</h3>
-                                    <div class="timeline-company-name">Indian Institute of Technology (IIT) Bombay</div>
-                                </div>
-                                <span class="timeline-date-badge">2014 - 2018</span>
-                            </div>
-                            <div class="timeline-cgpa">CGPA: 9.2/10.0</div>
-                        </div>
+                        <% if (EducationList.Count == 0 && string.IsNullOrEmpty(CandidateExperience)) { %>
+                            <p style="color:#94a3b8; font-size:13px; margin:8px 0;">No education or experience details provided yet.</p>
+                        <% } %>
                     </div>
                 </div>
 
@@ -184,37 +173,26 @@
                     </h2>
 
                     <div class="projects-cards-grid">
-                        <!-- Project 1 -->
-                        <div class="project-box-card">
-                            <div class="project-top-row">
-                                <h3 class="project-card-title">E-Commerce API Gateway</h3>
-                                <i class="fa-solid fa-code project-link-icon"></i>
-                            </div>
-                            <p class="project-card-desc">
-                                A high-performance API gateway built in C# .NET to manage traffic for high concurrency web services.
-                            </p>
-                            <div class="project-tags-row">
-                                <span class="proj-tag">C#</span>
-                                <span class="proj-tag">.NET Core</span>
-                                <span class="proj-tag">Redis</span>
-                            </div>
-                        </div>
+                        <asp:Repeater ID="rptCandidateProjects" runat="server">
+                            <ItemTemplate>
+                                <div class="project-box-card">
+                                    <div class="project-top-row">
+                                        <h3 class="project-card-title"><%# Eval("ProjectName") %></h3>
+                                        <%# !string.IsNullOrEmpty(Eval("LinkUrl")?.ToString()) ? "<a href=\"" + Eval("LinkUrl") + "\" target=\"_blank\"><i class=\"fa-solid fa-arrow-up-right-from-square project-link-icon\"></i></a>" : "<i class=\"fa-solid fa-code project-link-icon\"></i>" %>
+                                    </div>
+                                    <p class="project-card-desc">
+                                        <%# Eval("Description") %>
+                                    </p>
+                                    <div class="project-tags-row">
+                                        <%# string.Join("", ((System.Collections.Generic.List<string>)Eval("TechTags")).Select(t => "<span class=\"proj-tag\">" + t + "</span>")) %>
+                                    </div>
+                                </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
 
-                        <!-- Project 2 -->
-                        <div class="project-box-card">
-                            <div class="project-top-row">
-                                <h3 class="project-card-title">TaskMate App</h3>
-                                <i class="fa-solid fa-arrow-up-right-from-square project-link-icon"></i>
-                            </div>
-                            <p class="project-card-desc">
-                                A cross-platform productivity mobile application built with Flutter, featuring task syncing &amp; notifications.
-                            </p>
-                            <div class="project-tags-row">
-                                <span class="proj-tag">Flutter</span>
-                                <span class="proj-tag">Dart</span>
-                                <span class="proj-tag">Firebase</span>
-                            </div>
-                        </div>
+                        <% if (ProjectsList.Count == 0) { %>
+                            <p style="color:#94a3b8; font-size:13px; margin:8px 0;">No portfolio projects listed yet.</p>
+                        <% } %>
                     </div>
                 </div>
 
@@ -229,41 +207,41 @@
                         <i class="fa-solid fa-wand-magic-sparkles"></i>
                         <span class="ai-analysis-title">AI Match Analysis</span>
                     </div>
-                    <div class="ai-target-role">Target Role: Senior .NET Developer</div>
+                    <div class="ai-target-role">Target Role: <%= TargetRoleName %></div>
 
                     <div class="ai-big-score-row">
-                        <span class="big-score-number">94%</span>
-                        <span class="match-quality-pill">Excellent Fit</span>
+                        <span class="big-score-number"><%= CandidateMatchScore %>%</span>
+                        <span class="match-quality-pill"><%= CandidateMatchScore >= 80 ? "Excellent Fit" : (CandidateMatchScore >= 60 ? "Good Match" : "Moderate Fit") %></span>
                     </div>
 
                     <!-- Progress Bars -->
                     <div class="ai-score-bar-group">
                         <div class="bar-label-row">
                             <span>Skills Match</span>
-                            <strong>96%</strong>
+                            <strong><%= SkillsMatchPct %>%</strong>
                         </div>
                         <div class="cand-progress-track">
-                            <div class="cand-progress-fill" style="width: 96%;"></div>
+                            <div class="cand-progress-fill" style='width: <%= SkillsMatchPct %>%;'></div>
                         </div>
                     </div>
 
                     <div class="ai-score-bar-group">
                         <div class="bar-label-row">
                             <span>Experience Match</span>
-                            <strong>90%</strong>
+                            <strong><%= ExperienceMatchPct %>%</strong>
                         </div>
                         <div class="cand-progress-track">
-                            <div class="cand-progress-fill" style="width: 90%;"></div>
+                            <div class="cand-progress-fill" style='width: <%= ExperienceMatchPct %>%;'></div>
                         </div>
                     </div>
 
                     <div class="ai-score-bar-group">
                         <div class="bar-label-row">
                             <span>Education Match</span>
-                            <strong>95%</strong>
+                            <strong><%= EducationMatchPct %>%</strong>
                         </div>
                         <div class="cand-progress-track">
-                            <div class="cand-progress-fill" style="width: 95%;"></div>
+                            <div class="cand-progress-fill" style='width: <%= EducationMatchPct %>%;'></div>
                         </div>
                     </div>
 
@@ -275,10 +253,11 @@
                             <i class="fa-regular fa-circle-check text-green"></i> Key Matching Skills
                         </div>
                         <div class="ai-skills-chips">
-                            <span class="ai-skill-chip-green">C#</span>
-                            <span class="ai-skill-chip-green">ASP.NET</span>
-                            <span class="ai-skill-chip-green">SQL Server</span>
-                            <span class="ai-skill-chip-green">Microservices</span>
+                            <asp:Repeater ID="rptKeyMatchingSkills" runat="server">
+                                <ItemTemplate>
+                                    <span class="ai-skill-chip-green"><%# Container.DataItem %></span>
+                                </ItemTemplate>
+                            </asp:Repeater>
                         </div>
                     </div>
 
@@ -288,8 +267,11 @@
                             <i class="fa-regular fa-circle-xmark text-red"></i> Missing/Weak Skills
                         </div>
                         <div class="ai-skills-chips">
-                            <span class="ai-skill-chip-orange">AWS (Required)</span>
-                            <span class="ai-skill-chip-gray">Docker (Preferred)</span>
+                            <asp:Repeater ID="rptMissingSkills" runat="server">
+                                <ItemTemplate>
+                                    <span class="ai-skill-chip-orange"><%# Container.DataItem %></span>
+                                </ItemTemplate>
+                            </asp:Repeater>
                         </div>
                     </div>
                 </div>
@@ -303,19 +285,19 @@
                     <div class="cand-pref-list">
                         <div class="cand-pref-row">
                             <span class="pref-label">Preferred Roles</span>
-                            <span class="pref-value">Senior Dev, Tech Lead</span>
+                            <span class="pref-value"><%= PreferredRoles %></span>
                         </div>
                         <div class="cand-pref-row">
                             <span class="pref-label">Expected Salary</span>
-                            <span class="pref-value">&#8377; 25,00,000 / yr</span>
+                            <span class="pref-value"><%= ExpectedSalary %></span>
                         </div>
                         <div class="cand-pref-row">
                             <span class="pref-label">Notice Period</span>
-                            <span class="pref-badge-pill">30 Days</span>
+                            <span class="pref-badge-pill"><%= NoticePeriod %></span>
                         </div>
                         <div class="cand-pref-row">
                             <span class="pref-label">Work Mode</span>
-                            <span class="pref-value">Hybrid / Remote</span>
+                            <span class="pref-value"><%= WorkMode %></span>
                         </div>
                     </div>
                 </div>
@@ -326,22 +308,29 @@
                         <i class="fa-regular fa-note-sticky"></i> Private Team Notes
                     </h3>
 
-                    <!-- Previous Note Bubble -->
-                    <div class="team-note-bubble">
-                        <div class="team-note-header">
-                            <span class="note-author">Sarah Jenkins (You)</span>
-                            <span class="note-time">2 days ago</span>
+                    <% if (!string.IsNullOrEmpty(CandidateTeamNote)) { %>
+                        <div class="team-note-bubble">
+                            <div class="team-note-header">
+                                <span class="note-author"><%= NoteAuthorName %> (You)</span>
+                                <span class="note-time"><%= NoteUpdatedAt %></span>
+                            </div>
+                            <p class="note-content">
+                                <%= CandidateTeamNote %>
+                            </p>
                         </div>
-                        <p class="note-content">
-                            Strong technical background. Need to verify AWS knowledge during the technical round as it was flagged by AI.
-                        </p>
-                    </div>
+                    <% } else { %>
+                        <div class="team-note-bubble" style="background:#f8fafc; border-left:3px solid #cbd5e1;">
+                            <p class="note-content" style="color:#64748b; font-style:italic; margin:0;">
+                                No private team notes added yet. Use the field below to record evaluation notes or interview feedback.
+                            </p>
+                        </div>
+                    <% } %>
 
                     <!-- Add Note Input Box -->
-                    <div class="add-note-box">
-                        <textarea class="add-note-textarea" placeholder="Add a note for the hiring team..."></textarea>
+                    <div class="add-note-box" style="margin-top:12px;">
+                        <asp:TextBox ID="txtCandidateNote" runat="server" TextMode="MultiLine" Rows="3" CssClass="add-note-textarea" placeholder="Add an evaluation note for this candidate..." />
                         <div style="text-align: right; margin-top: 8px;">
-                            <button type="button" class="btn-save-note">Save</button>
+                            <asp:Button ID="btnSaveNote" runat="server" Text="Save Note" CssClass="btn-save-note" OnClick="btnSaveNote_Click" style="padding:6px 14px; font-size:12.5px; font-weight:600; background:#2563eb; color:#fff; border:none; border-radius:6px; cursor:pointer;" />
                         </div>
                     </div>
                 </div>
@@ -364,7 +353,7 @@
             <div class="modal-body-content">
                 <div class="admin-form-group">
                     <label class="admin-input-label">Candidate</label>
-                    <input type="text" class="admin-profile-input" value="Raviraj Dhadhal (raviraj08@gmail.com)" readonly="readonly" style="background-color:#F8FAFC;" />
+                    <input type="text" class="admin-profile-input" value="<%= CandidateName %> (<%= CandidateEmail %>)" readonly="readonly" style="background-color:#F8FAFC;" />
                 </div>
                 <div class="admin-form-group">
                     <label class="admin-input-label">Interview Stage / Round</label>
@@ -378,18 +367,18 @@
                 <div class="form-2col-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                     <div class="admin-form-group">
                         <label class="admin-input-label">Interview Date *</label>
-                        <input type="date" class="admin-profile-input" id="interviewDateInput" value="2026-10-24" />
+                        <input type="date" class="admin-profile-input" id="interviewDateInput" value="<%= DateTime.Today.AddDays(1).ToString("yyyy-MM-dd") %>" />
                     </div>
                     <div class="admin-form-group">
                         <label class="admin-input-label">Interview Time *</label>
-                        <input type="time" class="admin-profile-input" id="interviewTimeInput" value="14:00" />
+                        <input type="time" class="admin-profile-input" id="interviewTimeInput" value="11:00" />
                     </div>
                 </div>
                 <div class="admin-form-group">
                     <label class="admin-input-label">Meeting Provider &amp; Link</label>
                     <div style="display:flex; gap:8px;">
-                        <input type="text" class="admin-profile-input" id="meetLinkInput" value="https://meet.google.com/abc-defg-hij" />
-                        <button type="button" class="btn-cancel-modal" id="btnGenMeetLink" style="white-space:nowrap; background:#EFF6FF; border-color:#BFDBFE; color:#1D4ED8;">
+                        <input type="text" class="admin-profile-input" id="meetLinkInput" value="https://meet.google.com/new" />
+                        <button type="button" class="btn-cancel-modal" id="btnGenMeetLink" onclick="document.getElementById('meetLinkInput').value='https://meet.google.com/' + Math.random().toString(36).substring(2, 5) + '-' + Math.random().toString(36).substring(2, 6) + '-' + Math.random().toString(36).substring(2, 5);" style="white-space:nowrap; background:#EFF6FF; border-color:#BFDBFE; color:#1D4ED8;">
                             <i class="fa-solid fa-arrows-rotate"></i> New Link
                         </button>
                     </div>
@@ -397,7 +386,9 @@
             </div>
             <div class="modal-footer-row" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
                 <button type="button" class="btn-cancel-modal" onclick="document.getElementById('scheduleInterviewModal').style.display='none';">Cancel</button>
-                <button type="button" class="btn-submit-modal" id="btnConfirmScheduleInterview" style="background-color:#2563EB;">Send Invite</button>
+                <a href='<%= ResolveUrl("~/Company/Interviews.aspx?candId=" + StudentId + "&name=" + Server.UrlEncode(CandidateName) + "&role=" + Server.UrlEncode(TargetRoleName)) %>' class="btn-submit-modal" style="background-color:#2563EB; text-decoration:none; display:inline-flex; align-items:center; padding:8px 16px; border-radius:6px; color:#fff; font-size:13px; font-weight:600;">
+                    Continue to Interview Scheduler
+                </a>
             </div>
         </div>
     </div>
