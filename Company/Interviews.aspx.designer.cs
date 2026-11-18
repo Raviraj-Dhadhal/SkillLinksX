@@ -8,6 +8,11 @@ namespace SkillLinksX.Company
 {
     public partial class Interviews
     {
+        protected global::System.Web.UI.WebControls.LinkButton btnPrevMonth;
+        protected global::System.Web.UI.WebControls.LinkButton btnNextMonth;
+        protected global::System.Web.UI.WebControls.LinkButton btnViewMonth;
+        protected global::System.Web.UI.WebControls.LinkButton btnViewWeek;
+        protected global::System.Web.UI.WebControls.Repeater rptApplicantsDatalist;
         protected global::System.Web.UI.WebControls.Repeater rptUpcomingInterviews;
         protected global::System.Web.UI.WebControls.Label lblScheduleMsg;
         protected global::System.Web.UI.WebControls.HiddenField hfInterviewId;
@@ -17,5 +22,6 @@ namespace SkillLinksX.Company
         protected global::System.Web.UI.WebControls.TextBox txtMeetingLink;
         protected global::System.Web.UI.WebControls.DropDownList ddlInterviewStatus;
         protected global::System.Web.UI.WebControls.Button btnSaveInterview;
+        protected global::System.Web.UI.WebControls.Button btnDeleteModalInterview;
     }
 }
