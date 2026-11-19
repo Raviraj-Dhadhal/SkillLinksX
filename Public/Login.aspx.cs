@@ -61,9 +61,15 @@ namespace SkillLinksX.Public
                     DataRow row = dt.Rows[0];
                     string status = row["account_status"] != DBNull.Value ? row["account_status"].ToString() : "Active";
 
-                    if (status.Equals("Suspended", StringComparison.OrdinalIgnoreCase))
+                    if (status.Equals("Suspended", StringComparison.OrdinalIgnoreCase) || status.Equals("Revoked", StringComparison.OrdinalIgnoreCase))
                     {
-                        ShowError("Your account has been suspended by the administrator. Please contact support.");
+                        ShowError("Your account has been revoked/suspended by the administrator. Please contact support.");
+                        return;
+                    }
+
+                    if (status.Equals("Pending", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ShowError("Your account is currently pending administrator verification. Please wait for approval.");
                         return;
                     }
 
