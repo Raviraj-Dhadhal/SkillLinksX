@@ -234,9 +234,9 @@
                             <span class="ai-score-value"><%= ResumeScore %>/100</span>
                         </div>
 
-                        <button type="button" class="btn-improve-profile" onclick="openInlineSkillsModal();">
+                        <a href="<%= ResolveUrl("~/User/CareerAssistant.aspx") %>" class="btn-improve-profile" style="text-decoration:none;">
                             <i class="fa-solid fa-wand-magic-sparkles"></i> Improve My Profile
-                        </button>
+                        </a>
                     </div>
                 </div>
 

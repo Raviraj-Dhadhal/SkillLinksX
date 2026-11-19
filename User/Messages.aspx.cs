@@ -82,15 +82,13 @@ namespace SkillLinksX.User
                         SET m.receiver_id = c.user_id
                         FROM messages m
                         INNER JOIN company_table c ON m.receiver_id = c.company_id
-                        WHERE m.receiver_id <> c.user_id
-                          AND NOT EXISTS (SELECT 1 FROM user_auth u WHERE u.user_id = m.receiver_id);
+                        WHERE m.receiver_id <> c.user_id;
 
                         UPDATE m
                         SET m.sender_id = c.user_id
                         FROM messages m
                         INNER JOIN company_table c ON m.sender_id = c.company_id
-                        WHERE m.sender_id <> c.user_id
-                          AND NOT EXISTS (SELECT 1 FROM user_auth u WHERE u.user_id = m.sender_id);";
+                        WHERE m.sender_id <> c.user_id;";
                     DBHelper.ExecuteNonQuery(healSql);
                 }
                 catch { }
@@ -116,7 +114,7 @@ namespace SkillLinksX.User
                             con_target.contact_id,
                             COALESCE(comp.comp_name, m.full_name, u.email, 'Recruiter / Member') AS full_name,
                             COALESCE(comp.email_add, m.email_add, u.email, '') AS email,
-                            CASE WHEN comp.user_id IS NOT NULL OR u.role_id = 3 THEN 'Recruiter' ELSE 'Connection' END AS role_type,
+                            CASE WHEN comp.comp_name IS NOT NULL OR u.role_id = 3 THEN 'Recruiter' ELSE 'Connection' END AS role_type,
                             COALESCE(comp.profile_photo, m.profile_photo, '') AS profile_photo
                         FROM (
                             SELECT DISTINCT contact_id FROM (
@@ -143,9 +141,21 @@ namespace SkillLinksX.User
                             ) raw_c
                             WHERE contact_id IS NOT NULL AND contact_id <> @uid
                         ) con_target
-                        LEFT JOIN company_table comp ON comp.user_id = con_target.contact_id
-                        LEFT JOIN member_master_table m ON m.id = con_target.contact_id
-                        LEFT JOIN user_auth u ON u.user_id = con_target.contact_id
+                        OUTER APPLY (
+                            SELECT TOP 1 comp_name, email_add, profile_photo 
+                            FROM company_table 
+                            WHERE user_id = con_target.contact_id
+                        ) comp
+                        OUTER APPLY (
+                            SELECT TOP 1 full_name, email_add, profile_photo 
+                            FROM member_master_table 
+                            WHERE id = con_target.contact_id
+                        ) m
+                        OUTER APPLY (
+                            SELECT TOP 1 email, role_id 
+                            FROM user_auth 
+                            WHERE user_id = con_target.contact_id
+                        ) u
                     ) c
                     ORDER BY 
                         unread_count DESC,

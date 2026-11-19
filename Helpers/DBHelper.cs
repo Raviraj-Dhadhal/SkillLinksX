@@ -2,6 +2,7 @@ using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Web;
 
 namespace SkillLinksX.Helpers
 {
@@ -76,6 +77,22 @@ namespace SkillLinksX.Helpers
         }
 
         // =========================================================================
+        // [DATABASE ACCESS]: Check if column exists in table schema
+        // =========================================================================
+        public static bool ColumnExists(string tableName, string columnName)
+        {
+            try
+            {
+                object res = ExecuteScalar(
+                    "SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = @t AND COLUMN_NAME = @c",
+                    new SqlParameter("@t", tableName),
+                    new SqlParameter("@c", columnName));
+                return res != null && res != DBNull.Value;
+            }
+            catch { return false; }
+        }
+
+        // =========================================================================
         // [DATABASE ACCESS]: Guarantee profile_photo columns exist
         // =========================================================================
         public static void EnsureProfilePhotoColumns()
@@ -83,6 +100,18 @@ namespace SkillLinksX.Helpers
             try
             {
                 string sql = @"
+                    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'user_auth' AND COLUMN_NAME = 'profile_photo')
+                    BEGIN
+                        ALTER TABLE user_auth ADD profile_photo NVARCHAR(300) NULL;
+                    END;
+                    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'user_auth' AND COLUMN_NAME = 'full_name')
+                    BEGIN
+                        ALTER TABLE user_auth ADD full_name NVARCHAR(150) NULL;
+                    END;
+                    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'user_auth' AND COLUMN_NAME = 'phone')
+                    BEGIN
+                        ALTER TABLE user_auth ADD phone NVARCHAR(20) NULL;
+                    END;
                     IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'member_master_table' AND COLUMN_NAME = 'profile_photo')
                     BEGIN
                         ALTER TABLE member_master_table ADD profile_photo NVARCHAR(300) NULL;
@@ -104,6 +133,8 @@ namespace SkillLinksX.Helpers
             try
             {
                 string sql = @"
+                    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'company_table' AND COLUMN_NAME = 'user_id')
+                        ALTER TABLE company_table ADD user_id INT NULL;
                     IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'company_table' AND COLUMN_NAME = 'industry')
                         ALTER TABLE company_table ADD industry NVARCHAR(100) NULL;
                     IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'company_table' AND COLUMN_NAME = 'description')
@@ -116,8 +147,68 @@ namespace SkillLinksX.Helpers
                         ALTER TABLE company_table ADD profile_strength INT NULL;
                     IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'company_table' AND COLUMN_NAME = 'is_verified')
                         ALTER TABLE company_table ADD is_verified BIT DEFAULT 0;
+
+                    -- Heal corrupted data: Unlink legacy TechNova company from accounts that are not TechNova
+                    UPDATE company_table 
+                    SET user_id = 0 
+                    WHERE (company_id = 1 OR comp_name LIKE '%TechNova%')
+                      AND user_id > 0
+                      AND user_id IN (
+                          SELECT user_id FROM user_auth 
+                          WHERE LOWER(email) NOT LIKE '%technova%'
+                      );
+
+                    -- Link company users in user_auth to their own company_table rows matching their email
+                    UPDATE c
+                    SET c.user_id = u.user_id
+                    FROM company_table c
+                    INNER JOIN user_auth u ON LOWER(c.email_add) = LOWER(u.email)
+                    WHERE u.role_id IN (SELECT role_id FROM role WHERE role_name LIKE '%Comp%')
+                      AND (c.user_id IS NULL OR c.user_id = 0 OR c.user_id != u.user_id);
                 ";
                 ExecuteNonQuery(sql);
+            }
+            catch { }
+        }
+
+        // =========================================================================
+        // [DATABASE ACCESS]: Guarantee audit log and contact inquiries tables exist
+        // =========================================================================
+        public static void EnsureAuditLogTable()
+        {
+            try
+            {
+                string sqlInquiries = @"
+                    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'contact_inquiries')
+                    BEGIN
+                        CREATE TABLE [dbo].[contact_inquiries] (
+                            [inquiry_id] INT IDENTITY(1,1) PRIMARY KEY,
+                            [name] NVARCHAR(150) NOT NULL,
+                            [email] NVARCHAR(150) NOT NULL,
+                            [role] NVARCHAR(50) NULL,
+                            [subject] NVARCHAR(250) NULL,
+                            [message] NVARCHAR(MAX) NULL,
+                            [status] NVARCHAR(50) DEFAULT 'Pending',
+                            [created_at] DATETIME DEFAULT GETDATE()
+                        );
+                    END";
+                ExecuteNonQuery(sqlInquiries);
+            }
+            catch { }
+
+            try
+            {
+                string sqlLogs = @"
+                    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'admin_audit_logs')
+                    BEGIN
+                        CREATE TABLE [dbo].[admin_audit_logs] (
+                            [log_id] INT IDENTITY(1,1) PRIMARY KEY,
+                            [action] NVARCHAR(100) NOT NULL,
+                            [details] NVARCHAR(MAX) NULL,
+                            [created_at] DATETIME DEFAULT GETDATE()
+                        );
+                    END";
+                ExecuteNonQuery(sqlLogs);
             }
             catch { }
         }
@@ -154,6 +245,49 @@ namespace SkillLinksX.Helpers
                     IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'interviews' AND COLUMN_NAME = 'application_id' AND IS_NULLABLE = 'NO')
                     BEGIN
                         ALTER TABLE interviews ALTER COLUMN application_id INT NULL;
+                    END;
+                    IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'interviews' AND COLUMN_NAME = 'interview_time' AND IS_NULLABLE = 'NO')
+                    BEGIN
+                        ALTER TABLE interviews ALTER COLUMN interview_time TIME NULL;
+                    END;
+                    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'interviews' AND COLUMN_NAME = 'candidate_name')
+                    BEGIN
+                        ALTER TABLE interviews ADD candidate_name NVARCHAR(200) NULL;
+                    END;
+                    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'interviews' AND COLUMN_NAME = 'job_title')
+                    BEGIN
+                        ALTER TABLE interviews ADD job_title NVARCHAR(200) NULL;
+                    END;
+                    -- Backfill existing legacy records if empty
+                    UPDATE i
+                    SET i.candidate_name = m.full_name
+                    FROM interviews i
+                    INNER JOIN member_master_table m ON i.user_id = m.id
+                    WHERE i.candidate_name IS NULL OR i.candidate_name = '';
+
+                    UPDATE interviews 
+                    SET job_title = SUBSTRING(notes, 21, 200)
+                    WHERE (job_title IS NULL OR job_title = '') AND notes LIKE 'Interview round for %';";
+                ExecuteNonQuery(sql);
+            }
+            catch { }
+        }
+
+        // =========================================================================
+        // [DATABASE ACCESS]: Guarantee views_count column on jobs and internships
+        // =========================================================================
+        public static void EnsureJobViewsColumn()
+        {
+            try
+            {
+                string sql = @"
+                    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'jobs' AND COLUMN_NAME = 'views_count')
+                    BEGIN
+                        ALTER TABLE jobs ADD views_count INT NOT NULL DEFAULT 0;
+                    END;
+                    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'internships' AND COLUMN_NAME = 'views_count')
+                    BEGIN
+                        ALTER TABLE internships ADD views_count INT NOT NULL DEFAULT 0;
                     END;";
                 ExecuteNonQuery(sql);
             }
@@ -362,8 +496,62 @@ namespace SkillLinksX.Helpers
             {
                 try
                 {
-                    // 1. Strictly query company_table by the logged-in user_id
-                    object obj = ExecuteScalar("SELECT company_id FROM company_table WHERE user_id = @uid", new SqlParameter("@uid", userId));
+                    EnsureCompanyColumns();
+
+                    string email = session != null && session["Email"] != null ? session["Email"].ToString().Trim() : "";
+                    if (string.IsNullOrEmpty(email))
+                    {
+                        object emailObj = ExecuteScalar("SELECT email FROM user_auth WHERE user_id = @uid", new SqlParameter("@uid", userId));
+                        if (emailObj != null && emailObj != DBNull.Value) email = emailObj.ToString().Trim();
+                    }
+
+                    // 1. First priority: match company_table row where BOTH user_id and email match
+                    if (!string.IsNullOrEmpty(email))
+                    {
+                        object exactCid = ExecuteScalar(@"
+                            SELECT TOP 1 company_id 
+                            FROM company_table 
+                            WHERE user_id = @uid AND LOWER(email_add) = LOWER(@email)
+                            ORDER BY company_id DESC",
+                            new SqlParameter("@uid", userId),
+                            new SqlParameter("@email", email));
+
+                        if (exactCid != null && exactCid != DBNull.Value && Convert.ToInt32(exactCid) > 0)
+                        {
+                            int cid = Convert.ToInt32(exactCid);
+                            if (session != null) session["CompanyId"] = cid;
+                            return cid;
+                        }
+
+                        // 2. Second priority: match company_table row by user's verified email
+                        object emailCid = ExecuteScalar(@"
+                            SELECT TOP 1 company_id 
+                            FROM company_table 
+                            WHERE LOWER(email_add) = LOWER(@email)
+                            ORDER BY company_id DESC",
+                            new SqlParameter("@email", email));
+
+                        if (emailCid != null && emailCid != DBNull.Value && Convert.ToInt32(emailCid) > 0)
+                        {
+                            int cid = Convert.ToInt32(emailCid);
+                            ExecuteNonQuery("UPDATE company_table SET user_id = @uid WHERE company_id = @cid",
+                                new SqlParameter("@uid", userId),
+                                new SqlParameter("@cid", cid));
+                            if (session != null) session["CompanyId"] = cid;
+                            return cid;
+                        }
+                    }
+
+                    // 3. Third priority: match by user_id alone (EXCLUDE TechNova unless user's email is technova)
+                    object obj = ExecuteScalar(@"
+                        SELECT TOP 1 company_id 
+                        FROM company_table 
+                        WHERE user_id = @uid 
+                          AND (comp_name NOT LIKE '%TechNova%' OR LOWER(@email) LIKE '%technova%')
+                        ORDER BY company_id DESC",
+                        new SqlParameter("@uid", userId),
+                        new SqlParameter("@email", email));
+
                     if (obj != null && obj != DBNull.Value && Convert.ToInt32(obj) > 0)
                     {
                         int cid = Convert.ToInt32(obj);
@@ -371,40 +559,19 @@ namespace SkillLinksX.Helpers
                         return cid;
                     }
 
-                    // 2. Query company_table by user's verified login email
-                    if (session != null && session["Email"] != null)
+                    // 4. If this is a company user who doesn't have a row in company_table yet, auto-provision a fresh isolated row!
+                    if (session == null || session["Role"] == null || session["Role"]?.ToString() == "Company")
                     {
-                        string email = session["Email"].ToString().Trim();
-                        if (!string.IsNullOrEmpty(email))
-                        {
-                            object emailCid = ExecuteScalar("SELECT company_id FROM company_table WHERE email_add = @email", new SqlParameter("@email", email));
-                            if (emailCid != null && emailCid != DBNull.Value && Convert.ToInt32(emailCid) > 0)
-                            {
-                                int cid = Convert.ToInt32(emailCid);
-                                ExecuteNonQuery("UPDATE company_table SET user_id = @uid WHERE company_id = @cid",
-                                    new SqlParameter("@uid", userId),
-                                    new SqlParameter("@cid", cid));
-                                session["CompanyId"] = cid;
-                                return cid;
-                            }
-                        }
-                    }
-
-                    // 3. If this is a company user who doesn't have a row in company_table yet, auto-provision one!
-                    if (session != null && session["Role"]?.ToString() == "Company")
-                    {
-                        string email = session["Email"] != null ? session["Email"].ToString().Trim() : "";
-                        string name = session["UserName"] != null ? session["UserName"].ToString().Trim() : "Company";
+                        string name = session != null && session["UserName"] != null ? session["UserName"].ToString().Trim() : "Company";
                         if (string.IsNullOrEmpty(name) || name == "Admin" || name == "Company")
                         {
                             name = !string.IsNullOrEmpty(email) ? email.Split('@')[0] : "New Company";
                             if (name.Length > 0) name = char.ToUpper(name[0]) + (name.Length > 1 ? name.Substring(1) : "");
                         }
 
-                        EnsureCompanyColumns();
                         object newCid = ExecuteScalar(@"
                             INSERT INTO company_table (user_id, comp_name, email_add, ph_no, city, state, address, is_verified, profile_strength)
-                            VALUES (@uid, @cname, @email, '', 'Ahmedabad', 'Gujarat', '', 0, 50);
+                            VALUES (@uid, @cname, @email, '', '', '', '', 0, 0);
                             SELECT SCOPE_IDENTITY();",
                             new SqlParameter("@uid", userId),
                             new SqlParameter("@cname", name),
@@ -413,8 +580,12 @@ namespace SkillLinksX.Helpers
                         if (newCid != null && newCid != DBNull.Value)
                         {
                             int cid = Convert.ToInt32(newCid);
-                            session["CompanyId"] = cid;
-                            session["UserName"] = name;
+                            if (session != null)
+                            {
+                                session["CompanyId"] = cid;
+                                session["UserName"] = name;
+                                session["CompanyName"] = name;
+                            }
                             return cid;
                         }
                     }
@@ -450,6 +621,32 @@ namespace SkillLinksX.Helpers
             }
             catch { }
             return 2;
+        }
+
+        // =========================================================================
+        // [IMAGE RESOLVER]: Normalizes image URLs from DB for reliable client rendering
+        // Handles relative paths, virtual tildes (~/), and fallback placeholders
+        // =========================================================================
+        public static string ResolveImageUrl(object rawPath, string defaultPath = "~/assets/images/user-male-logo.png")
+        {
+            string path = rawPath != null && rawPath != DBNull.Value ? rawPath.ToString().Trim() : "";
+            if (string.IsNullOrEmpty(path)) path = defaultPath;
+            if (path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || path.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                return path;
+            if (!path.StartsWith("~") && !path.StartsWith("/"))
+                path = "~/" + path;
+            if (HttpContext.Current != null)
+            {
+                try
+                {
+                    return VirtualPathUtility.ToAbsolute(path);
+                }
+                catch
+                {
+                    return path.Replace("~", "");
+                }
+            }
+            return path.Replace("~", "");
         }
     }
 }
