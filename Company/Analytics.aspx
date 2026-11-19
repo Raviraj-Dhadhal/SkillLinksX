@@ -134,69 +134,18 @@
                 </script>
             </div>
 
-            <!-- Right: Recruitment Funnel -->
+            <!-- Right: Recruitment Funnel Dynamic ApexChart -->
             <div class="chart-box-card">
-                <div class="chart-card-header">
+                <div class="chart-card-header flex-between" style="display:flex; justify-content:space-between; align-items:center;">
                     <h3 class="chart-card-title">Recruitment Funnel</h3>
+                    <span style="font-size:12px; color:#64748B; font-weight:500;">Live Conversion Pipeline</span>
                 </div>
 
-                <div class="funnel-bars-list">
-                    <!-- Funnel 1: Views -->
-                    <div class="funnel-row-item">
-                        <div class="funnel-bar-track">
-                            <% if (ViewsPct > 0) { %>
-                                <div class="funnel-bar-fill" style="width: <%= ViewsPct %>%; background-color: #E2E8F0;"></div>
-                            <% } %>
-                            <span class="funnel-label-name" style="color: #0F172A;">Views</span>
-                        </div>
-                        <span class="funnel-count"><%= TotalViews.ToString("N0") %></span>
-                    </div>
+                <div id="recruitmentFunnelChart" style="min-height: 290px;"></div>
 
-                    <!-- Funnel 2: Applications -->
-                    <div class="funnel-row-item">
-                        <div class="funnel-bar-track">
-                            <% if (AppsPct > 0) { %>
-                                <div class="funnel-bar-fill" style="width: <%= AppsPct %>%; background-color: #C7D7F7;"></div>
-                            <% } %>
-                            <span class="funnel-label-name" style="color: #0F172A;">Applications</span>
-                        </div>
-                        <span class="funnel-count"><%= TotalApps %></span>
-                    </div>
-
-                    <!-- Funnel 3: Shortlisted -->
-                    <div class="funnel-row-item">
-                        <div class="funnel-bar-track">
-                            <% if (ShortlistedPct > 0) { %>
-                                <div class="funnel-bar-fill" style="width: <%= ShortlistedPct %>%; background-color: #93B0FC;"></div>
-                            <% } %>
-                            <span class="funnel-label-name" style="color: #0F172A;">Shortlisted</span>
-                        </div>
-                        <span class="funnel-count"><%= TotalShortlisted %></span>
-                    </div>
-
-                    <!-- Funnel 4: Interviews -->
-                    <div class="funnel-row-item">
-                        <div class="funnel-bar-track">
-                            <% if (InterviewsPct > 0) { %>
-                                <div class="funnel-bar-fill" style="width: <%= InterviewsPct %>%; background-color: #4C7DE8;"></div>
-                            <% } %>
-                            <span class="funnel-label-name" style="color: <%= InterviewsPct >= 35 ? "#FFFFFF" : "#0F172A" %>;">Interviews</span>
-                        </div>
-                        <span class="funnel-count"><%= TotalInterviews %></span>
-                    </div>
-
-                    <!-- Funnel 5: Hired -->
-                    <div class="funnel-row-item">
-                        <div class="funnel-bar-track">
-                            <% if (HiredPct > 0) { %>
-                                <div class="funnel-bar-fill" style="width: <%= HiredPct %>%; background-color: #0040A2;"></div>
-                            <% } %>
-                            <span class="funnel-label-name" style="color: <%= HiredPct >= 35 ? "#FFFFFF" : "#0F172A" %>;">Hired / Selected</span>
-                        </div>
-                        <span class="funnel-count"><%= TotalHired %></span>
-                    </div>
-                </div>
-
+                <script type="text/javascript">
+                    window.dbCompanyFunnelData = <%= FunnelSeriesJson %>;
+                </script>
             </div>
 
         </div>

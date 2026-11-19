@@ -88,7 +88,8 @@
 
                     <div class="filter-opp-select-wrapper" style="min-width: 160px;">
                         <asp:DropDownList ID="ddlStatusFilter" runat="server" CssClass="app-filter-select" AutoPostBack="true" OnSelectedIndexChanged="ddlStatusFilter_SelectedIndexChanged">
-                            <asp:ListItem Text="Active (Pending Review)" Value="All" Selected="True" />
+                            <asp:ListItem Text="All Applicants" Value="All" Selected="True" />
+                            <asp:ListItem Text="Pending Review (Active)" Value="Active" />
                             <asp:ListItem Text="New Applications" Value="New" />
                             <asp:ListItem Text="Under Review" Value="Under Review" />
                             <asp:ListItem Text="Shortlisted" Value="Shortlisted" />

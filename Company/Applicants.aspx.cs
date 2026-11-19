@@ -286,15 +286,25 @@ namespace SkillLinksX.Company
             }
 
             // Dynamic filter by status:
-            // Main/Default tab: show active applicants needing review.
-            // Shortlisted are in 'Shortlisted' tab, Rejected are in 'Rejected' tab, and Selected vanish into Team Members!
-            if (string.IsNullOrEmpty(selectedStatus) || selectedStatus.Equals("All", StringComparison.OrdinalIgnoreCase) || selectedStatus.Equals("Active", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrEmpty(selectedStatus) || selectedStatus.Equals("All", StringComparison.OrdinalIgnoreCase) || selectedStatus.Equals("AllHistorical", StringComparison.OrdinalIgnoreCase))
             {
-                sql += " AND a.status NOT IN ('Rejected', 'Shortlisted', 'Selected', 'Released')";
+                // Show all applicants for this company
             }
-            else if (selectedStatus.Equals("AllHistorical", StringComparison.OrdinalIgnoreCase))
+            else if (selectedStatus.Equals("Active", StringComparison.OrdinalIgnoreCase))
             {
-                // Show all historical records
+                sql += " AND a.status NOT IN ('Rejected')";
+            }
+            else if (selectedStatus.Equals("New", StringComparison.OrdinalIgnoreCase))
+            {
+                sql += " AND a.status IN ('New', 'Applied')";
+            }
+            else if (selectedStatus.Equals("Selected", StringComparison.OrdinalIgnoreCase))
+            {
+                sql += " AND a.status IN ('Selected', 'Accepted', 'Hired')";
+            }
+            else if (selectedStatus.Equals("Interview Scheduled", StringComparison.OrdinalIgnoreCase))
+            {
+                sql += " AND a.status LIKE 'Interview%'";
             }
             else
             {
@@ -331,6 +341,14 @@ namespace SkillLinksX.Company
                 string rSkills = r["required_skills"] != DBNull.Value ? r["required_skills"].ToString() : "";
                 int matchScore = AIService.CalculateMatchScore(sSkills, rSkills);
 
+                string photo = r["ProfilePhoto"] != DBNull.Value ? r["ProfilePhoto"].ToString().Trim() : "";
+                if (photo.IndexOf("user-male-logo", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    photo.IndexOf("user-female-logo", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    photo = "";
+                }
+                string resolvedPhoto = !string.IsNullOrEmpty(photo) ? DBHelper.ResolveImageUrl(photo, "") : "";
+
                 list.Add(new
                 {
                     ApplicationId = r["application_id"],
@@ -341,7 +359,7 @@ namespace SkillLinksX.Company
                     Status = status,
                     StatusClass = statusClass,
                     AiMatchScore = matchScore,
-                    ProfilePhoto = r["ProfilePhoto"] != DBNull.Value ? r["ProfilePhoto"].ToString() : ""
+                    ProfilePhoto = resolvedPhoto
                 });
             }
 
@@ -368,7 +386,13 @@ namespace SkillLinksX.Company
                 QuickJobTitle = firstRow["JobTitle"] != DBNull.Value ? firstRow["JobTitle"].ToString() : "";
                 QuickCollege = firstRow["College"] != DBNull.Value ? firstRow["College"].ToString() : "University";
                 QuickDegree = firstRow["Degree"] != DBNull.Value ? firstRow["Degree"].ToString() : "Computer Engineering";
-                QuickProfilePhoto = firstRow["ProfilePhoto"] != DBNull.Value ? firstRow["ProfilePhoto"].ToString() : "";
+                string qPhoto = firstRow["ProfilePhoto"] != DBNull.Value ? firstRow["ProfilePhoto"].ToString().Trim() : "";
+                if (qPhoto.IndexOf("user-male-logo", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    qPhoto.IndexOf("user-female-logo", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    qPhoto = "";
+                }
+                QuickProfilePhoto = !string.IsNullOrEmpty(qPhoto) ? DBHelper.ResolveImageUrl(qPhoto, "") : "";
 
                 string sSkills = firstRow["StudentSkills"] != DBNull.Value ? firstRow["StudentSkills"].ToString() : "";
                 string rSkills = firstRow["required_skills"] != DBNull.Value ? firstRow["required_skills"].ToString() : "";

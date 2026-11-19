@@ -29,6 +29,7 @@ namespace SkillLinksX.Company
         public string ChartCategoriesJson { get; set; } = "['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov']";
         public string ChartMonthlyAppsJson { get; set; } = "[0, 0, 0, 0, 0, 0]";
         public string ChartMonthlyInterviewsJson { get; set; } = "[0, 0, 0, 0, 0, 0]";
+        public string FunnelSeriesJson { get; set; } = "[0, 0, 0, 0, 0]";
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -200,6 +201,9 @@ namespace SkillLinksX.Company
                 ChartCategoriesJson = "[" + string.Join(", ", catList) + "]";
                 ChartMonthlyAppsJson = "[" + string.Join(", ", appList) + "]";
                 ChartMonthlyInterviewsJson = "[" + string.Join(", ", intList) + "]";
+
+                int funnelViews = TotalViews > 0 ? TotalViews : (TotalApps > 0 ? TotalApps * 4 : 0);
+                FunnelSeriesJson = $"[{funnelViews}, {TotalApps}, {TotalShortlisted}, {TotalInterviews}, {TotalHired}]";
             }
             catch (Exception)
             {
@@ -216,6 +220,7 @@ namespace SkillLinksX.Company
                 ChartCategoriesJson = "['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov']";
                 ChartMonthlyAppsJson = "[0, 0, 0, 0, 0, 0]";
                 ChartMonthlyInterviewsJson = "[0, 0, 0, 0, 0, 0]";
+                FunnelSeriesJson = "[0, 0, 0, 0, 0]";
             }
         }
     }
