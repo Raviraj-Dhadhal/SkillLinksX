@@ -12,11 +12,7 @@
         <div class="admin-profile-header-card">
             <div class="admin-profile-avatar-wrapper">
                 <div style="width:72px; height:72px; border-radius:50%; background:#f1f5f9; color:#64748b; display:flex; align-items:center; justify-content:center; font-size:32px; border:1px solid #cbd5e1; overflow:hidden;">
-                    <% if (!string.IsNullOrEmpty(AdminPhotoUrl)) { %>
-                        <img src="<%= ResolveUrl(AdminPhotoUrl) %>" alt="<%= AdminFullName %>" style="width:100%; height:100%; object-fit:cover;" />
-                    <% } else { %>
-                        <i class="fa-regular fa-user"></i>
-                    <% } %>
+                    <img src="<%= AdminPhotoUrl %>" alt="<%= AdminFullName %>" style="width:100%; height:100%; object-fit:cover;" />
                 </div>
             </div>
             

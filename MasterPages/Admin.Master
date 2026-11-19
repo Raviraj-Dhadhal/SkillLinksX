@@ -79,6 +79,11 @@
                                 <i class="fa-solid fa-chart-line"></i> Reports &amp; Analytics
                             </a>
                         </li>
+                        <li>
+                            <a href="<%= ResolveUrl("~/Admin/Notifications.aspx") %>" class="sidebar-link">
+                                <i class="fa-regular fa-bell"></i> Notifications
+                            </a>
+                        </li>
                     </ul>
                 </nav>
 
@@ -111,8 +116,22 @@
 
                     <!-- Actions & Admin Info -->
                     <div class="topbar-actions">
+                        <!-- Notification Bell with dynamic database count -->
+                        <a href="<%= ResolveUrl("~/Admin/Notifications.aspx") %>" class="topbar-icon-btn" title="Notifications">
+                            <i class="fa-regular fa-bell"></i>
+                            <% if (UnreadNotificationCount > 0) { %>
+                                <span class="badge-unread-count"><%= UnreadNotificationCount %></span>
+                            <% } %>
+                        </a>
+
                         <a href="<%= ResolveUrl("~/Admin/Profile.aspx") %>" class="topbar-user-profile" title="Admin Profile">
-                            <img src='<%= ResolveUrl("~/assets/images/user-female-logo.png") %>' alt='<%= Session["UserName"] ?? "Administrator" %>' class="user-avatar-img" />
+                            <span class="user-avatar-circle" style="width:32px; height:32px; border-radius:50%; background:#EFF6FF; display:inline-flex; align-items:center; justify-content:center; color:#0040A2; font-size:15px; border:1px solid #CBD5E1; overflow:hidden;">
+                                <% if (!string.IsNullOrEmpty(ProfilePhotoUrl)) { %>
+                                    <img src="<%= ResolveUrl(ProfilePhotoUrl) %>" alt="<%= Session["UserName"] ?? "Administrator" %>" style="width:100%; height:100%; object-fit:cover;" />
+                                <% } else { %>
+                                    <i class="fa-regular fa-user"></i>
+                                <% } %>
+                            </span>
                             <span class="user-name-text"><%= Session["UserName"] ?? "Administrator" %></span>
                             <i class="fa-solid fa-chevron-down profile-dropdown-arrow"></i>
                         </a>
@@ -130,7 +149,7 @@
         </div>
     </form>
 
-    <!-- Admin JS -->
-    <script src="<%= ResolveUrl("~/assets/JS/admin.js") %>"></script>
+    <!-- Admin JS with cache-buster -->
+    <script src="<%= ResolveUrl("~/assets/JS/admin.js?v=3.0") %>"></script>
 </body>
 </html>

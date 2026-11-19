@@ -69,23 +69,12 @@ document.addEventListener("DOMContentLoaded", function () {
     /* ----------------------------------------------------------------------
        3. User Growth Analytics ApexCharts (Linear Growth Area / Line Chart)
        ---------------------------------------------------------------------- */
+    let apexChartRetryCount = 0;
     function renderUserGrowthChart() {
         const chartContainer = document.querySelector("#userGrowthChart");
         if (!chartContainer) return;
 
-        if (typeof ApexCharts === "undefined") {
-            // Retry briefly if CDN is still downloading
-            setTimeout(renderUserGrowthChart, 150);
-            return;
-        }
-
-        // Clear existing chart container
-        chartContainer.innerHTML = "";
-
-        // =========================================================================
-        // [DATABASE DYNAMIC INJECTION]:
-        // Read database-fed series data passed from Admin/Dashboard.aspx.cs
-        // =========================================================================
+        // Dynamic categories and series from DB
         const liveStudentData = (typeof window.dbAdminStudentGrowth !== "undefined" && Array.isArray(window.dbAdminStudentGrowth)) 
             ? window.dbAdminStudentGrowth 
             : [0, 0, 0, 0, 0, 0];
@@ -97,6 +86,20 @@ document.addEventListener("DOMContentLoaded", function () {
         const liveCategories = (typeof window.dbAdminCategories !== "undefined" && Array.isArray(window.dbAdminCategories))
             ? window.dbAdminCategories
             : ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
+
+        if (typeof ApexCharts === "undefined") {
+            apexChartRetryCount++;
+            if (apexChartRetryCount < 4) {
+                setTimeout(renderUserGrowthChart, 200);
+                return;
+            }
+            // Fallback: render SVG area chart directly
+            renderFallbackSvgGrowthChart(chartContainer, liveCategories, liveStudentData, liveCompanyData);
+            return;
+        }
+
+        // Clear existing chart container
+        chartContainer.innerHTML = "";
 
         const chartOptions = {
             series: [
@@ -184,8 +187,100 @@ document.addEventListener("DOMContentLoaded", function () {
             const chart = new ApexCharts(chartContainer, chartOptions);
             chart.render();
         } catch (chartErr) {
-            console.error("SkillLinkX: Admin ApexCharts render error", chartErr);
+            console.warn("SkillLinkX: Admin ApexCharts render warning, switching to SVG", chartErr);
+            renderFallbackSvgGrowthChart(chartContainer, liveCategories, liveStudentData, liveCompanyData);
         }
+    }
+
+    function renderFallbackSvgGrowthChart(container, categories, studentData, companyData) {
+        if (!container) return;
+        const width = container.clientWidth || 600;
+        const height = 260;
+        const padding = { top: 25, right: 20, bottom: 35, left: 40 };
+        const chartW = width - padding.left - padding.right;
+        const chartH = height - padding.top - padding.bottom;
+
+        const maxVal = Math.max(10, ...studentData, ...companyData) * 1.2;
+        const n = categories.length;
+
+        function getX(i) {
+            return padding.left + (i / (n - 1)) * chartW;
+        }
+        function getY(val) {
+            return padding.top + chartH - (val / maxVal) * chartH;
+        }
+
+        let sPoints = [];
+        let cPoints = [];
+        for (let i = 0; i < n; i++) {
+            sPoints.push({ x: getX(i), y: getY(studentData[i] || 0) });
+            cPoints.push({ x: getX(i), y: getY(companyData[i] || 0) });
+        }
+
+        function createAreaPath(pts) {
+            if (!pts.length) return "";
+            let p = `M ${pts[0].x} ${pts[0].y}`;
+            for (let i = 1; i < pts.length; i++) p += ` L ${pts[i].x} ${pts[i].y}`;
+            p += ` L ${pts[pts.length - 1].x} ${padding.top + chartH} L ${pts[0].x} ${padding.top + chartH} Z`;
+            return p;
+        }
+
+        function createLinePath(pts) {
+            if (!pts.length) return "";
+            let p = `M ${pts[0].x} ${pts[0].y}`;
+            for (let i = 1; i < pts.length; i++) p += ` L ${pts[i].x} ${pts[i].y}`;
+            return p;
+        }
+
+        let svgHtml = `
+            <svg width="100%" height="${height}" viewBox="0 0 ${width} ${height}" style="overflow:visible; font-family:Inter,sans-serif;">
+                <defs>
+                    <linearGradient id="svgGradStudents" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#0040A2" stop-opacity="0.35"/>
+                        <stop offset="100%" stop-color="#0040A2" stop-opacity="0.02"/>
+                    </linearGradient>
+                    <linearGradient id="svgGradCompanies" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#10B981" stop-opacity="0.35"/>
+                        <stop offset="100%" stop-color="#10B981" stop-opacity="0.02"/>
+                    </linearGradient>
+                </defs>
+                <line x1="${padding.left}" y1="${padding.top}" x2="${width - padding.right}" y2="${padding.top}" stroke="#F1F5F9" stroke-dasharray="4"/>
+                <line x1="${padding.left}" y1="${padding.top + chartH * 0.5}" x2="${width - padding.right}" y2="${padding.top + chartH * 0.5}" stroke="#F1F5F9" stroke-dasharray="4"/>
+                <line x1="${padding.left}" y1="${padding.top + chartH}" x2="${width - padding.right}" y2="${padding.top + chartH}" stroke="#E2E8F0"/>
+                
+                <text x="${padding.left - 8}" y="${padding.top + 4}" text-anchor="end" font-size="11" fill="#94A3B8">${Math.round(maxVal)}</text>
+                <text x="${padding.left - 8}" y="${padding.top + chartH * 0.5 + 4}" text-anchor="end" font-size="11" fill="#94A3B8">${Math.round(maxVal * 0.5)}</text>
+                <text x="${padding.left - 8}" y="${padding.top + chartH + 4}" text-anchor="end" font-size="11" fill="#94A3B8">0</text>
+
+                <path d="${createAreaPath(sPoints)}" fill="url(#svgGradStudents)"/>
+                <path d="${createAreaPath(cPoints)}" fill="url(#svgGradCompanies)"/>
+
+                <path d="${createLinePath(sPoints)}" fill="none" stroke="#0040A2" stroke-width="2.5"/>
+                <path d="${createLinePath(cPoints)}" fill="none" stroke="#10B981" stroke-width="2.5"/>
+        `;
+
+        for (let i = 0; i < n; i++) {
+            svgHtml += `
+                <text x="${sPoints[i].x}" y="${padding.top + chartH + 20}" text-anchor="middle" font-size="12" fill="#64748B">${categories[i]}</text>
+                <circle cx="${sPoints[i].x}" cy="${sPoints[i].y}" r="4" fill="#0040A2" stroke="#FFFFFF" stroke-width="2">
+                    <title>Students: ${studentData[i] || 0}</title>
+                </circle>
+                <circle cx="${cPoints[i].x}" cy="${cPoints[i].y}" r="4" fill="#10B981" stroke="#FFFFFF" stroke-width="2">
+                    <title>Companies: ${companyData[i] || 0}</title>
+                </circle>
+            `;
+        }
+
+        svgHtml += `
+            <g transform="translate(${Math.max(padding.left, width - 170)}, 10)">
+                <circle cx="6" cy="6" r="4.5" fill="#0040A2"/>
+                <text x="16" y="10" font-size="12" fill="#475569" font-weight="600">Students</text>
+                <circle cx="90" cy="6" r="4.5" fill="#10B981"/>
+                <text x="100" y="10" font-size="12" fill="#475569" font-weight="600">Companies</text>
+            </g>
+        </svg>`;
+
+        container.innerHTML = svgHtml;
     }
 
     try {
@@ -243,26 +338,28 @@ document.addEventListener("DOMContentLoaded", function () {
         if (studentRows.length > 0 && studentSidebar) {
             studentRows.forEach(row => {
                 row.addEventListener("click", function (e) {
-                    // Ignore clicks if clicking directly on a checkbox
-                    if (e.target.type === "checkbox") return;
+                    // Ignore clicks if clicking directly on a link, button, or checkbox
+                    if (e.target.type === "checkbox" || e.target.closest("a") || e.target.closest("button")) return;
 
                     studentRows.forEach(r => r.classList.remove("active-row"));
                     this.classList.add("active-row");
 
                     const name = this.getAttribute("data-name") || "Student";
                     const email = this.getAttribute("data-email") || "";
-                    const avatar = this.getAttribute("data-avatar") || "../assets/Images/profile.png";
+                    const avatar = this.getAttribute("data-avatar") || "";
                     const status = this.getAttribute("data-status") || "Active Account";
                     const college = this.getAttribute("data-college") || "";
                     const degree = this.getAttribute("data-degree") || "";
                     const cgpa = this.getAttribute("data-cgpa") || "";
                     const skills = (this.getAttribute("data-skills") || "").split(",").map(s => s.trim()).filter(Boolean);
                     const resume = this.getAttribute("data-resume") || "Student_Resume.pdf";
+                    const studentId = this.getAttribute("data-student-id") || this.getAttribute("data-id") || "";
 
                     // Update UI elements
                     const sdName = document.getElementById("sdName");
                     const sdEmail = document.getElementById("sdEmail");
                     const sdAvatar = document.getElementById("sdAvatar");
+                    const sdAvatarFallback = document.getElementById("sdAvatarFallback");
                     const sdStatus = document.getElementById("sdStatus");
                     const sdCollege = document.getElementById("sdCollege");
                     const sdDegree = document.getElementById("sdDegree");
@@ -272,7 +369,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     if (sdName) sdName.textContent = name;
                     if (sdEmail) sdEmail.textContent = email;
-                    if (sdAvatar) sdAvatar.src = avatar;
+                    if (avatar && avatar.trim() !== "") {
+                        if (sdAvatar) {
+                            sdAvatar.src = avatar;
+                            sdAvatar.style.display = "block";
+                        }
+                        if (sdAvatarFallback) sdAvatarFallback.style.display = "none";
+                    } else {
+                        if (sdAvatar) sdAvatar.style.display = "none";
+                        if (sdAvatarFallback) sdAvatarFallback.style.display = "flex";
+                    }
                     if (sdStatus) {
                         sdStatus.textContent = status;
                         sdStatus.className = "student-badge-status " + (status.toLowerCase().includes("inactive") ? "status-inactive" : "status-active");
@@ -281,6 +387,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (sdDegree) sdDegree.textContent = degree;
                     if (sdCgpa) sdCgpa.textContent = cgpa;
                     if (sdResumeName) sdResumeName.textContent = resume;
+                    const sdResumeLink = document.getElementById("sdResumeLink");
+                    if (sdResumeLink && studentId) {
+                        sdResumeLink.href = "Students.aspx?download_resume=1&uid=" + encodeURIComponent(studentId);
+                    }
 
                     if (sdSkills) {
                         sdSkills.innerHTML = "";
@@ -319,13 +429,13 @@ document.addEventListener("DOMContentLoaded", function () {
         if (companyRows.length > 0 && companySidebar) {
             companyRows.forEach(row => {
                 row.addEventListener("click", function (e) {
-                    if (e.target.type === "checkbox") return;
+                    if (e.target.type === "checkbox" || e.target.closest("a") || e.target.closest("button")) return;
 
                     companyRows.forEach(r => r.classList.remove("active-row"));
                     this.classList.add("active-row");
 
                     const name = this.getAttribute("data-name") || "Company";
-                    const initials = this.getAttribute("data-initials") || "CO";
+                    const avatar = this.getAttribute("data-avatar") || "";
                     const status = this.getAttribute("data-status") || "Pending";
                     const industry = this.getAttribute("data-industry") || "";
                     const location = this.getAttribute("data-location") || "";
@@ -353,7 +463,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     const cdAppCount = document.getElementById("cdAppCount");
                     const cdHiresCount = document.getElementById("cdHiresCount");
 
-                    if (cdInitials) cdInitials.textContent = initials;
+                    const cdAvatar = document.getElementById("cdAvatar");
+                    const cdAvatarFallback = document.getElementById("cdAvatarFallback");
+                    if (avatar && avatar.trim() !== "") {
+                        if (cdAvatar) {
+                            cdAvatar.src = avatar;
+                            cdAvatar.style.display = "block";
+                        }
+                        if (cdAvatarFallback) cdAvatarFallback.style.display = "none";
+                    } else {
+                        if (cdAvatar) cdAvatar.style.display = "none";
+                        if (cdAvatarFallback) cdAvatarFallback.style.display = "flex";
+                    }
                     if (cdName) cdName.textContent = name;
                     if (cdStatus) {
                         cdStatus.textContent = status;
@@ -406,13 +527,14 @@ document.addEventListener("DOMContentLoaded", function () {
         if (appRows.length > 0 && appSidebar) {
             appRows.forEach(row => {
                 row.addEventListener("click", function (e) {
-                    if (e.target.tagName === "BUTTON" || e.target.closest("button") || e.target.closest(".action-dropdown-wrap")) return;
+                    if (e.target.tagName === "BUTTON" || e.target.closest("button") || e.target.closest(".action-dropdown-wrap") || e.target.closest("a") || e.target.type === "checkbox") return;
 
                     appRows.forEach(r => r.classList.remove("active-row"));
                     this.classList.add("active-row");
 
                     const name = this.getAttribute("data-name") || this.getAttribute("data-student-name") || "Applicant";
-                    const avatar = this.getAttribute("data-avatar") || "../assets/Images/profile.png";
+                    const avatar = this.getAttribute("data-avatar") || "";
+                    const userId = this.getAttribute("data-user-id") || "";
                     const role = this.getAttribute("data-role") || this.getAttribute("data-applied-for") || "Applicant";
                     const company = this.getAttribute("data-company") || "";
                     const match = this.getAttribute("data-match") || "90%";
@@ -437,7 +559,17 @@ document.addEventListener("DOMContentLoaded", function () {
                     const adTimelineStatus = document.getElementById("adTimelineStatus");
                     const adStatusSelect = document.getElementById("adStatusSelect") || document.getElementById("ddlUpdateAppStatus");
 
-                    if (adAvatar) adAvatar.src = avatar;
+                    const adAvatarFallback = document.getElementById("adAvatarFallback");
+                    if (avatar && avatar.trim() !== "") {
+                        if (adAvatar) {
+                            adAvatar.src = avatar;
+                            adAvatar.style.display = "block";
+                        }
+                        if (adAvatarFallback) adAvatarFallback.style.display = "none";
+                    } else {
+                        if (adAvatar) adAvatar.style.display = "none";
+                        if (adAvatarFallback) adAvatarFallback.style.display = "flex";
+                    }
                     if (adName) adName.textContent = name;
                     if (adAppliedFor) adAppliedFor.textContent = role.includes(" at ") ? "Applying for " + role : "Applying for " + role + " at " + company;
                     if (adMatchPct) adMatchPct.textContent = match;
@@ -449,6 +581,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (adCollege) adCollege.textContent = college;
                     if (adTimelineStatus) adTimelineStatus.textContent = status;
                     if (adStatusSelect) adStatusSelect.value = status;
+                    const adResumeBtn = document.getElementById("adResumeBtn");
+                    if (adResumeBtn && userId) {
+                        adResumeBtn.href = "Applications.aspx?download_resume=1&uid=" + encodeURIComponent(userId);
+                    }
 
                     if (adSkills) {
                         adSkills.innerHTML = "";

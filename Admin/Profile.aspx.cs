@@ -49,7 +49,7 @@ namespace SkillLinksX.Admin
                     AdminFullName = row["username"] != DBNull.Value ? row["username"].ToString() : sessionName;
                     AdminEmail = row["email"] != DBNull.Value ? row["email"].ToString() : (sessionName.ToLower().Replace(" ", ".") + "@skilllinkx.com");
                     if (row["profile_photo"] != DBNull.Value)
-                        AdminPhotoUrl = row["profile_photo"].ToString().Trim();
+                        AdminPhotoUrl = DBHelper.ResolveImageUrl(row["profile_photo"], "~/assets/images/user-male-logo.png");
                 }
                 else
                 {
@@ -63,6 +63,8 @@ namespace SkillLinksX.Admin
                 AdminEmail = sessionName.ToLower().Replace(" ", ".") + "@skilllinkx.com";
             }
 
+            if (string.IsNullOrEmpty(AdminPhotoUrl))
+                AdminPhotoUrl = ResolveUrl("~/assets/images/user-male-logo.png");
             AdminInitials = !string.IsNullOrEmpty(AdminFullName) ? AdminFullName.Substring(0, 1).ToUpper() : "A";
             litAdminName.Text = AdminFullName;
             litAdminEmail.Text = AdminEmail;
