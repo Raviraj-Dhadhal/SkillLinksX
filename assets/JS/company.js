@@ -234,6 +234,119 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /* ----------------------------------------------------------------------
+       3b. Dynamic Recruitment Funnel ApexCharts (Analytics Page)
+       ---------------------------------------------------------------------- */
+    function renderRecruitmentFunnelChart() {
+        const funnelContainer = document.querySelector("#recruitmentFunnelChart");
+        if (!funnelContainer) return;
+
+        if (typeof ApexCharts === "undefined") {
+            setTimeout(renderRecruitmentFunnelChart, 150);
+            return;
+        }
+
+        funnelContainer.innerHTML = "";
+
+        const funnelData = (typeof window.dbCompanyFunnelData !== "undefined" && Array.isArray(window.dbCompanyFunnelData))
+            ? window.dbCompanyFunnelData
+            : [0, 0, 0, 0, 0];
+
+        const funnelCategories = ['Views', 'Applications', 'Shortlisted', 'Interviews', 'Hired'];
+
+        const funnelOptions = {
+            series: [{
+                name: 'Candidates',
+                data: funnelData
+            }],
+            chart: {
+                type: 'bar',
+                height: 290,
+                toolbar: { show: false },
+                fontFamily: 'inherit',
+                animations: {
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 600
+                }
+            },
+            plotOptions: {
+                bar: {
+                    borderRadius: 5,
+                    horizontal: true,
+                    barHeight: '58%',
+                    isFunnel: true,
+                    distributed: true,
+                    dataLabels: {
+                        position: 'center'
+                    }
+                }
+            },
+            colors: ['#94A3B8', '#60A5FA', '#3B82F6', '#2563EB', '#10B981'],
+            dataLabels: {
+                enabled: true,
+                formatter: function (val, opt) {
+                    const cat = opt.w.globals.labels[opt.dataPointIndex] || "";
+                    return cat + ": " + val;
+                },
+                dropShadow: {
+                    enabled: false
+                },
+                style: {
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    colors: ['#0F172A', '#0F172A', '#FFFFFF', '#FFFFFF', '#FFFFFF']
+                }
+            },
+            xaxis: {
+                categories: funnelCategories,
+                labels: {
+                    show: false
+                },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                labels: {
+                    show: true,
+                    style: {
+                        colors: '#475569',
+                        fontSize: '12px',
+                        fontWeight: 600
+                    }
+                }
+            },
+            grid: {
+                show: false,
+                padding: { top: 0, bottom: 0, left: 10, right: 20 }
+            },
+            legend: {
+                show: false
+            },
+            tooltip: {
+                theme: 'light',
+                y: {
+                    formatter: function (val) {
+                        return val + " candidates";
+                    }
+                }
+            }
+        };
+
+        try {
+            const funnelChart = new ApexCharts(funnelContainer, funnelOptions);
+            funnelChart.render();
+        } catch (e) {
+            console.warn("SkillLinkX: Funnel chart render error", e);
+        }
+    }
+
+    try {
+        renderRecruitmentFunnelChart();
+    } catch (err) {
+        console.warn("SkillLinkX: Funnel chart init warning", err);
+    }
+
+    /* ----------------------------------------------------------------------
        4. Applicants Table Row Selection & Quick Preview (Applicants Page)
        ---------------------------------------------------------------------- */
     try {

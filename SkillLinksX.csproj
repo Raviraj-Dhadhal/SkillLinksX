@@ -58,6 +58,7 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
@@ -80,6 +81,7 @@
     <Content Include="Public\Contact.aspx" />
     <Content Include="Public\Login.aspx" />
     <Content Include="Public\Register.aspx" />
+    <Content Include="Public\CompanyRegister.aspx" />
     <Content Include="Public\ForgotPassword.aspx" />
     <Content Include="Public\HelpCenter.aspx" />
     <Content Include="Public\About.aspx" />
@@ -108,12 +110,14 @@
     <Content Include="User\Messages.aspx" />
     <Content Include="User\CareerAssistant.aspx" />
     <Content Include="User\Settings.aspx" />
+    <Content Include="User\Help.aspx" />
     <Content Include="Admin\Dashboard.aspx" />
     <Content Include="Admin\Students.aspx" />
     <Content Include="Admin\Companies.aspx" />
     <Content Include="Admin\JobsInternships.aspx" />
     <Content Include="Admin\Applications.aspx" />
     <Content Include="Admin\Analytics.aspx" />
+    <Content Include="Admin\Notifications.aspx" />
     <Content Include="Admin\Profile.aspx" />
     <Content Include="Admin\Settings.aspx" />
     <Content Include="Company\Dashboard.aspx" />
@@ -135,6 +139,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Helpers\DBHelper.cs" />
+    <Compile Include="Helpers\AIService.cs" />
     <Compile Include="MasterPages\Admin.Master.cs">
       <DependentUpon>Admin.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -191,6 +197,13 @@
     <Compile Include="Public\Register.aspx.designer.cs">
       <DependentUpon>Register.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Public\CompanyRegister.aspx.cs">
+      <DependentUpon>CompanyRegister.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Public\CompanyRegister.aspx.designer.cs">
+      <DependentUpon>CompanyRegister.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Public\ForgotPassword.aspx.cs">
       <DependentUpon>ForgotPassword.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -242,7 +255,6 @@
     </Compile>
     <Compile Include="User\Portfolio.aspx.cs">
       <DependentUpon>Portfolio.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="User\Portfolio.aspx.designer.cs">
       <DependentUpon>Portfolio.aspx</DependentUpon>
@@ -324,6 +336,13 @@
     <Compile Include="User\Settings.aspx.designer.cs">
       <DependentUpon>Settings.aspx</DependentUpon>
     </Compile>
+    <Compile Include="User\Help.aspx.cs">
+      <DependentUpon>Help.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="User\Help.aspx.designer.cs">
+      <DependentUpon>Help.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Admin\Dashboard.aspx.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -365,6 +384,13 @@
     </Compile>
     <Compile Include="Admin\Analytics.aspx.designer.cs">
       <DependentUpon>Analytics.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Notifications.aspx.cs">
+      <DependentUpon>Notifications.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin\Notifications.aspx.designer.cs">
+      <DependentUpon>Notifications.aspx</DependentUpon>
     </Compile>
     <Compile Include="Admin\Profile.aspx.cs">
       <DependentUpon>Profile.aspx</DependentUpon>
@@ -431,7 +457,6 @@
     </Compile>
     <Compile Include="Company\Interviews.aspx.cs">
       <DependentUpon>Interviews.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Company\Interviews.aspx.designer.cs">
       <DependentUpon>Interviews.aspx</DependentUpon>

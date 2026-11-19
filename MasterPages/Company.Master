@@ -177,6 +177,6 @@
     </form>
 
     <!-- JS -->
-    <script src="<%= ResolveUrl("~/assets/JS/company.js") %>"></script>
+    <script src="<%= ResolveUrl("~/assets/JS/company.js?v=3.1") %>"></script>
 </body>
 </html>
