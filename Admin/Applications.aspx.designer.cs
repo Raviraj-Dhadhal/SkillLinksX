@@ -3,6 +3,7 @@ namespace SkillLinksX.Admin
     public partial class Applications
     {
         protected global::System.Web.UI.WebControls.Literal litTotalApps;
+        protected global::System.Web.UI.WebControls.Literal litAppTrend;
         protected global::System.Web.UI.WebControls.Literal litNewApps;
         protected global::System.Web.UI.WebControls.Literal litUnderReview;
         protected global::System.Web.UI.WebControls.Literal litShortlisted;

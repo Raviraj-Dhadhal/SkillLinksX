@@ -22,8 +22,8 @@
                     <span class="stat-label">Total Applications</span>
                 </div>
                 <div class="stat-num-val">
-                    <asp:Literal ID="litTotalApps" runat="server">12,450</asp:Literal> 
-                    <span class="stat-trend-green"><i class="fa-solid fa-arrow-up"></i> 15%</span>
+                    <asp:Literal ID="litTotalApps" runat="server">0</asp:Literal> 
+                    <asp:Literal ID="litAppTrend" runat="server"><span class="stat-trend-green"><i class="fa-solid fa-check"></i> Live</span></asp:Literal>
                 </div>
             </div>
 
@@ -32,7 +32,7 @@
                     <span class="stat-label">New Applications</span>
                 </div>
                 <div class="stat-num-val color-blue">
-                    <asp:Literal ID="litNewApps" runat="server">842</asp:Literal>
+                    <asp:Literal ID="litNewApps" runat="server">0</asp:Literal>
                 </div>
             </div>
 
@@ -41,7 +41,7 @@
                     <span class="stat-label">Under Review</span>
                 </div>
                 <div class="stat-num-val">
-                    <asp:Literal ID="litUnderReview" runat="server">2,130</asp:Literal>
+                    <asp:Literal ID="litUnderReview" runat="server">0</asp:Literal>
                 </div>
             </div>
 
@@ -50,7 +50,7 @@
                     <span class="stat-label">Shortlisted</span>
                 </div>
                 <div class="stat-num-val color-green">
-                    <asp:Literal ID="litShortlisted" runat="server">1,450</asp:Literal>
+                    <asp:Literal ID="litShortlisted" runat="server">0</asp:Literal>
                 </div>
             </div>
 
@@ -59,7 +59,7 @@
                     <span class="stat-label">Interviews</span>
                 </div>
                 <div class="stat-num-val color-orange">
-                    <asp:Literal ID="litInterviews" runat="server">420</asp:Literal>
+                    <asp:Literal ID="litInterviews" runat="server">0</asp:Literal>
                 </div>
             </div>
 
@@ -68,83 +68,83 @@
                     <span class="stat-label">Hired</span>
                 </div>
                 <div class="stat-num-val color-teal">
-                    <asp:Literal ID="litHired" runat="server">156</asp:Literal>
+                    <asp:Literal ID="litHired" runat="server">0</asp:Literal>
                 </div>
             </div>
         </div>
 
-        <!-- Application Funnel Card -->
+        <!-- Application Funnel Card (100% Dynamic from dbo.applications) -->
         <div class="admin-funnel-card">
             <h3 class="funnel-card-title">Application Funnel</h3>
             <div class="funnel-steps-row">
                 <!-- Step 1: Applied -->
                 <div class="funnel-step-item">
-                    <div class="funnel-bubble-circle bg-blue-light">100%</div>
+                    <div class="funnel-bubble-circle bg-blue-light"><%= FunnelAppliedPct %></div>
                     <div class="funnel-step-name">Applied</div>
-                    <div class="funnel-step-val">12.4k</div>
+                    <div class="funnel-step-val"><%= FunnelAppliedCount %></div>
                 </div>
                 <div class="funnel-divider-line"></div>
 
                 <!-- Step 2: Under Review -->
                 <div class="funnel-step-item">
-                    <div class="funnel-bubble-circle bg-purple-light">45%</div>
+                    <div class="funnel-bubble-circle bg-purple-light"><%= FunnelUnderReviewPct %></div>
                     <div class="funnel-step-name">Under Review</div>
-                    <div class="funnel-step-val">5.6k</div>
+                    <div class="funnel-step-val"><%= FunnelUnderReviewCount %></div>
                 </div>
                 <div class="funnel-divider-line"></div>
 
                 <!-- Step 3: Shortlisted -->
                 <div class="funnel-step-item">
-                    <div class="funnel-bubble-circle bg-green-light">11%</div>
+                    <div class="funnel-bubble-circle bg-green-light"><%= FunnelShortlistedPct %></div>
                     <div class="funnel-step-name">Shortlisted</div>
-                    <div class="funnel-step-val">1.4k</div>
+                    <div class="funnel-step-val"><%= FunnelShortlistedCount %></div>
                 </div>
                 <div class="funnel-divider-line"></div>
 
                 <!-- Step 4: Interview -->
                 <div class="funnel-step-item">
-                    <div class="funnel-bubble-circle bg-gray-light">3%</div>
+                    <div class="funnel-bubble-circle bg-gray-light"><%= FunnelInterviewPct %></div>
                     <div class="funnel-step-name">Interview</div>
-                    <div class="funnel-step-val">420</div>
+                    <div class="funnel-step-val"><%= FunnelInterviewCount %></div>
                 </div>
                 <div class="funnel-divider-line"></div>
 
                 <!-- Step 5: Selected -->
                 <div class="funnel-step-item">
-                    <div class="funnel-bubble-circle bg-teal-light">1.2%</div>
+                    <div class="funnel-bubble-circle bg-teal-light"><%= FunnelSelectedPct %></div>
                     <div class="funnel-step-name">Selected</div>
-                    <div class="funnel-step-val">156</div>
+                    <div class="funnel-step-val"><%= FunnelSelectedCount %></div>
                 </div>
                 <div class="funnel-divider-line"></div>
 
                 <!-- Step 6: Rejected -->
                 <div class="funnel-step-item">
-                    <div class="funnel-bubble-circle bg-red-light">85%</div>
+                    <div class="funnel-bubble-circle bg-red-light"><%= FunnelRejectedPct %></div>
                     <div class="funnel-step-name">Rejected</div>
-                    <div class="funnel-step-val">10.5k</div>
+                    <div class="funnel-step-val"><%= FunnelRejectedCount %></div>
                 </div>
             </div>
         </div>
 
-        <!-- Filter Bar Row -->
+        <!-- Filter Bar Row (100% Dynamic Companies & Functional Filters) -->
         <div class="admin-filter-bar-card">
             <div class="admin-search-input-wrap">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchAppInput" placeholder="Search jobs, internships, people..." />
+                <input type="text" id="txtAppSearch" placeholder="Search jobs, internships, people..." />
             </div>
 
             <div class="admin-dropdown-wrap">
                 <select id="filterAppCompany">
-                    <option value="">Company</option>
-                    <option value="TechCorp India">TechCorp India</option>
-                    <option value="Global Analytics">Global Analytics</option>
-                    <option value="CreativeMinds">CreativeMinds</option>
+                    <option value="">All Companies</option>
+                    <% foreach (var c in CompanyFilterList) { %>
+                        <option value="<%= c %>"><%= c %></option>
+                    <% } %>
                 </select>
             </div>
 
             <div class="admin-dropdown-wrap">
                 <select id="filterAppType">
-                    <option value="">Type</option>
+                    <option value="">All Types</option>
                     <option value="Job">Job</option>
                     <option value="Internship">Internship</option>
                 </select>
@@ -152,9 +152,11 @@
 
             <div class="admin-dropdown-wrap">
                 <select id="filterAppStatus">
-                    <option value="">Status</option>
+                    <option value="">All Statuses</option>
+                    <option value="Applied">Applied</option>
                     <option value="Under Review">Under Review</option>
                     <option value="Shortlisted">Shortlisted</option>
+                    <option value="Interview Scheduled">Interview Scheduled</option>
                     <option value="Selected">Selected</option>
                     <option value="Rejected">Rejected</option>
                 </select>
@@ -178,29 +180,33 @@
                                 <th>Type &amp; Loc</th>
                                 <th>Match</th>
                                 <th>Status</th>
-                                <th style="width: 40px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <asp:Repeater ID="rptAdminApplications" runat="server">
+                            <asp:Repeater ID="rptAdminApplications" runat="server" OnItemCommand="rptAdminApplications_ItemCommand">
                                 <ItemTemplate>
                                     <tr class="app-row"
                                         data-student-name='<%# Eval("StudentName") %>'
+                                        data-company='<%# Eval("CompanyName") %>'
+                                        data-role='<%# Eval("OpportunityTitle") %>'
                                         data-applied-for='<%# Eval("OpportunityTitle") + " at " + Eval("CompanyName") %>'
+                                        data-type='<%# Eval("OppType") %>'
                                         data-match='<%# Eval("MatchScore") + "%" %>'
                                         data-skills-match='<%# Eval("MatchScore") + "%" %>'
-                                        data-exp-match="85%"
+                                        data-exp-match='<%# Eval("ExperienceScore") + "%" %>'
                                         data-education='<%# Eval("Degree") %>'
                                         data-college='<%# Eval("College") %>'
                                         data-skills='<%# Eval("Skills") %>'
                                         data-status='<%# Eval("Status") %>'
-                                        data-date='<%# Eval("AppliedDateFormatted") %>'>
+                                        data-date='<%# Eval("AppliedDateFormatted") %>'
+                                        data-avatar='<%# Eval("ProfilePhoto") %>'
+                                        data-user-id='<%# Eval("UserId") %>'>
                                         <td>
                                             <div class="student-cell-flex">
                                                 <div class="student-avatar-wrap">
-                                                    <div style="width:36px; height:36px; border-radius:50%; background:#0040A2; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;">
-                                                        <%# Eval("StudentName").ToString().Length > 0 ? Eval("StudentName").ToString().Substring(0, 1).ToUpper() : "S" %>
-                                                    </div>
+                                                    <%# !string.IsNullOrEmpty(Eval("ProfilePhoto") as string)
+                                                        ? "<img src='" + ResolveUrl(Eval("ProfilePhoto").ToString()) + "' alt='Avatar' style='width:36px; height:36px; border-radius:50%; object-fit:cover;' />"
+                                                        : "<div style='width:36px; height:36px; border-radius:50%; background:#EFF6FF; color:#0040A2; display:flex; align-items:center; justify-content:center; font-size:15px; border:1px solid #CBD5E1;'><i class=\"fa-regular fa-user\"></i></div>" %>
                                                 </div>
                                                 <div>
                                                     <div class="student-name-text"><%# Eval("StudentName") %></div>
@@ -222,24 +228,6 @@
                                                 <%# Eval("Status") %>
                                             </span>
                                         </td>
-                                        <td>
-                                            <div class="action-dropdown-wrap">
-                                                <button type="button" class="btn-more-dots" onclick="event.stopPropagation(); this.nextElementSibling.classList.toggle('show');">
-                                                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                                                </button>
-                                                <div class="action-menu-dropdown">
-                                                    <a href='<%= ResolveUrl("~/User/Messages.aspx") %>' class="action-menu-item" onclick="event.stopPropagation();">
-                                                        <i class="fa-regular fa-message"></i> Message
-                                                    </a>
-                                                    <a href='<%= ResolveUrl("~/User/Profile.aspx") %>' class="action-menu-item" onclick="event.stopPropagation();">
-                                                        <i class="fa-regular fa-user"></i> View Profile
-                                                    </a>
-                                                    <a href="javascript:void(0);" class="action-menu-item danger" onclick="event.stopPropagation(); confirm('Reject candidate?');">
-                                                        <i class="fa-solid fa-ban"></i> Reject
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </td>
                                     </tr>
                                 </ItemTemplate>
                             </asp:Repeater>
@@ -258,14 +246,15 @@
 
                 <div class="student-profile-center-block" style="padding-top:0;">
                     <div class="student-large-avatar-box">
-                        <div style="width:72px; height:72px; border-radius:50%; background:#0040A2; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:26px; margin:0 auto;">
-                            <%= !string.IsNullOrEmpty(SelectedStudentName) ? SelectedStudentName.Substring(0, 1).ToUpper() : "S" %>
+                        <img src='<%= SelectedProfilePhoto %>' id="adAvatar" alt="Student" style='width:72px; height:72px; border-radius:50%; object-fit:cover; margin:0 auto; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,0.08); <%= string.IsNullOrEmpty(SelectedProfilePhoto) ? "display:none;" : "display:block;" %>' />
+                        <div id="adAvatarFallback" style='width:72px; height:72px; border-radius:50%; background:#EFF6FF; color:#0040A2; display:<%= !string.IsNullOrEmpty(SelectedProfilePhoto) ? "none" : "flex" %>; align-items:center; justify-content:center; font-size:28px; border:1px solid #CBD5E1; margin:0 auto;'>
+                            <i class="fa-regular fa-user"></i>
                         </div>
                     </div>
                     <h4 class="sd-student-name" id="adName"><%= SelectedStudentName %></h4>
                     <div class="sd-student-email" id="adAppliedFor">Applying for <%= SelectedAppliedRole %> at <%= SelectedCompanyName %></div>
                     <div class="ad-resume-portfolio-row">
-                        <a href="javascript:void(0);" class="btn-ad-pill-outline"><i class="fa-regular fa-file-lines"></i> Resume</a>
+                        <a href='<%= ResolveUrl("~/Admin/Applications.aspx?download_resume=1&uid=" + SelectedUserId) %>' id="adResumeBtn" class="btn-ad-pill-outline" title="Download Resume"><i class="fa-regular fa-file-lines"></i> Resume <i class="fa-solid fa-download" style="font-size:11px; margin-left:3px;"></i></a>
                         <a href='<%= ResolveUrl("~/User/Portfolio.aspx") %>' class="btn-ad-pill-outline"><i class="fa-solid fa-globe"></i> Portfolio</a>
                     </div>
                 </div>
@@ -286,9 +275,9 @@
                     <div class="ad-match-bar-group" style="margin-top:8px;">
                         <div class="ad-match-bar-label flex-between">
                             <span>Experience Match</span>
-                            <span id="adExpMatchPct">85%</span>
+                            <span id="adExpMatchPct"><%= SelectedExpPct %>%</span>
                         </div>
-                        <div class="ad-bar-track"><div class="ad-bar-fill fill-blue" id="adExpBar" style="width: 85%;"></div></div>
+                        <div class="ad-bar-track"><div class="ad-bar-fill fill-blue" id="adExpBar" style="width: <%= SelectedExpPct %>%;"></div></div>
                     </div>
                 </div>
 
@@ -326,16 +315,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Actions Stack -->
-                <div class="ad-actions-2btn-row">
-                    <a href='<%= ResolveUrl("~/User/Messages.aspx") %>' class="btn-ad-message" style="text-align:center; text-decoration:none;">
-                        Message Student
-                    </a>
-                    <a href='<%= ResolveUrl("~/User/Profile.aspx") %>' class="btn-ad-fullprofile" style="text-align:center; text-decoration:none;">
-                        Full Profile
-                    </a>
-                </div>
                 <% } else { %>
                 <div style="padding: 40px 20px; text-align: center; color: #64748B;">
                     <i class="fa-regular fa-folder-open" style="font-size: 40px; margin-bottom: 12px; color: #CBD5E1;"></i>
@@ -348,4 +327,74 @@
         </div>
 
     </div>
+
+    <!-- Live Client-side Filter & Interactive Sidebar Wiring -->
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById("txtAppSearch");
+            const companyFilter = document.getElementById("filterAppCompany");
+            const typeFilter = document.getElementById("filterAppType");
+            const statusFilter = document.getElementById("filterAppStatus");
+            const btnApply = document.getElementById("btnApplyAppFilters");
+            const btnClear = document.getElementById("btnClearAppFilters");
+            const rows = document.querySelectorAll(".app-row");
+
+            function applyApplicationFilters() {
+                const search = (searchInput ? searchInput.value : "").trim().toLowerCase();
+                const selectedCompany = (companyFilter ? companyFilter.value : "").trim().toLowerCase();
+                const selectedType = (typeFilter ? typeFilter.value : "").trim().toLowerCase();
+                const selectedStatus = (statusFilter ? statusFilter.value : "").trim().toLowerCase();
+
+                let firstVisible = null;
+
+                rows.forEach(function (row) {
+                    const rowText = row.innerText.toLowerCase();
+                    const rowCompany = (row.getAttribute("data-company") || "").toLowerCase();
+                    const rowType = (row.getAttribute("data-type") || "").toLowerCase();
+                    const rowStatus = (row.getAttribute("data-status") || "").toLowerCase();
+
+                    const matchesSearch = !search || rowText.includes(search);
+                    const matchesCompany = !selectedCompany || rowCompany.includes(selectedCompany);
+                    const matchesType = !selectedType || rowType === selectedType;
+                    const matchesStatus = !selectedStatus || rowStatus.includes(selectedStatus);
+
+                    if (matchesSearch && matchesCompany && matchesType && matchesStatus) {
+                        row.style.display = "";
+                        if (!firstVisible) firstVisible = row;
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+
+                if (firstVisible) {
+                    firstVisible.click();
+                }
+            }
+
+            if (searchInput) searchInput.addEventListener("input", applyApplicationFilters);
+            if (companyFilter) companyFilter.addEventListener("change", applyApplicationFilters);
+            if (typeFilter) typeFilter.addEventListener("change", applyApplicationFilters);
+            if (statusFilter) statusFilter.addEventListener("change", applyApplicationFilters);
+
+            if (btnApply) {
+                btnApply.addEventListener("click", applyApplicationFilters);
+            }
+
+            if (btnClear) {
+                btnClear.addEventListener("click", function () {
+                    if (searchInput) searchInput.value = "";
+                    if (companyFilter) companyFilter.selectedIndex = 0;
+                    if (typeFilter) typeFilter.selectedIndex = 0;
+                    if (statusFilter) statusFilter.selectedIndex = 0;
+                    rows.forEach(function (r) { r.style.display = ""; });
+                    if (rows.length > 0) rows[0].click();
+                });
+            }
+
+            // Auto-select first row on load
+            if (rows.length > 0) {
+                rows[0].classList.add("active-row");
+            }
+        });
+    </script>
 </asp:Content>
