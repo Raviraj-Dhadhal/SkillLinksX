@@ -22,6 +22,26 @@ namespace SkillLinksX.Admin
 
             int adminUserId = Convert.ToInt32(Session["UserId"]);
 
+            // Handle lightweight async mark as read call from preview modal
+            if (Request["ajax"] == "mark_read" && int.TryParse(Request["id"], out int notifIdToMark))
+            {
+                Response.Clear();
+                Response.ContentType = "application/json";
+                try
+                {
+                    DBHelper.ExecuteNonQuery("UPDATE notifications SET is_read = 1 WHERE notification_id = @id AND user_id = @uid",
+                        new SqlParameter("@id", notifIdToMark),
+                        new SqlParameter("@uid", adminUserId));
+                    Response.Write("{\"success\":true}");
+                }
+                catch
+                {
+                    Response.Write("{\"success\":false}");
+                }
+                Response.End();
+                return;
+            }
+
             if (!IsPostBack)
             {
                 EnsureAdminAlerts(adminUserId);
@@ -155,6 +175,10 @@ namespace SkillLinksX.Admin
                 {
                     whereFilter = " AND (title LIKE '%Security%' OR title LIKE '%System%' OR title LIKE '%Pending%') ";
                 }
+                else if (CurrentFilter == "inquiries")
+                {
+                    whereFilter = " AND (title LIKE '%Inquiry%' OR title LIKE '%Contact%' OR title LIKE '%Complain%' OR message LIKE '%Role:%') ";
+                }
 
                 string sql = $@"
                     SELECT notification_id, user_id, title, message, target_url, is_read, created_at
@@ -210,6 +234,8 @@ namespace SkillLinksX.Admin
         public string GetIconClass(string title)
         {
             string t = title.ToLower();
+            if (t.Contains("inquiry") || t.Contains("contact") || t.Contains("complain") || t.Contains("feedback") || t.Contains("report"))
+                return "fa-solid fa-envelope-open-text text-purple";
             if (t.Contains("company") || t.Contains("verification"))
                 return "fa-solid fa-building-circle-check text-blue";
             if (t.Contains("student") || t.Contains("candidate"))
