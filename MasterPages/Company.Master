@@ -126,10 +126,10 @@
                         <i class="fa-solid fa-bars"></i>
                     </button>
 
-                    <!-- Center: Search Input -->
+                    <!-- Center: Search Input (Connected to global-search.js) -->
                     <div class="topbar-search">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" placeholder="Search jobs, internships, people..." />
+                        <input type="text" id="txtGlobalHeaderSearchCompany" placeholder="Search jobs, internships, people..." autocomplete="off" />
                     </div>
 
                     <!-- Right: Quick Actions & Profile -->
@@ -178,5 +178,10 @@
 
     <!-- JS -->
     <script src="<%= ResolveUrl("~/assets/JS/company.js?v=3.1") %>"></script>
+    <!-- Global Unified Search Configuration & Script -->
+    <script type="text/javascript">
+        window.SKILLLINKSX_SEARCH_HANDLER_URL = '<%= ResolveUrl("~/Handlers/SearchHandler.ashx") %>';
+    </script>
+    <script src="<%= ResolveUrl("~/assets/JS/global-search.js") %>"></script>
 </body>
 </html>

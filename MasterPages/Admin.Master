@@ -108,10 +108,10 @@
                         <i class="fa-solid fa-bars"></i>
                     </button>
 
-                    <!-- Search Input -->
+                    <!-- Search Input (Connected to global-search.js) -->
                     <div class="topbar-search">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" placeholder="Search jobs, internships, people..." />
+                        <input type="text" id="txtGlobalHeaderSearchAdmin" placeholder="Search jobs, internships, people..." autocomplete="off" />
                     </div>
 
                     <!-- Actions & Admin Info -->
@@ -151,5 +151,10 @@
 
     <!-- Admin JS with cache-buster -->
     <script src="<%= ResolveUrl("~/assets/JS/admin.js?v=3.0") %>"></script>
+    <!-- Global Unified Search Configuration & Script -->
+    <script type="text/javascript">
+        window.SKILLLINKSX_SEARCH_HANDLER_URL = '<%= ResolveUrl("~/Handlers/SearchHandler.ashx") %>';
+    </script>
+    <script src="<%= ResolveUrl("~/assets/JS/global-search.js") %>"></script>
 </body>
 </html>

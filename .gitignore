@@ -60,3 +60,12 @@ $RECYCLE.BIN/
 *.env
 *.env.local
 *.local.config
+
+# Ignore all markdown documentation files
+*.md
+
+# ignore pdf and image
+*.pdf
+*.jpeg
+*.jpg
+*.png
