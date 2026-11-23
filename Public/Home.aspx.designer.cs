@@ -20,14 +20,6 @@ namespace SkillLinksX.Public
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtSearchKeyword;
 
-        /// <summary>
-        /// txtSearchLocation control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtSearchLocation;
         protected global::System.Web.UI.WebControls.Repeater rptStackedJobs;
     }
 }

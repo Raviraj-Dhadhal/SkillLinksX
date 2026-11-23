@@ -18,23 +18,14 @@
                 </p>
             </div>
 
-            <!-- Multi-field Search Bar -->
+            <!-- Unified Global Search Bar (People, Internships, Jobs) -->
             <div class="search-bar-wrapper" id="searchBarWrapper">
-                <!-- Search Keyword -->
-                <div class="search-input-group">
+                <div class="search-input-group" style="flex:1;">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <asp:TextBox ID="txtSearchKeyword" runat="server" CssClass="search-input-field" placeholder="Job title, keywords, or company"></asp:TextBox>
+                    <asp:TextBox ID="txtSearchKeyword" runat="server" CssClass="search-input-field" placeholder="Search jobs, internships, people..." autocomplete="off"></asp:TextBox>
                 </div>
 
-                <div class="search-field-divider"></div>
-
-                <!-- Search Location -->
-                <div class="search-input-group">
-                    <i class="fa-solid fa-location-dot"></i>
-                    <asp:TextBox ID="txtSearchLocation" runat="server" CssClass="search-input-field" placeholder="City, state, or 'Remote'"></asp:TextBox>
-                </div>
-
-                <!-- Search Button (Anchor tag) -->
+                <!-- Search Button -->
                 <a href="#" class="btn-search-submit" id="btnSearchJobs">Search</a>
             </div>
 

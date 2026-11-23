@@ -17,7 +17,7 @@
 
     <!-- Public Master & Pages Stylesheets -->
     <link rel="stylesheet" href="<%= ResolveUrl("~/assets/CSS/public-master.css") %>" />
-    <link rel="stylesheet" href="<%= ResolveUrl("~/assets/CSS/public-pages.css") %>" />
+    <link rel="stylesheet" href="<%= ResolveUrl("~/assets/CSS/public-pages.css?v=2.0") %>" />
 
     <asp:ContentPlaceHolder ID="head" runat="server">
     </asp:ContentPlaceHolder>
@@ -123,5 +123,10 @@
 
     <!-- Public JavaScript -->
     <script src="<%= ResolveUrl("~/assets/JS/public.js") %>"></script>
+    <!-- Global Unified Search Configuration & Script -->
+    <script type="text/javascript">
+        window.SKILLLINKSX_SEARCH_HANDLER_URL = '<%= ResolveUrl("~/Handlers/SearchHandler.ashx") %>';
+    </script>
+    <script src="<%= ResolveUrl("~/assets/JS/global-search.js") %>"></script>
 </body>
 </html>
